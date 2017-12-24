@@ -3,59 +3,13 @@
 <head>
 	<title></title>
 	<style type="text/css">
-		.axis path,
-		.axis line {
-			  fill: none;
-			  stroke: #000;
-			  shape-rendering: crispEdges;
-			}
+		
 	</style>
 </head>
 <body>
 	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
-	<svg class="chart"></svg>
-	<div style="width:200px;height:100px;"></div>
 </body>
 	<script type="text/javascript">
-		var count = 0;
-		document.querySelector("div").onmouseenter = function(){
-			
-		}
-		var margin = {
-			top: 20,
-			right: 10,
-			bottom: 20,
-			left: 50
-		};
-		var width = 840;
-		var height = 500;
-		var nettoWidth = width - margin.left - margin.right;
-		var nettoHeight = height - margin.top - margin.bottom;
-		var yScale = d3.scale.linear().range([nettoHeight, 0]).domain([nettoHeight, 0]);
-		var yAxis = d3.svg.axis().scale(yScale).orient("left");
-
-		var xScale = d3.scale.linear().range([0, nettoWidth]).domain([0, nettoWidth]);
-		var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
-		var svg = d3.select(".chart")
-					.attr("width", width)
-					.attr("height", height)
-					.append("g")
-					.attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-					;
-
-		// y axis
-		svg.append("g")
-			.attr("class", "axis")
-			.call(yAxis);
-
-		svg.append("g")
-			.attr("class", "axis")
-			.call(xAxis)
-			.attr("transform", "translate(0, " + nettoHeight + ")");
-
-		// Hallo Don,
-		// ich schribe dir scnell. Ich muss jetzt zum Banhof. Dorf wartet Paolo auf mich.
-		// Wir fahren zusammen mit dem Zug nach Berlin. Toll! Wir wohnen bei Freund von Paolo - Seben lange Tage!
-		// Du kannst auch kommen. Es ist nicht so weit von Hamburg. Hast du Zeit? Das waere so schoen.
+		
 	</script>
 </html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style type="text/css">
+		body{
+			background-color: #ccc;
+		}
+		.tableContainer {
+			margin:auto;
+			width: 1000px;
+			height: 650px;
+			background-color: #fff; 
+      
+		}
+svg{
+  margin:20px;
+}
+rect:hover
+{
+  opacity: 0.5;
+  cursor: pointer;
+}
+svg rect {
+				 -moz-transition: all 0.8s;
+				 -o-transition: all 0.8s;
+				
+				 -webkit-transition: all 0.8s;
+				 transition: all 0.8s;
+			}
+svg text {
+ pointer-events: none;
+}
+
+	</style>
+</head>
+<body>
+	<div class="tableContainer">
+		<svg class="table"></svg>
+</div>
+	<script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+</body>
+	<script type="text/javascript">
+		var dataUrl = "https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json";
+var margin = 20;
+var columnMargin = 3;
+var rowMargin = 3;
+var numberOfColumns = 18;
+var columnMarginSum = (numberOfColumns - 1) * columnMargin;
+var rowMarginSum = (numberOfColumns - 1) * columnMargin;
+var tableWidth = 1000 - margin * 2;
+var tableHeight = 650 - margin * 2;
+var elementWidth = (tableWidth - columnMarginSum) / numberOfColumns;
+var elementHeight = elementWidth;
+var colors = {    
+                  "diatomic nonmetal": "#42f46e", 
+                  "noble gas": "#66728c", 
+                  "alkali metal": "#f4ca41",
+                  "alkaline earth metal":"#eaea59",
+                  "metalloid": "#0b6828", 
+                  "polyatomic nonmetal": "#228942",
+                  "post-transition metal": "#2fcec1",
+                  "transition metal": "#d8a39c", 
+                  "lanthanide": "#d6a486",
+                  "actinide":"#c9a0ff",
+                  "unknown, probably transition metal": "#ccc",
+                  "unknown, probably post transition metal": "#ccc",
+                  "unknown,probably metalloid": "#ccc",
+                  "unknown, predicted to be noble gas": "#ccc"
+             };
+var getPositionX = function(xpos){
+  var x = (xpos - 1) * (elementWidth + columnMargin);
+  return x;
+}
+var getPositionY = function(ypos){
+  var y = (ypos - 1) * (elementHeight + rowMargin);
+  return y;
+}
+var table = d3.select(".table")
+  .attr({"width": tableWidth, "height": tableHeight});
+d3.json(dataUrl, function(error, json) {
+  var data = json["elements"];
+  var tooltip = d3.select("#tooltip");
+  table.selectAll("rect")
+       .data(data)
+       .enter()
+       .append("rect")
+       .attr("x", d => {return getPositionX(d["xpos"]);})
+       .attr("y", d => {return getPositionY(d["ypos"]);})
+       .attr("width", elementWidth)
+       .attr("height", elementHeight)
+       .attr("fill", d => { return colors[d["category"]];})
+       ;
+  
+  table.selectAll("text")
+    .data(data)
+    .enter()
+    .append("text")
+    .text(d => {return d["symbol"];})
+    .attr("x", d => {return getPositionX(d["xpos"]) + elementWidth / 2 - 10;})
+    .attr("y", d => {return getPositionY(d["ypos"]) + elementHeight / 2 + 6;})
+    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
+    ;
+    table.append("rect")
+        .attr("width", elementWidth)
+        .attr("height", elementHeight)
+        .attr("x", d => {return getPositionX(3);})
+        .attr("y", d => {return getPositionY(7);})
+        .attr("fill", colors["actinide"]);
+  
+    table.append("rect")
+        .attr("width", elementWidth)
+        .attr("height", elementHeight)
+        .attr("x", d => {return getPositionX(3);})
+        .attr("y", d => {return getPositionY(6);})
+        .attr("fill", colors["lanthanide"]);
+  
+    table.append("text")
+    .text("57-71")
+    .attr("x", d => {return getPositionX(3) + 2;})
+    .attr("y", d => {return getPositionY(6) + elementHeight / 2 + 6;})
+    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
+    ;
+    table.append("text")
+      .text("89-103")
+      .attr("x", d => {return getPositionX(3) + 2;})
+      .attr("y", d => {return getPositionY(7) + elementHeight / 2 + 6;})
+      .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
+      ;
+});
+
+	</script>
+</html>

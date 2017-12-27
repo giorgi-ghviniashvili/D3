@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>USA GDP</title>
+	<style type="text/css">
+		body{
+        		background-color: #ddd;
+			    background-repeat: repeat;
+			    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAACgCAMAAACsXRuGAAAADFBMVEWIiIjd3d3y8vLm5uZzdc63AAAAbklEQVR42u3ZIQ4AIAwDwI39/8/wAlTFxFUgm5ALmFZV51Iv52Vyx/7CzhdONr3/ylCgQIECBQoUKFCgQIECBQoUKFCgQIECBcrmccGe4qX4vqBAgQIFChQoUKBAgQIFChQoUKBAgQIFij3lX3gBXBBzc8FaGvIAAAAASUVORK5CYII=);
+        	}
+        	#chartContainer{
+        		width: 1050px;
+        		height: 640px;
+        		background: #fff;
+        		margin: auto;
+        	}
+        	.header{
+        		padding: 10px;
+        		text-align: center;
+        		font-size: 24px;
+        		color: #4B77BE;
+        		font-weight: bold; 
+        	}
+        	svg {
+        		margin: auto;
+        	}
+
+        	rect:hover {
+        		fill: #E7505A !important;
+        	}
+
+        	.axis path,
+			.axis line {
+			  fill: none;
+			  stroke: #000;
+			  shape-rendering: crispEdges;
+			}
+			.tooltip{
+				position: absolute;
+				opacity: 0;
+				background-color: white;
+				border-radius: 5px;
+				padding: 10px;
+				font: 1em sans-serif;
+			}
+	</style>
+</head>
+<body>
+	<div id="chartContainer">
+    		<div class="header">USA GDP</div>
+    		<svg class="svg"></svg>
+    </div>
+	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
+	<script type="text/javascript">
+		var dataUrl = 'https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json';
+        
+        var margin = {
+        	top: 5,
+        	right: 10,
+        	bottom: 30,
+        	left: 75
+		},
+		width = 1000 - margin.left - margin.right,
+		height = 500 - margin.top - margin.bottom;
+ 		var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+ 		var formatCurrency = d3.format("$,.2f");
+        d3.json(dataUrl, function(response){
+        	var data = response.data;
+        	var barWidth = Math.ceil(width / data.length);
+        	var y = d3.scale.linear()
+        					.range([height, 0])
+        					.domain([0, d3.max(data, function(d) { 
+        						return d[1];
+        					}
+        					)]);
+
+        	var minDate = new Date(data[0][0]);
+    		var maxDate = new Date(data[274][0]);
+    
+    		var x = d3.time.scale()
+						.domain([minDate, maxDate])
+      					.range([0, width]);			
+        	var yAxis =   d3.svg.axis()
+    						.scale(y)
+    						.orient("left")
+    						.ticks(10, "");
+    		var xAxis = d3.svg.axis()
+    						  .scale(x)
+    						  .orient("bottom")
+    						  .ticks(d3.time.years, 5);
+       		var chart = d3.select(".svg")
+       			.attr("width", 1000)
+       			.attr("height", 500)
+       			.append("g")
+       			.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+       		var tooltip = d3.select("#chartContainer")
+       						.append("div")
+       						.attr('class','tooltip')
+       						.attr("style","opacity:0");
+
+       		chart.append("g")
+		      .attr("class", "y axis")
+		      .call(yAxis)
+		      .append("text")
+		      .attr("transform", "rotate(-90)")
+		      .attr("y", 6)
+		      .attr("dy", "0.8em")
+		      .style("text-anchor", "end")
+		      .text("Gross Domestic Product, USA");
+		    chart.append("g")
+		    	 .attr("class", "x axis")
+		    	 .attr("transform", "translate(0," + height + ')')
+		         .call(xAxis)
+
+       		chart.selectAll("rect")
+       		   .data(data)
+       		   .enter()
+       		   .append("rect")
+       		   .attr("x", (d,i) => {
+       		   		return x(new Date(d[0]));
+       		   })
+       		   .attr("y", function(d) {
+       		   		return y(d[1]);
+       		   })
+       		   .attr("width", barWidth)
+       		   .attr("height", d => {
+       		   		return height - y(d[1]);
+       		   })
+       		   .attr("fill", "#578EBE")
+       		   .on("mouseenter",function(d,i){
+       		   		var line = document.getElementById('line-' + i);
+       		   		line.style.opacity = 1;
+       		   		var text = document.getElementById('text-' + i);
+       		   		var date = new Date(d[0]);
+       		   		var year = date.getFullYear();
+       		   		var month = date.getMonth();
+       		   		text.style.opacity = 1;
+       		   		tooltip.html("<span class='amount'>" + formatCurrency(d[1]) + "&nbsp;Billion </span><br><span class='year'>" + year + ' - ' + months[month] + "</span>");
+
+       		   		 tooltip.style("left", (d3.event.pageX + 5) + "px")
+          					.style("top", (d3.event.pageY - 20) + "px")
+       		   				.style("opacity", 0.9);
+       		   })
+       		   .on("mouseleave",function(d,i){
+       		   		var line = document.getElementById('line-' + i);
+       		   		line.style.opacity = 0;
+       		   		var text = document.getElementById('text-' + i);
+       		   		text.style.opacity = 0;
+       		   		tooltip.style("opacity", 0);
+
+       		   });
+       		
+       		chart.selectAll("line")
+       			.data(data)
+       			.enter()
+       			.append("line")
+       			.attr("x1", 0)
+       			.attr("y1", d => {
+       				return y(d[1]);
+       			})
+       			.attr("x2", d => {
+       				return x(new Date(d[0]));
+       			})
+       			.attr("y2", d => {
+       				return y(d[1]);
+       			})
+       			.attr("id", (d,i) => {
+       				return 'line-' + i;
+       			})
+       			.attr("stroke-width","1.5")
+       			.attr("stroke","black")
+       			.attr("fill", "grey")
+       			.attr("stroke-dasharray", '4.2')
+       			.attr("opacity", 0);
+
+       		chart.selectAll("text")
+       			.data(data)
+       			.enter()
+       			.append("text")
+       			.attr("x", (d,i) => {
+       				if (i > data.length - 5){
+       					return (d[1].toString().length * 5);
+       				}
+       				return 0 - (d[1].toString().length * 8.5);
+       			
+       			})
+       			.attr("y", (d,i) => {
+       				if (i > data.length - 5){
+       					return y(d[1]) + 15;
+       				}
+       				return y(d[1]);
+       			})
+       			.text(d => {
+       				return d[1];
+       			})
+       			.attr("id", (d,i) => {
+       				return 'text-' + i;
+       			})
+       			.attr("opacity", 0)
+       			.attr("fill", "#E7505A")
+       			.attr("style", "font-weight: bold;");
+        });
+	</script>
+</body>
+</html>

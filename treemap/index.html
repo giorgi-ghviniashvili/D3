@@ -101,7 +101,7 @@ function showTree(csvFileName) {
 
     nodes
       .transition()
-      .delay(transitionTime)
+      .duration(transitionTime)
       .attr("title", function(d) { return d.id + "\n" + format(d.value); })
       .style("left", function(d) { return d.x0 + "px"; })
       .style("top", function(d) { return (d.y0 + marginTop) + "px"; })

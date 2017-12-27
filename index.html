@@ -22,6 +22,7 @@
 			position: relative;
 			overflow: hidden;
 		}
+
 		.img_container a:after{
 			content: "";
 			display: block;
@@ -60,7 +61,17 @@
 		.imgCard{
 			margin-top:20px;
 		}
-		@media only screen and (max-width: 768px) { .imgCard:first-child{margin-left:0;}}
+		.img_container img  {
+			height: 200px;
+			width: 100%;
+		}
+		@media only screen and (max-width: 768px) { 
+			.imgCard:first-child{margin-left:0;}
+			.img_container img  {
+			height: 235px;
+			width: 100%;
+		}
+		}
 	</style>
 </head>
 <body>

@@ -3,6 +3,7 @@
 <head>
 	<title></title>
 	<style type="text/css">
+
 		body{
 			background-color: #ccc;
 		}
@@ -13,6 +14,7 @@
 			background-color: #fff; 
       
 		}
+
 	svg{
 	  margin:20px;
 	}
@@ -31,43 +33,131 @@
 	svg text {
 	 pointer-events: none;
 	}
+.modal,
+.modal-box {
+  z-index: 900;
+}
 
+.modal-sandbox {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: transparent;
+}
+
+.modal {
+  display: none; 
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: rgb(0,0,0);
+  background: rgba(0,0,0,.8);
+  overflow: auto;
+}
+
+.modal-box {
+  position: relative;
+  width: 80%;
+  max-width: 920px;
+  margin: 100px auto;
+  animation-name: modalbox;
+  animation-duration: .3s;
+  animation-timing-function: ease-out;
+}
+
+.modal-header {
+  padding: 20px 40px;
+  background: #546E7A;
+  color: #ffffff;
+}
+
+.modal-body {
+  background: #ECEFF1;
+  padding: 60px 40px;
+}
+
+/* Close Button */
+.close-modal {
+  text-align: right;
+  cursor: pointer;
+}
+
+/* Animation */
+@-webkit-keyframes modalbox {
+  0% {
+    top: -250px; 
+    opacity: 0;
+  }
+  100% {
+    top: 0; 
+    opacity: 1;
+  }
+}
+
+@keyframes modalbox {
+  0% {
+    top: -250px; 
+    opacity: 0;
+  }
+  100% {
+    top: 0; 
+    opacity: 1;
+  }
+}
 	</style>
 </head>
 <body>
 	<div class="tableContainer">
 		<svg class="table"></svg>
 </div>
+<!-- Modal -->
+<div class="modal" id="modal">
+  <div class="modal-sandbox"></div>
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="close-modal">&#10006;</div> 
+      <h1></h1>
+    </div>
+    <div class="modal-body">
+      
+    </div>
+  </div>
+</div>
 	<script type="text/javascript" src="https://d3js.org/d3.v3.min.js"></script>
 </body>
 	<script type="text/javascript">
 		var dataUrl = "https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json";
-var margin = 20;
-var columnMargin = 3;
-var rowMargin = 3;
-var numberOfColumns = 18;
-var columnMarginSum = (numberOfColumns - 1) * columnMargin;
-var rowMarginSum = (numberOfColumns - 1) * columnMargin;
-var tableWidth = 1000 - margin * 2;
-var tableHeight = 650 - margin * 2;
-var elementWidth = (tableWidth - columnMarginSum) / numberOfColumns;
-var elementHeight = elementWidth;
-var colors = {    
-                  "diatomic nonmetal": "#42f46e", 
+    var margin = 20;
+    var columnMargin = 3;
+    var rowMargin = 3;
+    var numberOfColumns = 18;
+    var columnMarginSum = (numberOfColumns - 1) * columnMargin;
+    var rowMarginSum = (numberOfColumns - 1) * columnMargin;
+    var tableWidth = 1000 - margin * 2;
+    var tableHeight = 650 - margin * 2;
+    var elementWidth = (tableWidth - columnMarginSum) / numberOfColumns;
+    var elementHeight = elementWidth;
+    var colors = {    
+                  "diatomic nonmetal": "#4fd671", 
                   "noble gas": "#66728c", 
                   "alkali metal": "#f4ca41",
-                  "alkaline earth metal":"#eaea59",
-                  "metalloid": "#0b6828", 
-                  "polyatomic nonmetal": "#228942",
-                  "post-transition metal": "#2fcec1",
-                  "transition metal": "#d8a39c", 
-                  "lanthanide": "#d6a486",
-                  "actinide":"#c9a0ff",
-                  "unknown, probably transition metal": "#ccc",
-                  "unknown, probably post transition metal": "#ccc",
-                  "unknown,probably metalloid": "#ccc",
-                  "unknown, predicted to be noble gas": "#ccc"
-             };
+                  "alkaline earth metal":"#C5BF66",
+                  "metalloid": "#09a038", 
+                  "polyatomic nonmetal": "#24a54c",
+                  "post-transition metal": "#4DB3A2",
+                  "transition metal": "#cc916e", 
+                  "lanthanide": "#efcdb8",
+                  "actinide":"#9B59B6",
+                  "unknown, probably transition metal": "#ACB5C3",
+                  "unknown, probably post transition metal": "#ACB5C3",
+                  "unknown, probably metalloid": "#ACB5C3",
+                  "unknown, predicted to be noble gas": "#66728c"
+     };
+
 var getPositionX = function(xpos){
   var x = (xpos - 1) * (elementWidth + columnMargin);
   return x;
@@ -76,11 +166,14 @@ var getPositionY = function(ypos){
   var y = (ypos - 1) * (elementHeight + rowMargin);
   return y;
 }
+
 var table = d3.select(".table")
   .attr({"width": tableWidth, "height": tableHeight});
+
 d3.json(dataUrl, function(error, json) {
   var data = json["elements"];
   var tooltip = d3.select("#tooltip");
+
   table.selectAll("rect")
        .data(data)
        .enter()
@@ -90,7 +183,17 @@ d3.json(dataUrl, function(error, json) {
        .attr("width", elementWidth)
        .attr("height", elementHeight)
        .attr("fill", d => { return colors[d["category"]];})
-       ;
+       .on("click", d => {
+          console.log(d);
+
+          var modal = d3.select("#modal");
+
+          modal.select(".modal-header").style("background-color", colors[d["category"]]).select("h1")
+                .text(d["symbol"]);
+
+          modal.style("display", "block");
+
+       });
   
   table.selectAll("text")
     .data(data)
@@ -99,8 +202,8 @@ d3.json(dataUrl, function(error, json) {
     .text(d => {return d["symbol"];})
     .attr("x", d => {return getPositionX(d["xpos"]) + elementWidth / 2 - 10;})
     .attr("y", d => {return getPositionY(d["ypos"]) + elementHeight / 2 + 6;})
-    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
-    ;
+    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+
     table.append("rect")
         .attr("width", elementWidth)
         .attr("height", elementHeight)
@@ -119,14 +222,22 @@ d3.json(dataUrl, function(error, json) {
     .text("57-71")
     .attr("x", d => {return getPositionX(3) + 2;})
     .attr("y", d => {return getPositionY(6) + elementHeight / 2 + 6;})
-    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
-    ;
+    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+
     table.append("text")
       .text("89-103")
       .attr("x", d => {return getPositionX(3) + 2;})
       .attr("y", d => {return getPositionY(7) + elementHeight / 2 + 6;})
-      .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5})
-      ;
+      .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+
+
+    d3.select(".close-modal")
+      .on("click", function(){
+
+        d3.select("#modal")
+        .style("display", "none");
+
+      })
 });
 
 	</script>

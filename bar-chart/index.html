@@ -5,15 +5,46 @@
 		<title>D3: A flexible, scalable bar chart</title>
 		<script type="text/javascript" src="https://d3js.org/d3.v4.js"></script>
 		<style type="text/css">
-			p:hover{
-				text-decoration: underline;
-				color: blue;
-				cursor: pointer;
-			}	
+				button{
+					background-color: #4CAF50; /* Green */
+				    border: none;
+				    color: white;
+				    padding: 16px 32px;
+				    text-align: center;
+				    text-decoration: none;
+				    display: inline-block;
+				    font-size: 16px;
+				    margin: 4px 2px;
+				    -webkit-transition-duration: 0.4s; /* Safari */
+				    transition-duration: 0.4s;
+				    cursor: pointer;
+				}
+				.button1 {
+				    background-color: white; 
+				    color: black; 
+				    border: 2px solid #4CAF50;
+				}
+
+				.button1:hover {
+				    background-color: #4CAF50;
+				    color: white;
+				}
+				svg{
+					display: block;
+					margin: auto;
+				}
+				button{
+					display: block;
+					margin: auto;
+				}
+
 		</style>
 	</head>
-		<p>Click on this text to update the chart with new data values as many times as you like!</p>
-			
+		<div>
+			<button class="button1">Get Random Data</button>
+		</div>
+		<div id="svgCont">
+		</div>
 		<script type="text/javascript">
 
 			//Width and height
@@ -33,10 +64,12 @@
 							.range([0, h]);
 			
 			//Create SVG element
-			var svg = d3.select("body")
+			var svg = d3.select("#svgCont")
 						.append("svg")
 						.attr("width", w)
 						.attr("height", h);
+
+			var color = d3.scaleOrdinal(d3.schemeCategory10);
 
 			//Create bars
 			svg.selectAll("rect")
@@ -54,8 +87,8 @@
 			   		return yScale(d);
 			   })
 			   .attr("fill", function(d) {
-					return "rgb(0, 0, " + Math.round(d * 10) + ")";
-			   });
+					return color(d);
+				});
 
 			//Create labels
 			svg.selectAll("text")
@@ -80,14 +113,14 @@
 
 
 			//On click, update with new data			
-			d3.select("p")
+			d3.select("button")
 				.on("click", function() {
-					var color = d3.scaleOrdinal(d3.schemeCategory10);
+					
 					//New values for dataset
 					var numValues = dataset.length;						//Count original length of dataset
 					dataset = [];  						 				//Initialize empty array
 					for (var i = 0; i < numValues; i++) {				//Loop numValues times
-						var newNumber = Math.floor(Math.random() * 25); //New random integer (0-24)
+						var newNumber = Math.floor(Math.random() * 23 + 2); //New random integer (0-24)
 						dataset.push(newNumber);			 			//Add new number to array
 					}
 

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title></title>
+	<title>Periodic table</title>
+  <meta charset="utf-8">
 	<style type="text/css">
 
 		body{
@@ -77,13 +78,15 @@
 
 .modal-body {
   background: #ECEFF1;
-  padding: 60px 40px;
+  padding: 40px 40px;
 }
 
 /* Close Button */
 .close-modal {
-  text-align: right;
   cursor: pointer;
+  display: inline-block;
+  float: right;
+  padding: 5px;
 }
 
 /* Animation */
@@ -108,7 +111,22 @@
     opacity: 1;
   }
 }
+.summary{
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;;
+  margin-bottom: 5px;
+}
+.element-name {
+  text-decoration: none;
+}
+.element-name:hover{
+  text-decoration: underline;
+  }
+  .label{
+    font-weight: bold;
+  }
 	</style>
+
+
 </head>
 <body>
 	<div class="tableContainer">
@@ -123,7 +141,29 @@
       <h1></h1>
     </div>
     <div class="modal-body">
-      
+        <div class="summary">
+          <a class="element-name" target="_blank"></a>
+          <span class="summary-body"></span>
+        </div>
+        <div>
+          <label class="label">Atomic number: </label><span class="number"></span>
+        </div>
+        <div>
+          <label class="label">Atomic mass: </label><span class="mass"></span>
+        </div>
+        <div>
+          <label class="label">Element category: </label><span class="category"></span>
+        </div>
+        
+        <div>
+          <label class="label">Phase: </label><span class="phase"></span>
+        </div>
+        <div>
+          <label class="label">Density: </label><span class="density"></span>
+        </div>
+        <div>
+          <label class="label">Discovered by: </label><span class="discovered_by"></span>
+        </div>
     </div>
   </div>
 </div>
@@ -150,14 +190,14 @@
                   "polyatomic nonmetal": "#24a54c",
                   "post-transition metal": "#4DB3A2",
                   "transition metal": "#cc916e", 
-                  "lanthanide": "#efcdb8",
+                  "lanthanide": "#e8b89b",
                   "actinide":"#9B59B6",
                   "unknown, probably transition metal": "#ACB5C3",
                   "unknown, probably post transition metal": "#ACB5C3",
                   "unknown, probably metalloid": "#ACB5C3",
                   "unknown, predicted to be noble gas": "#66728c"
      };
-
+     var textColor = "#22313F";
 var getPositionX = function(xpos){
   var x = (xpos - 1) * (elementWidth + columnMargin);
   return x;
@@ -191,6 +231,28 @@ d3.json(dataUrl, function(error, json) {
           modal.select(".modal-header").style("background-color", colors[d["category"]]).select("h1")
                 .text(d["symbol"]);
 
+          var body = modal.select(".modal-body");
+          var indexOfHari = d.summary.indexOf(" ");
+          var firstWordOfSummary = d.summary.substr(0, indexOfHari);
+
+          var summary = body.select("div.summary")
+
+          summary.select("a.element-name")
+                 .attr("href", d.source)
+                 .style("color", colors[d["category"]])
+                 .style("font-weight", "bold")
+                 .text(firstWordOfSummary);
+
+          summary.select("span.summary-body").text(d.summary.substr(indexOfHari + 1, d.summary.length));
+
+          body.select("span.mass").text(d.atomic_mass);
+          body.selectAll(".label").style("color", colors[d["category"]]);
+
+          body.select("span.category").text(d.category);
+          body.select("span.discovered_by").text(d.discovered_by);
+          body.select("span.number").text(d.number);
+          body.select("span.phase").text(d.phase);
+          body.select("span.density").text(d.density + " g/cm^3");
           modal.style("display", "block");
 
        });
@@ -202,7 +264,13 @@ d3.json(dataUrl, function(error, json) {
     .text(d => {return d["symbol"];})
     .attr("x", d => {return getPositionX(d["xpos"]) + elementWidth / 2 - 10;})
     .attr("y", d => {return getPositionY(d["ypos"]) + elementHeight / 2 + 6;})
-    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+    .attr({"fill": textColor, "stroke": textColor, "stroke-width": 1});
+
+    table.append("text")
+         .attr("x", getPositionX(7))
+         .attr("y", getPositionY(1) + 25)
+         .attr({"fill": textColor, "stroke": textColor, "stroke-width": 1, "font-family": "Verdana", "font-size": "25"})
+         .text("Mendeleev's periodic table");
 
     table.append("rect")
         .attr("width", elementWidth)
@@ -222,13 +290,14 @@ d3.json(dataUrl, function(error, json) {
     .text("57-71")
     .attr("x", d => {return getPositionX(3) + 2;})
     .attr("y", d => {return getPositionY(6) + elementHeight / 2 + 6;})
-    .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+    .attr({"fill": textColor, "stroke": textColor, "stroke-width": 0.5});
 
     table.append("text")
       .text("89-103")
       .attr("x", d => {return getPositionX(3) + 2;})
       .attr("y", d => {return getPositionY(7) + elementHeight / 2 + 6;})
-      .attr({"fill": "black", "stroke": "black", "stroke-width": 0.5});
+      .attr({"fill": textColor, "stroke": textColor, "stroke-width": 0.5});
+
 
 
     d3.select(".close-modal")

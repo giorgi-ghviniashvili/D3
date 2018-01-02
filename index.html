@@ -74,7 +74,7 @@
 		}
 	</style>
 </head>
-<body>
+<body onload="draw()">
 <div class="container-fluid">
 	<div class="container" id="container">
 			<h3 class="text-center mainHeader">My d3.js stuff</h3>
@@ -106,8 +106,7 @@
 				url: "https://giorgi-ghviniashvili.github.io/D3/periodic-table/",
 				imgUrl: "periodic-table/image.png",
 				alt: "periodic table"
-			},
-			{
+			},{
 				url: "https://giorgi-ghviniashvili.github.io/D3/bar-chart/",
 				imgUrl: "bar-chart/image.png",
 				alt: "barChar"
@@ -122,26 +121,28 @@
 			}
 		];
 
-	var counter = 0;
-	var rowCount = 0;
-	var container = document.getElementById("container");
-	data.forEach(d => {
-		// <div class="row pt-4 row-no-padding" id="row">
-		var div;
-		if (counter % 3 == 0) {
-			rowCount++;
-			var div = document.createElement("div");
-			div.setAttribute("class", "row pt-4 row-no-padding");
-			div.setAttribute("id", "row" + rowCount);
-		}
-		else {
-			var div = document.getElementById("row" + rowCount);
-		}
+	function draw(){
+		var counter = 0;
+		var rowCount = 0;
+		var container = document.getElementById("container");
+		data.forEach(d => {
+			// <div class="row pt-4 row-no-padding" id="row">
+			var div;
+			if (counter % 3 == 0) {
+				rowCount++;
+				var div = document.createElement("div");
+				div.setAttribute("class", "row pt-4 row-no-padding");
+				div.setAttribute("id", "row" + rowCount);
+			}
+			else {
+				var div = document.getElementById("row" + rowCount);
+			}
 
-		div.appendChild(getDiv(d));
-		container.appendChild(div);
-		counter++;
-	});
+			div.appendChild(getDiv(d));
+			container.appendChild(div);
+			counter++;
+		});
+    }
 </script>
 </body>
 </html>

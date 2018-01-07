@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <style type="text/css">
+        .domain {
+  stroke: #fff;
+}
+
+svg {
+  display: block;
+  margin: auto;
+}
+
+.container {
+  margin-bottom: 30px;
+}
+
+.ticks {
+  font: 10px sans-serif;
+}
+
+.track,
+.track-inset,
+.track-overlay {
+  stroke-linecap: round;
+}
+
+.track {
+  stroke: #000;
+  stroke-opacity: 0.3;
+  stroke-width: 10px;
+}
+
+.track-inset {
+  stroke: #ddd;
+  stroke-width: 8px;
+}
+
+.track-overlay {
+  pointer-events: stroke;
+  /*stroke-width: 50px;*/
+  stroke: transparent;
+  cursor: ew-resize;
+}
+
+.handle {
+  fill: #fff;
+  stroke: #000;
+  stroke-opacity: 0.5;
+  stroke-width: 1.25px;
+}
+.result{
+    background-color: rgb(186, 216, 10);
+    border-radius: 5px;
+    padding: 10px;
+    text-align: center;
+}
+
+    </style>
+
+</head>
+
+<body translate="no">
+    <main>
+  <div class="container">
+    <div class="row">
+      <div class="col s12 m9 l10">
+        
+        <div class="divider"></div>
+        <div class="section">
+          <h5>Home Price</h5>
+          <p>lorem ipsum lorem ipsum</p>
+          <div id="myGraph1">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="section">
+          <h5>How Long Do You Plan to Stay?</h5>
+          <p>lorem ipsum lorem ipsum</p>
+          <div id="myGraph2">
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="section">
+          <h5>What Are Your Mortgage Details?</h5>
+          <p>Mortgage rate</p>
+          <div id="myGraph3">
+          </div>
+          <p>Down payment</p>
+          <div id="myGraph4">
+          </div>
+          <p>Length of Mortgage</p>
+          <div id="myGraph5">
+          </div>
+        </div>
+      </div>
+      <div class="col hide-on-small-only m3 l2">
+        <div class="toc-wrapper pinned" style="top: 30px;">
+
+          <div>
+            If you can rent a similar home with less then ...
+          </div>
+          <div id="result" class="result"></div>
+          <div> ... Then renting is better</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+    <script src="libs/d3.v4.min.js"></script>
+    <script src="scripts/d3script.js"></script>
+
+    <script>
+
+    function getData() {
+          var startNumber = 30000;
+          var endNumber = 2500000;
+          var numberOfBars = 50;
+          var data = [startNumber];
+          var difference = 1000;
+          var i = 0;
+
+          while(true){
+              var number = data[i] + difference;
+              if (number >= endNumber)
+                    break;
+              data.push(number);
+              difference *= 1.1;
+              i++;
+          }
+          console.log(data);
+          return data;
+    }
+
+    var chartNames = ["home-price", "leaving-period", "mortgage-rate", "down-rate", "mortgage-period"];
+
+    var charts = [
+      renderChart()
+      .chartName(chartNames[0])
+      .svgHeight(300)
+      .svgWidth(window.innerWidth / 2)
+      .marginBottom(30)
+      .marginRight(50)
+      .container('#myGraph1')
+      .data(getData())
+      .debug(true)
+      .run()
+    ];
+
+    </script>
+
+</body>
+
+</html>

@@ -173,50 +173,17 @@ function renderChart(params) {
             slider.interrupt();
           })
           .on("start drag", function() {
-            drag(x.invert(d3.event.x));
+            attrs.sliderCallback(x.invert(d3.event.x), x, yAxis, calc, attrs, handle, svg);
 
           }));
+
 
       // Smoothly handle data updating
       updateData = function() {
 
       }
 
-      function drag(h) {
-
-        var currentSliderCx = handle.attr("cx");
-
-        var scaledX = x(h);
-        var invert = x.invert(scaledX);
-        if (invert < 30000 || invert > 3000000)
-          return;
-        console.log(invert);
-        var p = getPayment(invert, 30, 3.92, 20);
-        var result = document.getElementById("result");
-
-        result.innerText = "$ " + Math.round(p) + " per month";
-        
-        attrs.yScale.domain([0, scaleForYScale(invert)])
-        
-        //Update Y axis
-        svg.select(".y")
-           .transition()
-           .duration(1000)
-           .call(yAxis);
-
-        svg.selectAll('.bar')
-           .transition()
-           .duration(1000)
-           .attr("y", function(d) {
-            return attrs.yScale(getPayment(d, 30, 3.92, 20));
-          })
-          .attr("width", attrs.xScale.bandwidth())
-          .attr("height", function(d) {
-            return calc.chartHeight - attrs.yScale(getPayment(d, 30, 3.92, 20));
-          });
-
-        handle.attr("cx", scaledX);
-      }
+      
 
       //#########################################  UTIL FUNCS ##################################
 
@@ -292,6 +259,11 @@ function renderChart(params) {
     return main;
   }
 
+  main.onDrag = function(callback){
+    attrs.sliderCallback = callback;
+    return main;
+  }
+
   //Exposed update functions
   main.data = function(value) {
     if (!arguments.length) return attrs.data;
@@ -307,6 +279,8 @@ function renderChart(params) {
     d3.selectAll(attrs.container).call(main);
     return main;
   }
+
+  
 
   return main;
 }

@@ -77,7 +77,7 @@ svg {
         <div class="section">
           <h5>Home Price</h5>
           <p>lorem ipsum lorem ipsum</p>
-          <div id="myGraph1">
+          <div id="home-price">
           </div>
         </div>
         <div class="divider"></div>
@@ -91,7 +91,7 @@ svg {
         <div class="section">
           <h5>What Are Your Mortgage Details?</h5>
           <p>Mortgage rate</p>
-          <div id="myGraph3">
+          <div id="mortgage-rate">
           </div>
           <p>Down payment</p>
           <div id="myGraph4">
@@ -140,53 +140,53 @@ svg {
 
     var chartNames = ["home-price", "leaving-period", "mortgage-rate", "down-rate", "mortgage-period"];
 
+    var homeChart = renderChart()
+        .chartName(chartNames[0])
+        .svgHeight(300)
+        .svgWidth(window.innerWidth / 2)
+        .marginBottom(30)
+        .marginRight(50)
+        .container('#home-price')
+        .data(getData())
+        .onDrag(function(value) {
+
+            currentIndicators.homePrice = value;
+
+            var p = getPayment(value, 30, 3.92, 20);
+              
+            var result = document.getElementById("result");
+
+            result.innerText = "$ " + Math.round(p) + " per month";
+        
+        })
+        .debug(true)
+        .run();
+
+    var mortgageChart = renderChart()
+        .chartName(chartNames[2])
+        .svgHeight(300)
+        .svgWidth(window.innerWidth / 2)
+        .marginBottom(30)
+        .marginRight(50)
+        .container('#mortgage-rate')
+        .data(d3.range([10, 100]))
+        .onDrag(function(value) {
+            
+            currentIndicators.mortgageRate = value;
+
+            var p = getPayment(currentIndicators.homePrice, 30, value, 20);
+              
+            var result = document.getElementById("result");
+
+            result.innerText = "$ " + Math.round(p) + " per month";
+        
+        })
+        .debug(true)
+        .run();
+
     var charts = [
-      renderChart()
-      .chartName(chartNames[0])
-      .svgHeight(300)
-      .svgWidth(window.innerWidth / 2)
-      .marginBottom(30)
-      .marginRight(50)
-      .container('#myGraph1')
-      .data(getData())
-      .onDrag(function(h, x, yAxis, calc, attrs, handle, svg) {
-        console.log(h);
-        var currentSliderCx = handle.attr("cx");
-
-        var scaledX = x(h);
-        var invert = x.invert(scaledX);
-        if (invert < 30000 || invert > 3000000)
-          return;
-        console.log(invert);
-        var p = getPayment(invert, 30, 3.92, 20);
-        var result = document.getElementById("result");
-
-        result.innerText = "$ " + Math.round(p) + " per month";
-        
-        attrs.yScale.domain([0, scaleForYScale(invert)])
-        
-        //Update Y axis
-        svg.select(".y")
-           .transition()
-           .duration(1000)
-           .call(yAxis);
-
-        svg.selectAll('.bar')
-           .transition()
-           .duration(1000)
-           .attr("y", function(d) {
-            return attrs.yScale(getPayment(d, 30, 3.92, 20));
-          })
-          .attr("width", attrs.xScale.bandwidth())
-          .attr("height", function(d) {
-            return calc.chartHeight - attrs.yScale(getPayment(d, 30, 3.92, 20));
-          });
-
-        handle.attr("cx", scaledX);
-      
-      })
-      .debug(true)
-      .run()
+        homeChart,
+        mortgageChart
     ];
 
     </script>

@@ -1,6 +1,16 @@
 var rentPrice = d3.range(0, 2000);
 var scaleForYScale = d3.scaleLinear().domain([30000, 3000000])
                     .range([1200, 120000]);
+
+var constants = {
+  homePrice: 250000,
+  downRate: 20,
+  mortgageRate: 3.92,
+  mortgageYears: 30
+};
+
+var currentIndicators = constants;
+
 // hp - home price
 // rt - mortgate rate
 // dr - down rate
@@ -111,11 +121,13 @@ function renderChart(params) {
           return attrs.xScale(i);
         })
         .attr("y", function(d) {
-          return attrs.yScale(getPayment(d, 30, 3.92, 20));
+          return attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate));
         })
         .attr("width", attrs.xScale.bandwidth())
         .attr("height", function(d) {
-          return calc.chartHeight - attrs.yScale(getPayment(d, 30, 3.92, 20));
+          return calc.chartHeight - attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate));
         })
         .attr("fill", function(d) {
           return "#ccc";
@@ -163,17 +175,29 @@ function renderChart(params) {
         .attr("class", "handle")
         .attr("r", 9)
         .attr('cx', function(){
-          var p = getPayment(250000, 30, 3.92, 20);
+          var p = getPayment(constants.homePrice, constants.mortgageYears, constants.mortgageRate, constants.downRate);
           var result = document.getElementById("result");
           result.innerText = "$ " + Math.round(p) + " per month";
-          return  x(250000);
+          return  x(constants.homePrice);
         })
         .call(d3.drag()
           .on("start.interrupt", function() {
             slider.interrupt();
           })
           .on("start drag", function() {
-            attrs.sliderCallback(x.invert(d3.event.x), x, yAxis, calc, attrs, handle, svg);
+
+            var invert = x.invert(d3.event.x);
+
+            var scaledX = x(invert);
+
+            if (invert < 30000 || invert > 3000000)
+              return;
+
+            handle.attr("cx", scaledX);
+
+            main.updateChart(invert);
+
+            attrs.sliderCallback(invert);
 
           }));
 
@@ -183,6 +207,29 @@ function renderChart(params) {
 
       }
 
+      main.updateChart = function(invert) {
+
+        attrs.yScale.domain([0, scaleForYScale(invert)])
+        //Update Y axis
+        svg.select(".y")
+           .transition()
+           .duration(1000)
+           .call(yAxis);
+
+        svg.selectAll('.bar')
+           .transition()
+           .duration(1000)
+           .attr("y", function(d) {
+            return attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate));
+          })
+          .attr("width", attrs.xScale.bandwidth())
+          .attr("height", function(d) {
+            return calc.chartHeight - attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate));
+          });
+
+      }
       
 
       //#########################################  UTIL FUNCS ##################################

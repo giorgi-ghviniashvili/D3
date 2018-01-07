@@ -55,20 +55,16 @@ function renderChart(params) {
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
       calc.chartRightPadding = 30;
       calc.chartBottomPadding = 30;
+
       // scales
       attrs.xScale = d3.scaleBand()
         .domain(d3.range(attrs.data.length))
-        .rangeRound([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
+        .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
         .paddingInner(0.05);
 
       attrs.yScale = d3.scaleLinear()
         .domain([0, scaleForYScale(250000)])
         .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
-
-      //Define X axis
-      var xAxis = d3.axisBottom()
-        .scale(attrs.xScale)
-        .ticks(0);
 
       //Define Y axis
       var yAxis = d3.axisRight()
@@ -76,10 +72,16 @@ function renderChart(params) {
         .ticks(5)
         .tickFormat(d3.format("$.0s"));
 
-      var x = d3.scaleLinear()
+      var x = d3.scalePow()
+        .exponent(0.2)
         .domain([30000, 3000000])
-        .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
-        .clamp(true);
+        .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding]);
+
+      //Define X axis
+      var xAxis = d3.axisBottom()
+        .scale(x)
+        .ticks(8)
+        .tickFormat(d3.format("$.00s"));
 
       //Drawing containers
       var container = d3.select(this);
@@ -127,19 +129,19 @@ function renderChart(params) {
         .attr("transform", "translate(" + (calc.chartWidth - calc.chartRightPadding) + ", 0)")
         .call(yAxis);
 
-      // // x axis
-      // chart.patternify({
-      //     tag: 'g',
-      //     selector: 'x axis'
-      //   })
-      //   .attr("transform", "translate(0," + (calc.chartHeight + 8) + ")")
-      //   .call(xAxis);
+      // x axis
+      chart.patternify({
+          tag: 'g',
+          selector: 'x axis'
+        })
+        .attr("transform", "translate(0," + (calc.chartHeight + 8) + ")")
+        .call(xAxis);
 
       var slider = chart.patternify({
           tag: 'g',
           selector: 'slider'
         })
-        .attr("transform", "translate(5," + (calc.chartHeight) + ")");
+        .attr("transform", "translate(0," + (calc.chartHeight + 5.5) + ")");
 
       slider.patternify({
           tag: 'line',
@@ -155,6 +157,17 @@ function renderChart(params) {
           return this.parentNode.appendChild(this.cloneNode(true));
         })
         .attr("class", "track-overlay")
+        ;
+
+      var handle = slider.append("circle")
+        .attr("class", "handle")
+        .attr("r", 9)
+        .attr('cx', function(){
+          var p = getPayment(250000, 30, 3.92, 20);
+          var result = document.getElementById("result");
+          result.innerText = "$ " + Math.round(p) + " per month";
+          return  x(250000);
+        })
         .call(d3.drag()
           .on("start.interrupt", function() {
             slider.interrupt();
@@ -164,32 +177,26 @@ function renderChart(params) {
 
           }));
 
-      var handle = slider.insert("circle", ".track-overlay")
-        .attr("class", "handle")
-        .attr("r", 9)
-        .attr('cx', function(){
-          var p = getPayment(250000, 30, 3.92, 20);
-          var result = document.getElementById("result");
-          result.innerText = "$ " + Math.round(p) + " per month";
-          return  x(250000);
-        });
-
       // Smoothly handle data updating
       updateData = function() {
 
       }
 
       function drag(h) {
+
         var currentSliderCx = handle.attr("cx");
 
         var scaledX = x(h);
-
-        var p = getPayment(x.invert(scaledX), 30, 3.92, 20);
+        var invert = x.invert(scaledX);
+        if (invert < 30000 || invert > 3000000)
+          return;
+        console.log(invert);
+        var p = getPayment(invert, 30, 3.92, 20);
         var result = document.getElementById("result");
 
         result.innerText = "$ " + Math.round(p) + " per month";
         
-        attrs.yScale.domain([0, scaleForYScale(x.invert(scaledX))])
+        attrs.yScale.domain([0, scaleForYScale(invert)])
         
         //Update Y axis
         svg.select(".y")

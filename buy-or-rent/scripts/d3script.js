@@ -2,6 +2,9 @@ var rentPrice = d3.range(0, 2000);
 var scaleForYScale = d3.scaleLinear().domain([30000, 3000000])
                     .range([1200, 120000]);
 
+var scaleForOtherYScales = d3.scaleLinear().domain([1200, 120000])
+                    .range([400, 40000]);
+
 var constants = {
   homePrice: 250000,
   downRate: 20,
@@ -10,6 +13,8 @@ var constants = {
 };
 
 var currentIndicators = constants;
+
+var currentPayment = getPayment(constants.homePrice, constants.mortgageYears, constants.mortgageRate, constants.downRate);
 
 // hp - home price
 // rt - mortgate rate
@@ -27,6 +32,7 @@ function getPayment(hp, ys,  rt, dr) {
   return p;
 }
 
+
 function renderChart(params) {
 
   // Exposed variables
@@ -40,9 +46,12 @@ function renderChart(params) {
     marginRight: 5,
     marginLeft: 5,
     container: 'body',
-    xScale: null,
-    yScale: null,
+    xScaleExtern: null,
     sliderCallback: null,
+    xAxisFormat: d3.format("$.2s"),
+    yAxisFormat: d3.format("$.2s"),
+    indicator: null,
+    barHeight: null,
     data: null
   };
 
@@ -67,31 +76,37 @@ function renderChart(params) {
       calc.chartBottomPadding = 30;
 
       // scales
-      attrs.xScale = d3.scaleBand()
+      var xScale = d3.scaleBand()
         .domain(d3.range(attrs.data.length))
         .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
         .paddingInner(0.05);
 
-      attrs.yScale = d3.scaleLinear()
+      var yScale = d3.scaleLinear();
+
+      if (attrs.chartName == "home-price"){
+        yScale
         .domain([0, scaleForYScale(250000)])
         .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
+      }else{
+         yScale
+        .domain([0, scaleForOtherYScales(scaleForYScale(250000))])
+        .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
+      }
 
       //Define Y axis
       var yAxis = d3.axisRight()
-        .scale(attrs.yScale)
+        .scale(yScale)
         .ticks(5)
-        .tickFormat(d3.format("$.0s"));
+        .tickFormat(attrs.yAxisFormat);
 
-      var x = d3.scalePow()
-        .exponent(0.2)
-        .domain([30000, 3000000])
-        .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding]);
+      attrs.xScaleExtern
+           .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding]);
 
       //Define X axis
       var xAxis = d3.axisBottom()
-        .scale(x)
+        .scale(attrs.xScaleExtern)
         .ticks(8)
-        .tickFormat(d3.format("$.00s"));
+        .tickFormat(attrs.xAxisFormat);
 
       //Drawing containers
       var container = d3.select(this);
@@ -117,16 +132,30 @@ function renderChart(params) {
           selector: 'bar',
           data: attrs.data
         })
+        .attr("data-lower-bound", function(d, i) {
+          var lowerBound = xScale(i);
+          return attrs.xScaleExtern.invert(lowerBound);
+        })
+        .attr("data-upper-bound", function(d, i) {
+          var upperBound = xScale(i+1);
+          return attrs.xScaleExtern.invert(upperBound);
+        })
         .attr("x", function(d, i) {
-          return attrs.xScale(i);
+          return xScale(i);
         })
         .attr("y", function(d) {
-          return attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+          if (attrs.chartName != "home-price"){
+            return yScale(currentPayment);
+          }
+          return yScale(getPayment(d, currentIndicators.mortgageYears, 
                 currentIndicators.mortgageRate, currentIndicators.downRate));
         })
-        .attr("width", attrs.xScale.bandwidth())
+        .attr("width", xScale.bandwidth())
         .attr("height", function(d) {
-          return calc.chartHeight - attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+          if (attrs.chartName != "home-price"){
+            return calc.chartHeight - yScale(currentPayment);
+          }
+          return calc.chartHeight - yScale(getPayment(d, currentIndicators.mortgageYears, 
                 currentIndicators.mortgageRate, currentIndicators.downRate));
         })
         .attr("fill", function(d) {
@@ -159,8 +188,8 @@ function renderChart(params) {
           tag: 'line',
           selector: 'track'
         })
-        .attr("x1", attrs.xScale(0))
-        .attr("x2", attrs.xScale(attrs.data.length - 1) + attrs.xScale.bandwidth())
+        .attr("x1", xScale(0))
+        .attr("x2", xScale(attrs.data.length - 1) + xScale.bandwidth())
         .select(function() {
           return this.parentNode.appendChild(this.cloneNode(true));
         })
@@ -178,7 +207,7 @@ function renderChart(params) {
           var p = getPayment(constants.homePrice, constants.mortgageYears, constants.mortgageRate, constants.downRate);
           var result = document.getElementById("result");
           result.innerText = "$ " + Math.round(p) + " per month";
-          return  x(constants.homePrice);
+          return  attrs.xScaleExtern(constants[attrs.indicator]);
         })
         .call(d3.drag()
           .on("start.interrupt", function() {
@@ -186,21 +215,27 @@ function renderChart(params) {
           })
           .on("start drag", function() {
 
-            var invert = x.invert(d3.event.x);
+            var invert = attrs.xScaleExtern.invert(d3.event.x);
 
-            var scaledX = x(invert);
+            var bar = chart.selectAll(".bar").attr("fill", function(d) {
+              return "#ccc";
+            }).filter(function(){ return d3.select(this).attr("data-lower-bound") <= invert && d3.select(this).attr("data-upper-bound") >= invert; });
 
-            if (invert < 30000 || invert > 3000000)
-              return;
+            bar.attr("fill", function(d) {
+              return "rgb(186, 216, 10)";
+            });
+
+            var scaledX = attrs.xScaleExtern(invert);
+
+            if (attrs.chartName == 'home-price')
+              if (invert < 30000 || invert > 3000000)
+                return;
 
             handle.attr("cx", scaledX);
-
-            main.updateChart(invert);
 
             attrs.sliderCallback(invert);
 
           }));
-
 
       // Smoothly handle data updating
       updateData = function() {
@@ -208,8 +243,15 @@ function renderChart(params) {
       }
 
       main.updateChart = function(invert) {
+        
+        if (attrs.chartName == "home-price"){
+          yScale.domain([0, scaleForYScale(invert)]);
+        }
+        else{
+          yScale.domain([0, scaleForOtherYScales(scaleForYScale(invert))]);
+        }
+       
 
-        attrs.yScale.domain([0, scaleForYScale(invert)])
         //Update Y axis
         svg.select(".y")
            .transition()
@@ -220,12 +262,18 @@ function renderChart(params) {
            .transition()
            .duration(1000)
            .attr("y", function(d) {
-            return attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+            if (attrs.chartName != "home-price"){
+              return yScale(currentPayment);
+            }
+            return yScale(getPayment(d, currentIndicators.mortgageYears, 
                 currentIndicators.mortgageRate, currentIndicators.downRate));
           })
-          .attr("width", attrs.xScale.bandwidth())
+          .attr("width", xScale.bandwidth())
           .attr("height", function(d) {
-            return calc.chartHeight - attrs.yScale(getPayment(d, currentIndicators.mortgageYears, 
+            if (attrs.chartName != "home-price"){
+            return calc.chartHeight - yScale(currentPayment);
+          }
+            return calc.chartHeight - yScale(getPayment(d, currentIndicators.mortgageYears, 
                 currentIndicators.mortgageRate, currentIndicators.downRate));
           });
 

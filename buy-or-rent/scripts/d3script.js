@@ -81,16 +81,16 @@ function renderChart(params) {
         .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
         .paddingInner(0.05);
 
-      var yScale = d3.scaleLinear();
+      var yScale = d3.scaleLinear().range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
 
       if (attrs.chartName == "home-price"){
         yScale
         .domain([0, scaleForYScale(250000)])
-        .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
+        ;
       }else{
          yScale
         .domain([0, scaleForOtherYScales(scaleForYScale(250000))])
-        .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
+       ;
       }
 
       //Define Y axis
@@ -155,8 +155,10 @@ function renderChart(params) {
           if (attrs.chartName != "home-price"){
             return calc.chartHeight - yScale(currentPayment);
           }
-          return calc.chartHeight - yScale(getPayment(d, currentIndicators.mortgageYears, 
-                currentIndicators.mortgageRate, currentIndicators.downRate));
+          var payment  = getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate);
+          console.log(yScale(payment));
+          return calc.chartHeight - yScale(payment);
         })
         .attr("fill", function(d) {
           return "#ccc";
@@ -243,15 +245,16 @@ function renderChart(params) {
       }
 
       main.updateChart = function(invert) {
-        
+        var scaledAxis;
         if (attrs.chartName == "home-price"){
-          yScale.domain([0, scaleForYScale(invert)]);
+          scaledAxis  = scaleForYScale(invert);
+          yScale.domain([0, scaledAxis]);
         }
         else{
+          scaledAxis = scaleForOtherYScales(scaleForYScale(invert));
           yScale.domain([0, scaleForOtherYScales(scaleForYScale(invert))]);
         }
        
-
         //Update Y axis
         svg.select(".y")
            .transition()
@@ -263,18 +266,35 @@ function renderChart(params) {
            .duration(1000)
            .attr("y", function(d) {
             if (attrs.chartName != "home-price"){
+              if (currentPayment > scaledAxis){
+              return yScale(scaledAxis);
+              }
               return yScale(currentPayment);
             }
-            return yScale(getPayment(d, currentIndicators.mortgageYears, 
-                currentIndicators.mortgageRate, currentIndicators.downRate));
+            var payment = getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate);
+            console.log(d + " : " + payment);
+            if (payment > scaledAxis){
+              return yScale(scaledAxis);
+            }
+            return yScale(payment);
           })
           .attr("width", xScale.bandwidth())
           .attr("height", function(d) {
             if (attrs.chartName != "home-price"){
+            if (currentPayment > scaledAxis){
+              return calc.chartHeight - yScale(scaledAxis);
+            }
             return calc.chartHeight - yScale(currentPayment);
           }
-            return calc.chartHeight - yScale(getPayment(d, currentIndicators.mortgageYears, 
-                currentIndicators.mortgageRate, currentIndicators.downRate));
+            var payment = getPayment(d, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate);
+
+            if (payment > scaledAxis){
+              return calc.chartHeight - yScale(scaledAxis);
+            }
+
+            return calc.chartHeight - yScale(payment);
           });
 
       }

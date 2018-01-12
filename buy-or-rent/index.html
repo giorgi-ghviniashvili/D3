@@ -341,26 +341,20 @@
           return data;
     }
 
-    var chartNames = ["home-price", "living-period", "mortgage-rate", "down-rate", "mortgage-period"];
-
-    var charts = [
-
-      // home price chart
-      renderChart()
-        .chartName(chartNames[0])
-        .svgHeight(homePriceChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#home-price')
-        .data(getData())
-        .xScaleExtern(d3.scalePow()
-          .exponent(0.2)
-          .domain([30000, 3000000]))
-        .indicator("homePrice")
-        .onDrag(function(value) {
-
-            currentIndicators.homePrice = value;
+    var chartsData = [
+      // home price
+      { 
+        name: "home-price",
+        container: "#home-price",
+        indicator: "homePrice",
+        width: chartWidth, 
+        height: homePriceChartHeight,
+        xScaleExtern: d3.scalePow()
+                        .exponent(0.2)
+                        .domain([30000, 3000000]),
+        data: getData(),
+        dragCallback: function(value){
+          currentIndicators.homePrice = value;
 
             var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
                 currentIndicators.mortgageRate, currentIndicators.downRate);
@@ -374,58 +368,37 @@
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
+        }
+      },
+      // living period
+      { 
+        name: "living-period",
+        container: "#how-long",
+        indicator: "livingLength",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xAxisFormat: d3.format(""),
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 40, 1),
+        dragCallback: function(value){
 
-        // how long do you stay?
-        .debug(true)
-        .run(),
-        renderChart()
-        .chartName(chartNames[1])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#how-long')
-        .data(d3.range(1, 40, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([1, 40]))
-        .indicator("livingLength")
-        .onDrag(function(value) {
-
-            currentIndicators.livingLength = value;
-
-            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
-                currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            currentPayment = p;
-
-            charts.forEach(chart => {
-              chart.updateChart(currentIndicators.homePrice);
-            });
-
-            var result = document.getElementById("result");
-
-            result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[2])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#mortgage-rate')
-        .xAxisFormat(d3.format(""))
-        .data(d3.range(0, 15, 0.3))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 15]))
-        .indicator("mortgageRate")
-        .onDrag(function(value) {
             
+        }
+      },
+      // mortgage rate
+      { 
+        name: "mortgage-rate",
+        container: "#mortgage-rate",
+        indicator: "mortgageRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 15]),
+        xAxisFormat: d3.format(""),
+        data: d3.range(0, 15, 0.3),
+        dragCallback: function(value){
+
             currentIndicators.mortgageRate = value;
 
             var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, value, currentIndicators.downRate);
@@ -439,25 +412,23 @@
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
 
-        renderChart()
-        .chartName(chartNames[3])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#down-rate')
-        .xAxisFormat(d3.format(""))
-        .data(d3.range(0, 100, 3))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 100]))
-        .indicator("downRate")
-        .onDrag(function(value) {
-            
+
+        }
+      },
+      // down-rate
+      { 
+        name: "down-rate",
+        container: "#down-rate",
+        indicator: "downRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 100]),
+        data: d3.range(0, 100, 3),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
             currentIndicators.downRate = value;
 
             var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, currentIndicators.mortgageRate, value);
@@ -467,29 +438,27 @@
             charts.forEach(chart => {
               chart.updateChart(currentIndicators.homePrice);
             });
-            
+
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
 
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#mortgage-period')
-        .xAxisFormat(d3.format(""))
-        .data(d3.range(1, 41))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([1, 40]))
-        .indicator("mortgageYears")
-        .onDrag(function(value) {
-            
+
+        }
+      },
+      // mortgage period
+      { 
+        name: "mortgage-period",
+        container: "#mortgage-period",
+        indicator: "mortgageYears",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 40]),
+        data: d3.range(1, 41),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
             currentIndicators.mortgageYears = value;
 
             var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
@@ -503,556 +472,280 @@
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
 
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#home-price-growth-rate')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(-5, 15, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([-5, 15]))
-        .indicator("annualAppreciation")
-        .onDrag(function(value) {
-            
-            currentIndicators.annualAppreciation = value;
 
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#rent-growth-rate')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(-5, 15, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([-5, 15]))
-        .indicator("")
-        .onDrag(function(value) {
-            
-            // currentIndicators.mortgageYears = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#investment-return-rate')
-        .xAxisFormat(d3.format(""))
-        .data(d3.range(1, 41))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([1, 40]))
-        .indicator("")
-        .onDrag(function(value) {
-            
-            // currentIndicators.mortgageYears = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#inflation-rate')
-        .xAxisFormat(d3.format(""))
-        .data(d3.range(1, 41))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([1, 40]))
-        .indicator("generalInflation")
-        .onDrag(function(value) {
-            
-            currentIndicators.generalInflation = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#property-tax-rate')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 10, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 10]))
-        .indicator("propertyTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.propertyTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#marginal-tax-rate')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#costs-of-buying-home')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#costs-of-selling-home')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#maintainance-renovation')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#insurance')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#mothly-utilities')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#mothly-common-fees')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#common-fees-deduction')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#security-deposit')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#marginal-tax-rate')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#brokers-fee')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run(),
-
-        renderChart()
-        .chartName(chartNames[4])
-        .svgHeight(otherChartHeight)
-        .svgWidth(chartWidth)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#rents-insurance')
-        .xAxisFormat(d => {return d3.format(".0%")(d / 100)})
-        .data(d3.range(0, 50, 1))
-        .xScaleExtern(d3.scaleLinear()
-          .domain([0, 50]))
-        .indicator("marginalIncomeTaxRate")
-        .onDrag(function(value) {
-            
-            currentIndicators.marginalIncomeTaxRate = value;
-
-            // var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            // currentPayment = p;
-
-            // charts.forEach(chart => {
-            //   chart.updateChart(currentIndicators.homePrice);
-            // });
-
-            // var result = document.getElementById("result");
-
-            // result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run()
-        ];
-
+        }
+      },
+      // home price growth rate
+      { 
+        name: "home-price-growth-rate",
+        container: "#home-price-growth-rate",
+        indicator: "annualAppreciation",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([-5, 15]),
+        data: d3.range(-5, 15, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // rent growth rate
+      { 
+        name: "rent-growth-rate",
+        container: "#rent-growth-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([-5, 15]),
+        data: d3.range(-5, 15, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // Investment return rate
+      { 
+        name: "investment-return-rate",
+        container: "#investment-return-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 41),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // inflation rate
+      { 
+        name: "inflation-rate",
+        container: "#inflation-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 40),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // property tax
+      { 
+        name: "rent-growth-rate",
+        container: "#property-tax-rate",
+        indicator: "propertyTaxRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 10]),
+        data: d3.range(0, 10, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // pmarginal tax
+      { 
+        name: "rmarginal-tax-rate",
+        container: "#marginal-tax-rate",
+        indicator: "marginalIncomeTaxRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs of buying home
+      { 
+        name: "costs-of-buying-home",
+        container: "#costs-of-buying-home",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "costs-of-selling-home",
+        container: "#costs-of-selling-home",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "maintainance-renovation",
+        container: "#maintainance-renovation",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "insurance",
+        container: "#insurance",
+        indicator: "insurance",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "mothly-utilities",
+        container: "#mothly-utilities",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "mothly-common-fees",
+        container: "#mothly-common-fees",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "common-fees-deduction",
+        container: "#common-fees-deduction",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "security-deposit",
+        container: "#security-deposit",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "brokers-fee",
+        container: "#brokers-fee",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "rents-insurance",
+        container: "#rents-insurance",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      }
+    ];
+
+    var charts = [];
+
+    chartsData.forEach(chartObj => {
+
+      var chart = 
+            renderChart()
+            .chartName(chartObj.name)
+            .svgHeight(chartObj.height)
+            .svgWidth(chartObj.width)
+            .marginBottom(30)
+            .marginRight(50)
+            .container(chartObj.container)
+            .data(chartObj.data)
+            .xScaleExtern(chartObj.xScaleExtern)
+            .indicator(chartObj.indicator)
+            .onDrag(chartObj.dragCallback)
+            ;
+
+      if (chartObj.xAxisFormat){
+        chart.xAxisFormat(chartObj.xAxisFormat);
+      }
+
+      chart.debug(true)
+            .run();
+
+      charts.push(chart);
+
+    });
     </script>
 </body>
 </html>

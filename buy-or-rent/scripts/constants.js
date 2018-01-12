@@ -1,5 +1,6 @@
 var constants = {
   homePrice: 250000,
+  livingLength: 9,
   downRate: 20,
   mortgageRate: 3.92,
   mortgageYears: 30,

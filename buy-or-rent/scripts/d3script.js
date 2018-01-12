@@ -3,9 +3,7 @@ var scaleForYScale = d3.scaleLinear().domain([30000, 3000000])
                     .range([1200, 120000]);
 
 var scaleForOtherYScales = d3.scaleLinear().domain([1200, 120000])
-                    .range([400, 40000]);
-
-
+                    .range([400, 50000]);
 
 var currentIndicators = constants;
 
@@ -55,20 +53,17 @@ function renderChart(params) {
 
       // scales
       var xScale = d3.scaleBand()
-        .domain(d3.range(attrs.data.length))
-        .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
-        .paddingInner(0.05);
+                    .domain(d3.range(attrs.data.length))
+                    .range([calc.chartLeftMargin, calc.chartWidth - calc.chartRightPadding])
+                    .paddingInner(0.05);
 
-      var yScale = d3.scaleLinear().range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
+      var yScale = d3.scaleLinear()
+                      .range([calc.chartHeight, calc.chartBottomMargin + calc.chartBottomPadding]);
 
       if (attrs.chartName == "home-price"){
-        yScale
-        .domain([0, scaleForYScale(250000)])
-        ;
+        yScale.domain([0, scaleForYScale(250000)]);
       }else{
-         yScale
-        .domain([0, scaleForOtherYScales(scaleForYScale(250000))])
-       ;
+         yScale.domain([0, scaleForOtherYScales(scaleForYScale(250000))]);
       }
 
       //Define Y axis

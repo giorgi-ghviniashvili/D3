@@ -210,6 +210,7 @@ function renderChart(params) {
       main.updateChart = function(invert) {
 
         attrs.yScale.domain([0, scaleForYScale(invert)])
+        
         //Update Y axis
         svg.select(".y")
            .transition()

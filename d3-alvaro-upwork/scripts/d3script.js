@@ -50,6 +50,25 @@ function renderChart(params) {
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
+      var x = d3.scaleTime().range([0, calc.chartWidth]),
+          y = d3.scaleLinear().range([calc.chartHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+        return +d.value;
+      })]);
+
+      var line = d3.line()
+                  .curve(d3.curveBasis)
+                  .x(function(d) { return x(d.month); })
+                  .y(function(d) { return y(d.value); });
+
+      chart.append("g")
+          .attr("class", "axis axis--x")
+          .attr("transform", "translate(0," + calc.chartHeight + ")")
+          .call(d3.axisBottom(x));
+
+      chart.append("g")
+          .attr("class", "axis axis--y")
+          .call(d3.axisLeft(y));
+
       // Smoothly handle data updating
       updateData = function () {
 

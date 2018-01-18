@@ -6,10 +6,6 @@
     <meta charset="UTF-8">
     <title>Chart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
 </head>
 
 <body translate="no">
@@ -22,14 +18,18 @@
 
     <script>
 
+        d3.json("data/data.json", function(data){
 
-          var chart = renderChart()
+            var chart = renderChart()
                 .svgHeight(window.innerHeight-30)
                 .svgWidth(window.innerWidth-30)
                 .container('#myGraph')
-                .data('Pass Something Here and use it as attrs.data')
+                .data(data)
                 .debug(true)
                 .run()
+
+        });
+          
 
 
     </script>

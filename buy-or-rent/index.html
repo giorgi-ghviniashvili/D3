@@ -9,99 +9,298 @@
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
     <style type="text/css">
         .domain {
-  stroke: #fff;
-}
+            stroke: #fff;
+          }
 
-svg {
-  display: block;
-  margin: auto;
-}
+        svg {
+          display: block;
+          margin: auto;
+        }
 
-.container {
-  margin-bottom: 30px;
-}
+        .container {
+          margin-bottom: 30px;
+        }
 
-.ticks {
-  font: 10px sans-serif;
-}
+        .ticks {
+          font: 10px sans-serif;
+        }
 
-.track,
-.track-inset,
-.track-overlay {
-  stroke-linecap: round;
-}
+        .track,
+        .track-inset,
+        .track-overlay {
+          stroke-linecap: round;
+        }
 
-.track {
-  stroke: #000;
-  stroke-opacity: 0.3;
-  stroke-width: 10px;
-}
+        .track {
+          stroke: #000;
+          stroke-opacity: 0.3;
+          stroke-width: 10px;
+        }
 
-.track-inset {
-  stroke: #ddd;
-  stroke-width: 8px;
-}
+        .track-inset {
+          stroke: #ddd;
+          stroke-width: 8px;
+        }
 
-.track-overlay {
-  pointer-events: stroke;
-  /*stroke-width: 50px;*/
-  stroke: transparent;
-  
-}
+        .track-overlay {
+          pointer-events: stroke;
+          /*stroke-width: 50px;*/
+          stroke: transparent;
+          
+        }
 
-.handle {
-  fill: #fff;
-  stroke: #000;
-  stroke-opacity: 0.5;
-  stroke-width: 1.25px;
-  cursor: ew-resize;
-}
-.result{
-    background-color: rgb(186, 216, 10);
-    border-radius: 5px;
-    padding: 10px;
-    text-align: center;
-}
-
+        .handle {
+          fill: #fff;
+          stroke: #000;
+          stroke-opacity: 0.5;
+          stroke-width: 1.25px;
+          cursor: ew-resize;
+        }
+        .result{
+            background-color: rgb(186, 216, 10);
+            border-radius: 5px;
+            padding: 10px;
+            text-align: center;
+        }
+        .axis text {
+          fill: #89919e;
+          font-weight: bold;
+          font-size: 11px;
+        }
+        .axis line {
+          stroke: #89919e;
+          stroke-width: 1.5px; 
+        }
+        .indicator-container{
+          align-items: flex-end;
+        }
+        .inputDiv input {
+          margin-bottom: 0px;
+        }
+        .inputDiv p {
+          margin: 0px;
+        }
+        .inputDivHomePrice input{
+          margin-bottom: 20px;
+        }
     </style>
-
 </head>
 
 <body translate="no">
     <main>
   <div class="container">
     <div class="row">
-      <div class="col s12 m9 l10">
+      <div class="col s12 m8 l9">
         
         <div class="divider"></div>
         <div class="section">
           <h5>Home Price</h5>
           <p>lorem ipsum lorem ipsum</p>
-          <div id="home-price">
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2 inputDivHomePrice">
+              <input>
+            </div>
+            <div id="home-price" class="chart-container col s10">
+            </div>
           </div>
         </div>
         <div class="divider"></div>
         <div class="section">
           <h5>How Long Do You Plan to Stay?</h5>
-          <p>lorem ipsum lorem ipsum</p>
-          <div id="myGraph2">
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>lorem ipsum</p>
+            </div>
+            <div id="how-long" class="chart-container col s10">
+            </div>
           </div>
         </div>
         <div class="divider"></div>
         <div class="section">
           <h5>What Are Your Mortgage Details?</h5>
-          <p>Mortgage rate</p>
-          <div id="mortgage-rate">
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Mortgage rate</p>
+            </div>
+            <div id="mortgage-rate" class="chart-container col s10">
+            </div>
           </div>
-          <p>Down payment</p>
-          <div id="myGraph4">
+          
+          <div class="indicator-container valign-wrapper">
+            
+            <div class="inputDiv col s2">
+              <input>
+              <p>Down payment</p>
+            </div>
+            <div id="down-rate" class="chart-container col s10">
+            </div>
           </div>
-          <p>Length of Mortgage</p>
-          <div id="myGraph5">
+          
+           <div class="indicator-container valign-wrapper">
+            
+            <div class="inputDiv col s2">
+              <input>
+              <p>Length of Mortgage</p>
+            </div>
+            <div id="mortgage-period" class="chart-container col s10">
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h5>What Does the Future Hold?</h5>
+          <div class="indicator-container valign-wrapper">
+            
+            <div class="inputDiv col s2">
+              <input>
+              <p>Home price growth</p>
+            </div>
+            <div id="home-price-growth-rate" class="chart-container col s10">
+            </div>
+          </div>
+
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Rent price growth</p>
+          </div>
+            <div id="rent-growth-rate" class="chart-container col s10">
+            </div>
+          </div>
+
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Investment return rate</p>
+          </div>
+            <div id="investment-return-rate" class="chart-container col s10">
+            </div>
+          </div>
+
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Inflation rate</p>
+          </div>
+            <div id="inflation-rate" class="chart-container col s10">
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h5>Taxes</h5>
+          <p>Property taxes and mortgage-interest costs are significant but also deductible. The higher your marginal tax rate is, the bigger the deduction.</p>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Property tax rate</p>
+            </div>
+            <div id="property-tax-rate" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>marginal tax rate</p>
+            </div>
+            <div id="marginal-tax-rate" class="chart-container col s10">
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h5>Closing Costs</h5>
+          <p>You’ll have to pay various fees when you buy your home, as well as when you sell it.</p>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Costs of buying home</p>
+            </div>
+            <div id="costs-of-buying-home" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Costs of selling home</p>
+            </div>
+            <div id="costs-of-selling-home" class="chart-container col s10">
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h5>Maintenance and Fees</h5>
+          <p>Owning a home comes with a surprising variety of expenses that renters do not directly pay.</p>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>maintainance/renovation</p>
+            </div>
+            <div id="maintainance-renovation" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Homeowner's insurance</p>
+            </div>
+            <div id="insurance" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Mothly utilities</p>
+            </div>
+            <div id="mothly-utilities" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Mothly common fees</p>
+            </div>
+            <div id="mothly-common-fees" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Common fees deduction</p>
+            </div>
+            <div id="common-fees-deduction" class="chart-container col s10">
+            </div>
+          </div>
+        </div>
+        <div class="section">
+          <h5>Additional Renting Costs</h5>
+          <p>These are the costs on top of rent, such as the fee you pay to a broker and the opportunity cost on your security deposit. But these expenses typically have a negligible impact.</p>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Security deposit</p>
+            </div>
+            <div id="security-deposit" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Broker's fee</p>
+            </div>
+            <div id="brokers-fee" class="chart-container col s10">
+            </div>
+          </div>
+          <div class="indicator-container valign-wrapper">
+            <div class="inputDiv col s2">
+              <input>
+              <p>Rent's insurance</p>
+            </div>
+            <div id="rents-insurance" class="chart-container col s10">
+            </div>
           </div>
         </div>
       </div>
-      <div class="col hide-on-small-only m3 l2">
+      <div class="col hide-on-small-only m4 l3">
         <div class="toc-wrapper pinned" style="top: 30px;">
 
           <div>
@@ -115,9 +314,13 @@ svg {
   </div>
 </main>
     <script src="libs/d3.v4.min.js"></script>
+    <script src="scripts/constants.js"></script>
+    <script src="scripts/logic.js"></script>
     <script src="scripts/d3script.js"></script>
     <script>
-
+    var chartWidth = document.getElementsByClassName("chart-container")[0].clientWidth;
+    var homePriceChartHeight = 300;
+    var otherChartHeight = 180;
     function getData() {
           var startNumber = 30000;
           var endNumber = 3000000;
@@ -138,57 +341,411 @@ svg {
           return data;
     }
 
-    var chartNames = ["home-price", "leaving-period", "mortgage-rate", "down-rate", "mortgage-period"];
+    var chartsData = [
+      // home price
+      { 
+        name: "home-price",
+        container: "#home-price",
+        indicator: "homePrice",
+        width: chartWidth, 
+        height: homePriceChartHeight,
+        xScaleExtern: d3.scalePow()
+                        .exponent(0.2)
+                        .domain([30000, 3000000]),
+        data: getData(),
+        dragCallback: function(value){
+          currentIndicators.homePrice = value;
 
-    var homeChart = renderChart()
-        .chartName(chartNames[0])
-        .svgHeight(300)
-        .svgWidth(window.innerWidth / 2)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#home-price')
-        .data(getData())
-        .onDrag(function(value) {
+            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
+                currentIndicators.mortgageRate, currentIndicators.downRate);
 
-            currentIndicators.homePrice = value;
+            currentPayment = p;
 
-            var p = getPayment(value, 30, 3.92, 20);
-              
+            charts.forEach(chart => {
+              chart.updateChart(value);
+            });
+
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run();
+        }
+      },
+      // living period
+      { 
+        name: "living-period",
+        container: "#how-long",
+        indicator: "livingLength",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xAxisFormat: d3.format(""),
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 40, 1),
+        dragCallback: function(value){
 
-    var mortgageChart = renderChart()
-        .chartName(chartNames[2])
-        .svgHeight(300)
-        .svgWidth(window.innerWidth / 2)
-        .marginBottom(30)
-        .marginRight(50)
-        .container('#mortgage-rate')
-        .data(d3.range([10, 100]))
-        .onDrag(function(value) {
             
+        }
+      },
+      // mortgage rate
+      { 
+        name: "mortgage-rate",
+        container: "#mortgage-rate",
+        indicator: "mortgageRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 15]),
+        xAxisFormat: d3.format(""),
+        data: d3.range(0, 15, 0.3),
+        dragCallback: function(value){
+
             currentIndicators.mortgageRate = value;
 
-            var p = getPayment(currentIndicators.homePrice, 30, value, 20);
-              
+            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, value, currentIndicators.downRate);
+
+            currentPayment = p;
+
+            charts.forEach(chart => {
+              chart.updateChart(currentIndicators.homePrice);
+            });
+
             var result = document.getElementById("result");
 
             result.innerText = "$ " + Math.round(p) + " per month";
-        
-        })
-        .debug(true)
-        .run();
 
-    var charts = [
-        homeChart,
-        mortgageChart
+
+        }
+      },
+      // down-rate
+      { 
+        name: "down-rate",
+        container: "#down-rate",
+        indicator: "downRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 100]),
+        data: d3.range(0, 100, 3),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+            currentIndicators.downRate = value;
+
+            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, currentIndicators.mortgageRate, value);
+
+            currentPayment = p;
+
+            charts.forEach(chart => {
+              chart.updateChart(currentIndicators.homePrice);
+            });
+
+            var result = document.getElementById("result");
+
+            result.innerText = "$ " + Math.round(p) + " per month";
+
+
+        }
+      },
+      // mortgage period
+      { 
+        name: "mortgage-period",
+        container: "#mortgage-period",
+        indicator: "mortgageYears",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 40]),
+        data: d3.range(1, 41),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+            currentIndicators.mortgageYears = value;
+
+            var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
+
+            currentPayment = p;
+
+            charts.forEach(chart => {
+              chart.updateChart(currentIndicators.homePrice);
+            });
+
+            var result = document.getElementById("result");
+
+            result.innerText = "$ " + Math.round(p) + " per month";
+
+
+        }
+      },
+      // home price growth rate
+      { 
+        name: "home-price-growth-rate",
+        container: "#home-price-growth-rate",
+        indicator: "annualAppreciation",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([-5, 15]),
+        data: d3.range(-5, 15, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // rent growth rate
+      { 
+        name: "rent-growth-rate",
+        container: "#rent-growth-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([-5, 15]),
+        data: d3.range(-5, 15, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // Investment return rate
+      { 
+        name: "investment-return-rate",
+        container: "#investment-return-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 41),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // inflation rate
+      { 
+        name: "inflation-rate",
+        container: "#inflation-rate",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([1, 40]),
+        data: d3.range(1, 40),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // property tax
+      { 
+        name: "rent-growth-rate",
+        container: "#property-tax-rate",
+        indicator: "propertyTaxRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 10]),
+        data: d3.range(0, 10, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // pmarginal tax
+      { 
+        name: "rmarginal-tax-rate",
+        container: "#marginal-tax-rate",
+        indicator: "marginalIncomeTaxRate",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs of buying home
+      { 
+        name: "costs-of-buying-home",
+        container: "#costs-of-buying-home",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "costs-of-selling-home",
+        container: "#costs-of-selling-home",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "maintainance-renovation",
+        container: "#maintainance-renovation",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "insurance",
+        container: "#insurance",
+        indicator: "insurance",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "mothly-utilities",
+        container: "#mothly-utilities",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "mothly-common-fees",
+        container: "#mothly-common-fees",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "common-fees-deduction",
+        container: "#common-fees-deduction",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "security-deposit",
+        container: "#security-deposit",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "brokers-fee",
+        container: "#brokers-fee",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      },
+      // costs-of selling
+      { 
+        name: "rents-insurance",
+        container: "#rents-insurance",
+        indicator: "",
+        width: chartWidth, 
+        height: otherChartHeight,
+        xScaleExtern: d3.scaleLinear()
+                        .domain([0, 50]),
+        data: d3.range(0, 50, 1),
+        xAxisFormat: d3.format(""),
+        dragCallback: function(value){
+
+        }
+      }
     ];
 
+    var charts = [];
+
+    chartsData.forEach(chartObj => {
+
+      var chart = 
+            renderChart()
+            .chartName(chartObj.name)
+            .svgHeight(chartObj.height)
+            .svgWidth(chartObj.width)
+            .marginBottom(30)
+            .marginRight(50)
+            .container(chartObj.container)
+            .data(chartObj.data)
+            .xScaleExtern(chartObj.xScaleExtern)
+            .indicator(chartObj.indicator)
+            .onDrag(chartObj.dragCallback)
+            ;
+
+      if (chartObj.xAxisFormat){
+        chart.xAxisFormat(chartObj.xAxisFormat);
+      }
+
+      chart.debug(true)
+            .run();
+
+      charts.push(chart);
+
+    });
     </script>
 </body>
 </html>

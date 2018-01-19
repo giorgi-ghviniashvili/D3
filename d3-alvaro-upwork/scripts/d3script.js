@@ -1,14 +1,6 @@
-/*  
-
-This code is based on following convention:
-
-https://github.com/bumbeishvili/d3-coding-conventions/blob/84b538fa99e43647d0d4717247d7b650cb9049eb/README.md
-
-
-*/
-
 function renderChart(params) {
-
+  // we want to have animation only on load
+  var isFirstLoad = true;
   // Exposed variables
   var attrs = {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
@@ -18,6 +10,12 @@ function renderChart(params) {
     marginBottom: 15,
     marginRight: 5,
     marginLeft: 5,
+    animationSpeed: 1200,
+    tooltipTextColor: '#C5C5C5',
+    tooltipTextFontSize: 12,
+    tooltipBackgroundColor: '#222222',
+    axisLeftWidth : 30,
+    axisBottomHeight : 20,
     container: 'body',
     data: null
   };
@@ -37,45 +35,108 @@ function renderChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
-      calc.axisLeftWidth = 20;
-      calc.axisBottomHeight = 20;
 
       //Drawing containers
       var container = d3.select(this);
+      container.html('');
 
       //Add svg
       var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
         .attr('width', attrs.svgWidth)
-        .attr('height', attrs.svgHeight)
+        .attr('height', attrs.svgHeight);
 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - calc.axisLeftWidth]);
-      var x = d3.scaleLinear().range([calc.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
-          y = d3.scaleLinear().range([calc.chartHeight - calc.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
+      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
+          y = d3.scaleLinear().range([calc.chartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
         return +d.value;
       })]);
 
+      var t = d3.transition()
+            .duration(attrs.animationSpeed)
+            .ease(d3.easeLinear)
+            .on("start", function(d){ console.log("transiton start") })
+            .on("end", function(d){ console.log("transiton end") });
+
       var line = d3.line()
-                  .curve(d3.curveBasis)
                   .x(function(d, i) { return x(i); })
                   .y(function(d) { return y(d.value); });
 
-      chart.append("g")
-          .attr("class", "axis axis--x")
-          .attr("transform", "translate(" + calc.axisLeftWidth + "," + (calc.chartHeight - calc.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")));
+      var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
-      chart.append("g")
-          .attr("class", "axis axis--y")
-          .attr("transform", "translate("+calc.axisLeftWidth+", 0)")
-          .call(d3.axisLeft(y).ticks(5));
+      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.chartHeight - attrs.axisBottomHeight) + ")")
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.chartHeight));
 
-      chart.append("path")
+      var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
+
+      yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
+          .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
+          .tickPadding(8));
+
+      var path = chart.patternify({ tag: 'path', selector: 'line'})
            .attr("d", line(attrs.data))
-           .attr("class", "line");
+           
+      // animate
+      if (isFirstLoad){
+
+        path.attr("stroke-dasharray", function(d){ return this.getTotalLength() })
+           .attr("stroke-dashoffset", function(d){ return this.getTotalLength() });
+        chart.selectAll(".line").transition(t)
+            .attr("stroke-dashoffset", 0);
+
+        isFirstLoad = !isFirstLoad; // turn off animation 
+      }
+
+      var div = d3.select(".tooltip")
+                  .style("opacity", 0)
+                  .style("background", attrs.tooltipBackgroundColor)
+                  .style("color", attrs.tooltipTextColor)
+                  .style("font-size", attrs.tooltipTextFontSize);
+
+      var fixeddot = chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
+                .attr("r", 4)
+                .attr("cx", function (d, i) {
+                    return x(i);
+                })
+                .attr("cy", function (d) {
+                    return y(d.value);
+                })
+                .on("mouseover", function (d) {
+                     var circle = d3.select(this);
+                     circle.attr("stroke", "#c3cfe2")
+                           .attr("r", 6)
+                           .attr("stroke-width", 3);
+
+                     div.transition()
+                        .duration(attrs.animationSpeed)
+                        .style("opacity", .9);
+                    div.html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
+                        .style("left", (d3.event.pageX + 10) + "px")
+                        .style("top", (d3.event.pageY - 28) + "px");
+                    setTimeout(function(){ div.style("opacity", 0); }, 3000);   
+                })
+                .on("mouseout", function(){
+
+                  var circle = d3.select(this);
+                     circle.attr("stroke", null)
+                           .attr("r", 4)
+                           .attr("stroke-width", 0);
+
+                });
+
+      //RESPONSIVENESS
+       d3.select(window).on('resize.' + attrs.id, function () {
+        setDimensions();
+      })
+
+      function setDimensions() {
+        var width = container.node().getBoundingClientRect().width;
+        main.svgWidth(width);
+        container.call(main);
+      }
 
       // Smoothly handle data updating
       updateData = function () {
@@ -116,13 +177,13 @@ function renderChart(params) {
 
     // Pattern in action
     var selection = container.selectAll('.' + selector).data(data, (d, i) => {
-            if (typeof d === "object") {
-                if (d.id) {
-                    return d.id;
-                }
+        if (typeof d === "object") {
+            if (d.id) {
+                return d.id;
             }
-            return i;
-        })
+        }
+        return i;
+    });
     selection.exit().remove();
     selection = selection.enter().append(elementTag).merge(selection)
     selection.attr('class', selector);

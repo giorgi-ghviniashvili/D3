@@ -10,7 +10,7 @@ function renderChart(params) {
     marginBottom: 15,
     marginRight: 5,
     marginLeft: 5,
-    animationSpeed: 1200,
+    animationSpeed: 1500,
     tooltipTextColor: '#C5C5C5',
     tooltipTextFontSize: 12,
     tooltipBackgroundColor: '#222222',
@@ -35,6 +35,8 @@ function renderChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
+      calc.legendHeigh = calc.chartHeight * 0.2;
+      calc.lineChartHeight = calc.chartHeight * 0.8;
 
       //Drawing containers
       var container = d3.select(this);
@@ -51,7 +53,7 @@ function renderChart(params) {
 
       var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
       var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
-          y = d3.scaleLinear().range([calc.chartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
         return +d.value;
       })]);
 
@@ -67,8 +69,8 @@ function renderChart(params) {
 
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.chartHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.chartHeight));
+      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
 
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
 
@@ -97,40 +99,67 @@ function renderChart(params) {
                   .style("font-size", attrs.tooltipTextFontSize);
 
       var fixeddot = chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
-                .attr("r", 4)
-                .attr("cx", function (d, i) {
-                    return x(i);
-                })
-                .attr("cy", function (d) {
-                    return y(d.value);
-                })
-                .on("mouseover", function (d) {
-                     var circle = d3.select(this);
-                     circle.attr("stroke", "#c3cfe2")
-                           .attr("r", 6)
-                           .attr("stroke-width", 3);
+          .attr("r", 4)
+          .attr("cx", function (d, i) {
+              return x(i);
+          })
+          .attr("cy", function (d) {
+              return y(d.value);
+          })
+          .on("mouseover", function (d) {
+               var circle = d3.select(this);
+               circle.attr("stroke", "#c3cfe2")
+                     .attr("r", 6)
+                     .attr("stroke-width", 3);
 
-                     div.transition()
-                        .duration(attrs.animationSpeed)
-                        .style("opacity", .9);
-                    div.html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
-                        .style("left", (d3.event.pageX + 10) + "px")
-                        .style("top", (d3.event.pageY - 28) + "px");
-                    setTimeout(function(){ div.style("opacity", 0); }, 3000);   
-                })
-                .on("mouseout", function(){
+               div.transition()
+                  .duration(attrs.animationSpeed)
+                  .style("opacity", .9);
+              div.html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
+                  .style("left", (d3.event.pageX + 10) + "px")
+                  .style("top", (d3.event.pageY - 28) + "px");
+              setTimeout(function(){ div.style("opacity", 0); }, 3000);   
+          })
+          .on("mouseout", function(){
 
-                  var circle = d3.select(this);
-                     circle.attr("stroke", null)
-                           .attr("r", 4)
-                           .attr("stroke-width", 0);
+            var circle = d3.select(this);
+               circle.attr("stroke", null)
+                     .attr("r", 4)
+                     .attr("stroke-width", 0);
 
-                });
+          });
+
+      var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
+                                  .attr("x", calc.chartWidth / 2)
+                                  .attr("y", calc.lineChartHeight + 20)
+                                  .text("Registered users number x Time");
+
+      // ##### legend #####
+      var legend = chart.patternify({ tag: 'g', selector: 'legend' })
+                        
+
+      var regUsers = legend.patternify({ tag: 'g', selector: 'registeredUsers'})
+                           .attr('transform', 'translate(10, 30)');
+
+      regUsers.append("rect")
+              .attr("width", 15)
+              .attr("height", 15)
+              .attr("x", 10)
+              .attr("y", calc.lineChartHeight)
+              .attr('rx', 2)
+              .attr("fill", "#2f5491");
+
+      regUsers.append("text")
+              .attr("x", 30)
+              .attr("y", calc.lineChartHeight + 12)
+              .attr("stroke", "#2f5491")
+              .attr("stroke-width", 0.9)
+              .text("registeredUsers");
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();
-      })
+       });
 
       function setDimensions() {
         var width = container.node().getBoundingClientRect().width;

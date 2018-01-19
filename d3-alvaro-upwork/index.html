@@ -14,11 +14,6 @@
             display: block;
             margin: auto;
         }
-         .line {
-            stroke: rgb(247, 150, 29);
-            stroke-width: 2;
-            fill: none;
-        }
         div.tooltip {
             position: absolute;
             text-align: center;
@@ -41,50 +36,50 @@
             stroke-width: 1px;
           }
 
-  .axis text {
-    font-family: 'Proxima-Nova', sans-serif;
-    font-size: 13px;
-    pointer-events: none;
-    fill: #7e7e7e;
-  }
+          .axis text, .xAxisDescr {
+            font-family: 'Proxima-Nova', sans-serif;
+            font-size: 13px;
+            pointer-events: none;
+            fill: #7e7e7e;
+          }
 
-  .y.axis text {
-    text-anchor: end !important;
-    font-size:14px;
-    fill: #7e7e7e;
-  }
+          .y.axis text {
+            text-anchor: end !important;
+            font-size:14px;
+            fill: #7e7e7e;
+          }
 
-  .domain {
-    display: none;
-  }
+          .domain {
+            display: none;
+          }
 
-  .line {
-    stroke: #2f5491;
-    stroke-width: 3px;
-    fill: none;
-  }
-    circle {
-        fill: rgba(40, 53, 79, .95);
-    }
-    #myGraph{
-        position: relative;
-        width: 60%;
-        margin: auto;
-    }
-    @media(min-width:768px) and (max-width:850px) {
-       #myGraph{
+          .line {
+            stroke: #2f5491;
+            stroke-width: 3px;
+            fill: none;
+          }
+        circle {
+            fill: rgba(40, 53, 79, .95);
+        }
+        #myGraph{
             position: relative;
-            width: 80%;
+            width: 60%;
             margin: auto;
         }
-    }
-    @media(max-width:768px) {
-       #myGraph{
-            position: relative;
-            width: 100%;
-            margin: auto;
+        @media(min-width:768px) and (max-width:850px) {
+           #myGraph{
+                position: relative;
+                width: 80%;
+                margin: auto;
+            }
         }
-    }
+        @media(max-width:768px) {
+           #myGraph{
+                position: relative;
+                width: 100%;
+                margin: auto;
+            }
+        }
     </style>
 </head>
 
@@ -93,6 +88,7 @@
     <div class="container centered">
         <div id="myGraph"></div>
     </div>
+    <div class="legend"></div>
     <div class="tooltip"></div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/d3script.js"></script>
@@ -102,7 +98,7 @@
         d3.json("data/data.json", function(data){
             var width = document.getElementById('myGraph').getBoundingClientRect().width;
             var chart = renderChart()
-                .svgHeight(400)
+                .svgHeight(600)
                 .svgWidth(width)
                 .container('#myGraph')
                 .data(data)

@@ -154,7 +154,7 @@ function renderChart(params) {
               .attr("y", calc.lineChartHeight + 12)
               .attr("stroke", "#2f5491")
               .attr("stroke-width", 0.9)
-              .text("registeredUsers");
+              .text("Registered users");
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

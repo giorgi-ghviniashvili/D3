@@ -6,6 +6,17 @@
     <meta charset="UTF-8">
     <title>Chart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        svg{
+            display: block;
+            margin: auto;
+        }
+         .line {
+            stroke: rgb(247, 150, 29);
+            stroke-width: 2;
+            fill: none;
+        }
+    </style>
 </head>
 
 <body translate="no">
@@ -21,8 +32,8 @@
         d3.json("data/data.json", function(data){
 
             var chart = renderChart()
-                .svgHeight(window.innerHeight-30)
-                .svgWidth(window.innerWidth-30)
+                .svgHeight(400)
+                .svgWidth(600)
                 .container('#myGraph')
                 .data(data)
                 .debug(true)

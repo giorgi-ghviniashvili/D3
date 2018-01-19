@@ -1,18 +1,18 @@
 [
 	{
-		"month": "Jan",
+		"month": "January",
 		"value": "120"
 	},
 	{
-		"month": "Feb",
+		"month": "February",
 		"value": "180"
 	},
 	{
-		"month": "Mar",
+		"month": "March",
 		"value": "140"
 	},
 	{
-		"month": "Apr",
+		"month": "Aprril",
 		"value": "210"
 	},
 	{
@@ -20,31 +20,31 @@
 		"value": "280"
 	},
 	{
-		"month": "Jun",
+		"month": "June",
 		"value": "30"
 	},
 	{
-		"month": "Jul",
+		"month": "July",
 		"value": "85"
 	},
 	{
-		"month": "Aug",
+		"month": "August",
 		"value": "197"
 	},
 	{
-		"month": "Sep",
+		"month": "September",
 		"value": "187"
 	},
 	{
-		"month": "Nov",
+		"month": "November",
 		"value": "250"
 	},
 	{
-		"month": "Jan",
+		"month": "October",
 		"value": "125"
 	},
 	{
-		"month": "Dec",
+		"month": "December",
 		"value": "60"
-	},
+	}
 ]

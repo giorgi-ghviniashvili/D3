@@ -15,7 +15,7 @@ function renderChart(params) {
     svgWidth: 400,
     svgHeight: 400,
     marginTop: 5,
-    marginBottom: 5,
+    marginBottom: 15,
     marginRight: 5,
     marginLeft: 5,
     container: 'body',
@@ -37,6 +37,8 @@ function renderChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
+      calc.axisLeftWidth = 20;
+      calc.axisBottomHeight = 20;
 
       //Drawing containers
       var container = d3.select(this);
@@ -50,24 +52,30 @@ function renderChart(params) {
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
-      var x = d3.scaleTime().range([0, calc.chartWidth]),
-          y = d3.scaleLinear().range([calc.chartHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - calc.axisLeftWidth]);
+      var x = d3.scaleLinear().range([calc.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
+          y = d3.scaleLinear().range([calc.chartHeight - calc.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
         return +d.value;
       })]);
 
       var line = d3.line()
                   .curve(d3.curveBasis)
-                  .x(function(d) { return x(d.month); })
+                  .x(function(d, i) { return x(i); })
                   .y(function(d) { return y(d.value); });
 
       chart.append("g")
           .attr("class", "axis axis--x")
-          .attr("transform", "translate(0," + calc.chartHeight + ")")
-          .call(d3.axisBottom(x));
+          .attr("transform", "translate(" + calc.axisLeftWidth + "," + (calc.chartHeight - calc.axisBottomHeight) + ")")
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")));
 
       chart.append("g")
           .attr("class", "axis axis--y")
-          .call(d3.axisLeft(y));
+          .attr("transform", "translate("+calc.axisLeftWidth+", 0)")
+          .call(d3.axisLeft(y).ticks(5));
+
+      chart.append("path")
+           .attr("d", line(attrs.data))
+           .attr("class", "line");
 
       // Smoothly handle data updating
       updateData = function () {

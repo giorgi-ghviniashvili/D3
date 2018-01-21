@@ -288,9 +288,9 @@ function setNews() {
 
 	// sort acsending
 	current_news.sort((a, b) => {
-		var date_a = a.Date.getTime();
-		var date_b = b.Date.getTime();
-		return date_a > date_b;
+		if (a.Date > b.Date) return 1;
+		if (a.Date < b.Date) return -1;
+		return 0;
 	});
 
 	console.log("current_news");
@@ -312,16 +312,14 @@ function setNews() {
 			// console.log(diff, current_news[i].Date, current_news[i+1].Date);
 		}
 
-		diff = Math.round(diff / 60000);
-
-		// if the curret_news[i].Date is close to 00:00, give more width to the arc
+		diff = Math.round(diff / 86400);
+		//if the curret_news[i].Date is close to 00:00, give more width to the arc
 		if (diff < 10){
 			diff += 5;
 		}
 
 		data.push(diff);
 	}
-
 	change(data);
 }
 

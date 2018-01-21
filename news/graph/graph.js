@@ -332,7 +332,8 @@ function change(data) {
 	var outerArc = d3.svg.arc()
 	.innerRadius(radius * 1)
 	.outerRadius(radius * 1);
-
+	var arcOver = d3.svg.arc()
+    .outerRadius(radius + 10);
 	var labels = [];
 
 	for (let i = 0; i< current_news.length; i++) {
@@ -356,8 +357,9 @@ function change(data) {
 	slice.enter()
 		.insert("path")
 		.style("fill", function(d, i) { return color(i); })
-		.attr("class", "slice");
-
+		.attr("data-value",function(d, i) { return i; } )
+		.attr("class", "slice")
+		.style("opacity", 0.8)
 	slice		
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
@@ -394,6 +396,16 @@ function change(data) {
 		.attr("class","foreignObject")
 		.attr('width', 200)
 		.attr('height', 30)
+		.on("mouseenter", function(d,i){
+			var slice = d3.selectAll("path[data-value='"+i+"']");
+			
+			slice.style("opacity", 1)
+		})
+		.on("mouseleave", function(d,i){
+			var slice = d3.selectAll("path[data-value='"+i+"']");
+
+			slice.style("opacity", 0.8)
+		})
 		.call(drag);
 
 	text.append('xhtml:div')

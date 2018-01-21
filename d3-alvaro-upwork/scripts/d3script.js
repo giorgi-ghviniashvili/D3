@@ -113,14 +113,15 @@ function renderChart(params) {
                      .attr("stroke-width", 3);
 
                div.transition()
-                  .duration(attrs.animationSpeed)
+                  .duration(100)
                   .style("opacity", .9);
               div.html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
                   .style("left", (d3.event.pageX + 10) + "px")
-                  .style("top", (d3.event.pageY - 28) + "px");
-              setTimeout(function(){ div.style("opacity", 0); }, 3000);   
+                  .style("top", (d3.event.pageY - 28) + "px");  
           })
           .on("mouseout", function(){
+            
+            div.style("opacity", 0);
 
             var circle = d3.select(this);
                circle.attr("stroke", null)

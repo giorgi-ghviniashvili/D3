@@ -301,14 +301,14 @@ function setNews() {
 
 	for (var i = 0; i < current_news.length; i++) {
 		var diff = null;
-		if (i == 0 ) {
+		if (i == 0) {
 			diff = current_news[i].Date.getTime() - min_date.getTime();
 			// console.log(diff, max_date, current_news[i].Date);
 		} else if (i == current_news.length-1) {
 			diff = max_date.getTime() - current_news[i].Date.getTime();
 			// console.log("here",diff, current_news[i].Date, min_date.getTime());
 		} else {
-			diff = current_news[i+1].Date.getTime() - current_news[i].Date.getTime();
+			diff = current_news[i].Date.getTime() - current_news[i-1].Date.getTime();
 			// console.log(diff, current_news[i].Date, current_news[i+1].Date);
 		}
 

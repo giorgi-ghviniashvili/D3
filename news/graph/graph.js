@@ -359,7 +359,8 @@ function change(data) {
 		.style("fill", function(d, i) { return color(i); })
 		.attr("data-value",function(d, i) { return i; } )
 		.attr("class", "slice")
-		.style("opacity", 0.8)
+
+		.style("opacity", 0.6)
 	slice		
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
@@ -399,12 +400,12 @@ function change(data) {
 		.on("mouseenter", function(d,i){
 			var slice = d3.selectAll("path[data-value='"+i+"']");
 			
-			slice.style("opacity", 1)
+			slice.transition().duration(100).style("opacity", 1)
 		})
 		.on("mouseleave", function(d,i){
 			var slice = d3.selectAll("path[data-value='"+i+"']");
-
-			slice.style("opacity", 0.8)
+			
+			slice.transition().duration(100).style("opacity", 0.8)
 		})
 		.call(drag);
 

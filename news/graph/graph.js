@@ -333,20 +333,21 @@ function change(data) {
 	var arcOver = d3.svg.arc()
     .outerRadius(radius + 10);
 	var labels = [];
+	var pieData = pie(data);
 
 	for (let i = 0; i< current_news.length; i++) {
 		labels.push( {
 			'label': current_news[i].Title,
-			'value': data[i]
+			'value': data[i],
+			'date': current_news[i].Date.getTime()
 		});
+		pieData[i].date = current_news[i].Date.getTime();
 	}
 
 	var key = function(d){
 		var k = d.label;
 		return k; 
 	};
-
-	var pieData = pie(data);
 
 	/* ------- PIE SLICES -------*/
 	var slice = svg.select(".slices").selectAll("path.slice")
@@ -385,10 +386,14 @@ function change(data) {
             });
         });
 
+	
+
 	/* ------- TEXT LABELS -------*/
 
 	var text = svg.select(".labels").selectAll(".foreignObject")
 		.data(pieData);
+
+	console.log("labels:", labels);
 
 	text.enter()
 		.append("svg:foreignObject")
@@ -412,13 +417,11 @@ function change(data) {
 	    .style("direction", "rtl")
 		.attr("class","statement")
 		
-
 	text.select(".statement")
 		.style("color", function(d, i) { return color(i); })
 		.text(function(d) {
-			var _text = d3.select(this);
 			var label = labels.filter(function(next_item) {
-				return next_item.value == d.data; 
+				return next_item.date == d.date; 
 			});
 			return label.length ? label[0].label: "";
 		});

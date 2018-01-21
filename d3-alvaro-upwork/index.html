@@ -58,20 +58,21 @@
             fill: none;
           }
         
-        #myGraph{
+        .centered div {
             position: relative;
-            width: 60%;
+            width: 50%;
             margin: auto;
+            float: left;
         }
         @media(min-width:768px) and (max-width:850px) {
-           #myGraph{
+           .centered div{
                 position: relative;
                 width: 80%;
                 margin: auto;
             }
         }
         @media(max-width:768px) {
-           #myGraph{
+           .centered div{
                 position: relative;
                 width: 100%;
                 margin: auto;
@@ -90,16 +91,16 @@
 <body translate="no">
 
     <div class="container centered">
-        <div id="myGraph"></div>
+        <div id="lineChart"></div><div id="bubbleChart"></div>
     </div>
     <div class="legend"></div>
     <div class="tooltip"></div>
     <script src="libs/d3.v4.min.js"></script>
-    <script src="scripts/d3script.js"></script>
-
+    <script src="scripts/line_chart.js"></script>
+    <script src="scripts/bubble_chart.js"></script>
     <script>
 
-        d3.json("data/data.json", function(error, data){
+        d3.json("data/line_chart.json", function(error, data){
 
             // error check
             if (error) {
@@ -107,18 +108,35 @@
                 throw error;
             }
             // draw chart
-            var width = document.getElementById('myGraph').getBoundingClientRect().width;
-            var chart = renderChart()
+            var width = document.getElementById('lineChart').getBoundingClientRect().width;
+            var chart = renderLineChart()
                 .svgHeight(600)
                 .svgWidth(width)
-                .container('#myGraph')
+                .container('#lineChart')
                 .data(data)
                 .debug(true)
                 .run()
 
         });
           
-        
+        d3.json("data/bubble_chart.json", function(error, data){
+
+            // error check
+            if (error) {
+                console.error('Error getting or parsing the data.');
+                throw error;
+            }
+            // draw chart
+            var width = document.getElementById('bubbleChart').getBoundingClientRect().width;
+            var chart = renderBubbleChart()
+                .svgHeight(600)
+                .svgWidth(width)
+                .container('#bubbleChart')
+                .data(data)
+                .debug(true)
+                .run()
+
+        });
     </script>
 
 

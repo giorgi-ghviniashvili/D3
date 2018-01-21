@@ -1,0 +1,75 @@
+[
+	{
+		"month": "January",
+		"line1": "120",
+		"line2": "350",
+		"line3": "248"
+	},
+	{
+		"month": "February",
+		"line1": "180",
+		"line2": "230",
+		"line3": "100"
+	},
+	{
+		"month": "March",
+		"line1": "140",
+		"line2": "550",
+		"line3": "123"
+	},
+	{
+		"month": "April",
+		"line1": "210",
+		"line2": "340",
+		"line3": "423"
+	},
+	{
+		"month": "May",
+		"line1": "260",
+		"line2": "340",
+		"line3": "123"
+	},
+	{
+		"month": "June",
+		"line1": "90",
+		"line2": "45",
+		"line3": "23"
+	},
+	{
+		"month": "July",
+		"line1": "45",
+		"line2": "14",
+		"line3": "123"
+	},
+	{
+		"month": "August",
+		"line1": "437",
+		"line2": "120",
+		"line3": "223"
+	},
+	{
+		"month": "September",
+		"line1": "187",
+		"line2": "100",
+		"line3": "423"
+	},
+	{
+		"month": "October",
+		"line1": "125",
+		"line2": "225",
+		"line3": "323"
+	},
+	{
+		"month": "November",
+		"line1": "250",
+		"line2": "470",
+		"line3": "126"
+	},
+	
+	{
+		"month": "December",
+		"line1": "60",
+		"line2": "90",
+		"line3": "243"
+	}
+]

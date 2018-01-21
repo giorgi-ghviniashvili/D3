@@ -54,13 +54,10 @@
           }
 
           .line {
-            stroke: #2f5491;
             stroke-width: 3px;
             fill: none;
           }
-        circle {
-            fill: rgba(40, 53, 79, .95);
-        }
+        
         #myGraph{
             position: relative;
             width: 60%;
@@ -80,6 +77,13 @@
                 margin: auto;
             }
         }
+        .legend_item text, .xAxisDescr, .axis text {
+            cursor: default;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
     </style>
 </head>
 
@@ -95,7 +99,14 @@
 
     <script>
 
-        d3.json("data/data.json", function(data){
+        d3.json("data/data.json", function(error, data){
+
+            // error check
+            if (error) {
+                console.error('Error getting or parsing the data.');
+                throw error;
+            }
+            // draw chart
             var width = document.getElementById('myGraph').getBoundingClientRect().width;
             var chart = renderChart()
                 .svgHeight(600)
@@ -107,8 +118,7 @@
 
         });
           
-
-
+        
     </script>
 
 

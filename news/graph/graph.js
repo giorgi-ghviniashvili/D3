@@ -474,6 +474,16 @@ function change(data) {
 	
 };
 
+function showHideLines(value){
+    if (value == 1){
+    	svg.select(".lines").style("display", "block");
+    }
+    else {
+      	svg.select(".lines").style("display", "none");
+    }
+ }
+
 init();
 //getListOfSheets();
 getNewsFromAllSheets();
+

@@ -1,0 +1,58 @@
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+	<link rel="stylesheet" href="../style.css" />
+
+	<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+	<script src="./d3.v3.min.js"></script>
+
+	<style type="text/css">
+		.statement {
+			line-height: 1.1;
+		}
+		#message{
+			display: none;
+		}
+		.link{
+			stroke: #777;
+    		stroke-width: 2px;
+		}
+		.foreignObject{
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body>
+	
+	<div class="loader" id="loader"></div>
+
+	<div class="d-flex flex-row flex-wrap justify-content-center hidden" id="selection-box">
+		<select id="magazine" class="form-control" onchange="onMagazineChange()" style="max-width: 15rem;">
+			<option value="ynet.co.il" selected>YNET</option>	
+			<option value="mako.co.il">MAKO</option>	
+			<option value="walla.co.il">WALLA</option>	
+			<option value="haaretz.co.il">HAARETZ</option>	
+			<option value="israelhayom.co.il">ISRAELHAYOM</option>	
+			<option value="nrg.co.il">NRG</option>	
+		</select>
+
+		<div class="col-md-4 d-flex flex-row align-items-center justify-content-center" style="max-width:15rem">
+			<a class="navigator" onclick="decrementDate()"> < </a>
+			<p id="date" class="m-0 px-2"></p>
+			<a class="navigator" onclick="incrementDate()"> > </a>
+		</div>
+		
+	</div>
+	<div id="message" class="col-md-6 offset-md-3">
+		<div class="alert alert-danger">
+  			<strong>Ups!</strong> There is no news from the site
+		</div>
+	</div>
+	<div id="chart">
+		
+	</div>
+	<script src="https://d3js.org/d3-force.v1.min.js"></script>
+	<script src="./graph.js"></script>
+</body>	
+</html>

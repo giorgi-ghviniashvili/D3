@@ -20,6 +20,7 @@ function renderBubbleChart(params) {
     marginLeft: 5,
     bubbleMinRadius: 20,
     bubbleMaxRadius: 50,
+    minimumDistance: 250,
     container: 'body',
     data: null
   };
@@ -44,7 +45,7 @@ function renderBubbleChart(params) {
 
       // ###### layouts #######
       var simulation = d3.forceSimulation(attrs.data)
-            .force("charge", d3.forceManyBody().strength([-250]))
+            .force("charge", d3.forceManyBody().strength([-attrs.minimumDistance]))
             .force("x", d3.forceX())
             .force("y", d3.forceY())
             .on("tick", ticked);
@@ -155,6 +156,7 @@ function renderBubbleChart(params) {
         var width = container.node().getBoundingClientRect().width;
         main.svgWidth(width);
         container.call(main);
+        simulation.restart();
       }
 
       // Smoothly handle data updating

@@ -261,7 +261,7 @@ function setNews() {
 		svg.attr("display", "block");
 	}
 	current_news = current_news[current_sheet];
-
+	
 	// news of previous day
 	previous_news = news_data[previous_date];
 	previous_news = _.groupBy(previous_news, 'Magazine')[current_sheet];

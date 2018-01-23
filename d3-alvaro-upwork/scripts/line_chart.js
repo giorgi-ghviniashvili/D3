@@ -165,7 +165,7 @@ function renderLineChart(params) {
           .on("mouseout", function(){
 
             div.style("opacity", 0);
-
+            div.style("left", (0) + "px")
             var circle = d3.select(this);
             circle.style("fill", "#fff");
 

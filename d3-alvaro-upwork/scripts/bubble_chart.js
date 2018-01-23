@@ -44,7 +44,7 @@ function renderBubbleChart(params) {
 
       // ###### layouts #######
       var simulation = d3.forceSimulation(attrs.data)
-            .force("charge", d3.forceManyBody().strength([-300]))
+            .force("charge", d3.forceManyBody().strength([-250]))
             .force("x", d3.forceX())
             .force("y", d3.forceY())
             .on("tick", ticked);
@@ -88,6 +88,7 @@ function renderBubbleChart(params) {
             .data([1])
             .enter()
             .append("div")
+            .attr("class", "bubbleTooltip")
             .style("position", "absolute")
             .style("visibility", "hidden")
             .style("color", "white")
@@ -115,6 +116,7 @@ function renderBubbleChart(params) {
                 return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
             })
             .on("mouseout", function() {
+                tooltip.style("left", (0) + "px")
                 return tooltip.style("visibility", "hidden");
             });
 

@@ -351,11 +351,10 @@ function change(data) {
 	var labels = [];
 
 	var pieData = pie(data);
-
-	for (let i = 0; i< current_news.length; i++) {
-		var current_date_range;
-		if (i == 0){ // first iteration is always for previous day
-			if (showPrevious) {
+	if (showPrevious){
+		for (let i = 0; i< current_news.length; i++) {
+			var current_date_range;
+			if (i == 0){ // first iteration is always for previous day
 				current_date_range = formatTime(getMinDate(new Date(current_date)))  + " - " + formatTime(current_news[i].Date);
 				labels.push({
 					'label': previous_news[previous_news.length-1].Title,
@@ -365,36 +364,71 @@ function change(data) {
 					'date_range': current_date_range
 				});
 				pieData[i].previous_date = formatDate(new Date(previous_date));
+				
 			}
+			else{
+				current_date_range = formatTime(current_news[i - 1].Date) + " - " + formatTime(current_news[i].Date)
+				labels.push( {
+					'label': current_news[i-1].Title,
+					'value': data[i-1],
+					'date_start_int': current_news[i-1].Date.getTime(),
+					'date_end_int': current_news[i].Date.getTime(),
+					'date_range': current_date_range 
+				});
+			}
+		
+			pieData[i].date_range = current_date_range;
 		}
-		else{
-			current_date_range = formatTime(current_news[i - 1].Date) + " - " + formatTime(current_news[i].Date)
-			labels.push( {
-				'label': current_news[i-1].Title,
-				'value': data[i-1],
-				'date_start_int': current_news[i-1].Date.getTime(),
-				'date_end_int': current_news[i].Date.getTime(),
-				'date_range': current_date_range 
-			});
-		}
-		if (i == 0 && !showPrevious){
-			pieData[i-1].date_range = formatTime(getMinDate(new Date(current_date)))  + " - " + formatTime(current_news[0].Date);
-		}
-		else{
+		current_date_range = formatTime(current_news[current_news.length-1].Date) + " - 00:00";
+		labels.push( {
+			'label': current_news[current_news.length-1].Title,
+			'value': data[data.length-1],
+			'date_start_int': current_news[current_news.length-1].Date.getTime(),
+			'date_end_int': getMaxDate(new Date(current_date)).getTime(),
+			'date_range':  current_date_range
+		});
+
+		pieData[pieData.length-1].date_range = current_date_range;
+	}
+	else{
+		for (let i = 0; i< current_news.length; i++) {
+			var current_date_range;
+			if (i == 0){ // first iteration is always for previous day
+				current_date_range = formatTime(getMinDate(new Date(current_date)))  + " - " + formatTime(current_news[i+1].Date);
+				labels.push({
+					'label': current_news[i].Title,
+					'value': data[i],
+					'date_end_int': current_news[i].Date.getTime(),
+					'date_start_int': getMinDate(new Date(current_date)).getTime(),
+					'date_range': current_date_range
+				});				
+			}
+			else if (i == current_news.length - 1){
+				current_date_range = formatTime(current_news[i].Date) + " - " + "00:00";
+				labels.push( {
+					'label': current_news[i].Title,
+					'value': data[i],
+					'date_start_int': current_news[i].Date.getTime(),
+					'date_end_int': getMaxDate(new Date(current_date)).getTime(),
+					'date_range': current_date_range 
+				});
+			}
+			else{
+				current_date_range = formatTime(current_news[i].Date) + " - " + formatTime(current_news[i+1].Date)
+				labels.push( {
+					'label': current_news[i].Title,
+					'value': data[i],
+					'date_start_int': current_news[i].Date.getTime(),
+					'date_end_int': current_news[i+1].Date.getTime(),
+					'date_range': current_date_range 
+				});
+			}
 			pieData[i].date_range = current_date_range;
 		}
 	}
+	
 
-	current_date_range = formatTime(current_news[current_news.length-1].Date) + " - 00:00"
-	labels.push( {
-		'label': current_news[current_news.length-1].Title,
-		'value': data[data.length-1],
-		'date_start_int': current_news[current_news.length-1].Date.getTime(),
-		'date_end_int': getMaxDate(new Date(current_date)).getTime(),
-		'date_range':  current_date_range
-	});
-
-	pieData[pieData.length-1].date_range = current_date_range;
+	
 
 	var key = function(d){
 		var k = d.label;

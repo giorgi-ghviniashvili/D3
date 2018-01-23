@@ -75,12 +75,12 @@ function renderBubbleChart(params) {
       var container = d3.select(this);
 
       //Add svg
-      var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
-        .attr('width', attrs.svgWidth)
-        .attr('height', attrs.svgHeight)
+      var svg = container.patternify({ tag: 'svg:svg', selector: 'svg-chart-container' })
+        .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight )
+        .attr("preserveAspectRatio", "xMinYMin")
 
       //Add container g element
-      var chart = svg.patternify({ tag: 'g', selector: 'chart' })
+      var chart = svg.patternify({ tag: 'svg:g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
       // ###### tooltip #####
@@ -99,7 +99,7 @@ function renderBubbleChart(params) {
             .style("width", "100px")
             .text("");
 
-      var node = chart.patternify({ tag: 'circle', selector: 'bubble', data: attrs.data })
+      var node = chart.patternify({ tag: 'svg:circle', selector: 'bubble', data: attrs.data })
             .attr('r', function(d) {
                 return scaleRadius(d[columnForRadius])
             })

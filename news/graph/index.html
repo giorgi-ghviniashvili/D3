@@ -8,7 +8,7 @@
 	<script src="./d3.v3.min.js"></script>
 
 	<style type="text/css">
-		.statement {
+		.statement, .mainLabel, .secondLabel {
 			line-height: 1.1;
 			font-family: 'Alef', sans-serif;
 		}
@@ -128,9 +128,9 @@
 		</select>
 
 		<div class="col-md-4 d-flex flex-row align-items-center justify-content-center" style="max-width:15rem">
-			<a class="navigator" onclick="decrementDate()"> < </a>
+			<a class="navigator" onclick="incrementDate()"> &lt; </a>
 			<p id="date" class="m-0 px-2"></p>
-			<a class="navigator" onclick="incrementDate()"> > </a>
+			<a class="navigator" onclick="decrementDate()"> &gt; </a>
 		</div>
 		
 	</div>

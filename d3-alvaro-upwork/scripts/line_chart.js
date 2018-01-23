@@ -11,6 +11,9 @@ function renderLineChart(params) {
     marginRight: 5,
     marginLeft: 5,
     animationSpeed: 1500,
+    spacingAfterchart: 50,
+    legendColumnCount: 5,
+    legendRowHeight: 40,
     tooltipTextColor: '#C5C5C5',
     tooltipTextFontSize: 12,
     tooltipBackgroundColor: '#222222',
@@ -38,6 +41,9 @@ function renderLineChart(params) {
       calc.legendHeigh = calc.chartHeight * 0.2;
       calc.lineChartHeight = calc.chartHeight * 0.8;
 
+      calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
+      calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
+
       var t = d3.transition()
             .duration(attrs.animationSpeed)
             .ease(d3.easeLinear)
@@ -63,7 +69,8 @@ function renderLineChart(params) {
         return d3.max(d, function(x){
           return +x.value;
         });
-      })]);       
+      })]);
+
       var color = d3.scaleOrdinal(d3.schemeCategory10).domain(attrs.data.map(d => { 
         return d[0].name; 
       }));
@@ -166,14 +173,14 @@ function renderLineChart(params) {
           ;
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", calc.chartWidth / 2)
+                                  .attr("x", x(4))
                                   .attr("y", calc.lineChartHeight + 20)
                                   .text("Registered users number x Time");
 
       // ##### legend #####
       var legend = chart.patternify({ tag: 'g', selector: 'legend' })
                         .attr('transform', (d,i) => {
-                              return "translate("+ [0, calc.lineChartHeight + 50] +")"
+                              return "translate("+ [0, calc.lineChartHeight + attrs.spacingAfterchart] +")"
                         })
                         
 
@@ -184,9 +191,9 @@ function renderLineChart(params) {
                                             return d[0].name;
                                          })
                                        })
-                           .attr('transform', (d,i) => {
-                              return "translate("+ [x(i), 0] +")"
-                           });
+                                 .attr('transform', function (d, i) {
+                                    return "translate(" + (i % attrs.legendColumnCount * calc.eachLegendWidth - 17.5) + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
+                                  });
 
       legend_items.append("rect")
               .attr("width", 15)

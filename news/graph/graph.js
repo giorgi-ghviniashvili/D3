@@ -31,6 +31,8 @@ var sheets = [
 var news_data = [];
 var dates = [];
 var current_date;
+var previous_date;
+var showPrevious;
 var current_sheet;
 var current_news = [];
 
@@ -191,6 +193,7 @@ function parseNewsData(data) {
 
 	if (news_data) {
 		current_date = dates[0];
+		previous_date = dates[1];
 		current_sheet = sheets[0].title;
 
 		setDate();
@@ -207,49 +210,44 @@ function onMagazineChange() {
 	let lines = document.getElementsByClassName("lines")[0];
 
 	current_date = dates[0];
-
+	previous_date = dates[1];
 	setDate();
 	setNews();
 }
 
 
-function decrementDate() {
+function incrementDate() {
 	let index = _.indexOf(dates, current_date);
 	console.log(current_date, index);
 	if (index > 0) {
+		previous_date = dates[index];
 		current_date = dates[--index];
-		
 		setDate();
 		setNews();
 	}
 }
 
-function incrementDate() {
+function decrementDate() {
 	let index = _.indexOf(dates, current_date);
 	if (index < (dates.length-1)) {
 		current_date = dates[++index];
-		
+		previous_date = index == dates.length - 1 ? dates[index] : dates[index + 1];
 		setDate();
 		setNews();
 	}
 }
 
-function setDate(val) {
+function setDate() {
 	let date = new Date(current_date);
-
 	let date_ele = document.getElementById('date');
-
-	date_ele.innerHTML = (date.getDate() < 10 ? "0"+date.getDate() : date.getDate()) + "-";
-	date_ele.innerHTML += (date.getMonth() < 9 ? "0"+(date.getMonth()+1) : (date.getMonth()+1)) +"-";
-	date_ele.innerHTML += date.getFullYear();		
+	date_ele.innerHTML = formatDate(date);
 }
 
 function setNews() {
 	current_news = news_data[current_date];
 	current_news = _.groupBy(current_news, 'Magazine');
-
 	// if no news from the site
-	if (!current_news.hasOwnProperty(current_sheet)){
+	if (!current_news.hasOwnProperty(current_sheet)){ // sanity checks
 		// set message that there is no news
 		d3.select("#message").style("display", "block");
 		// hide the chart
@@ -262,8 +260,20 @@ function setNews() {
 		// show the chart
 		svg.attr("display", "block");
 	}
-
 	current_news = current_news[current_sheet];
+
+	// news of previous day
+	previous_news = news_data[previous_date];
+	previous_news = _.groupBy(previous_news, 'Magazine')[current_sheet];
+
+	if (previous_news!==undefined) { // sanity checks
+		// sort acsending
+		previous_news.sort((a, b) => {
+			if (a.Date > b.Date) return 1;
+			if (a.Date < b.Date) return -1;
+			return 0;
+		});
+	}
 
 	let cnews = [];
 	data = [];
@@ -296,33 +306,39 @@ function setNews() {
 	console.log("current_news");
 	console.log(current_news);
 	let date = new Date(current_date);
-	let max_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 00);
-	let min_date = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 00, 00, 00);
+	let max_date = getMaxDate(date);
+	let min_date = getMinDate(date);
+
+	var devision = 86400; // seconds a day
+
+	// if first news starts at 00:00, do not show last headline from the previous day
+	showPrevious = current_news[0].Date.getTime() !== min_date.getTime() && previous_news !== undefined;
 
 	for (var i = 0; i < current_news.length; i++) {
 		var diff = null;
-		if (i == 0) {
-			diff = current_news[i].Date.getTime() - min_date.getTime();
-			// console.log(diff, max_date, current_news[i].Date);
-		} else if (i == current_news.length-1) {
-			diff = max_date.getTime() - current_news[i].Date.getTime();
-			// console.log("here",diff, current_news[i].Date, min_date.getTime());
+		if (i == 0) { // first iteration is for previous day
+			if (showPrevious){
+				diff = current_news[i].Date.getTime() - min_date.getTime();
+			}
+			else{
+				continue;
+			}
 		} else {
 			diff = current_news[i].Date.getTime() - current_news[i-1].Date.getTime();
-			// console.log(diff, current_news[i].Date, current_news[i+1].Date);
 		}
-
-		diff = Math.round(diff / 86400);
-		//if the curret_news[i].Date is close to 00:00, give more width to the arc
-		if (diff < 10){
-			diff += 5;
-		}
-
+		diff = Math.round(diff / devision);
 		data.push(diff);
 	}
+
+	var diff = max_date.getTime() - current_news[current_news.length-1].Date.getTime();
+	diff = Math.round(diff / devision);
+	//if the curret_news[i].Date is close to 00:00, give more width to the arc
+	if (diff < 10){
+		diff += 5;
+	}
+	data.push(diff);
 	change(data);
 }
-
 
 function change(data) {
 	console.log("data:");
@@ -333,16 +349,52 @@ function change(data) {
 	var arcOver = d3.svg.arc()
     .outerRadius(radius + 10);
 	var labels = [];
+
 	var pieData = pie(data);
 
 	for (let i = 0; i< current_news.length; i++) {
-		labels.push( {
-			'label': current_news[i].Title,
-			'value': data[i],
-			'date': current_news[i].Date.getTime()
-		});
-		pieData[i].date = current_news[i].Date.getTime();
+		var current_date_range;
+		if (i == 0){ // first iteration is always for previous day
+			if (showPrevious) {
+				current_date_range = formatTime(getMinDate(new Date(current_date)))  + " - " + formatTime(current_news[i].Date);
+				labels.push({
+					'label': previous_news[previous_news.length-1].Title,
+					'value': data[i],
+					'date_end_int': current_news[i].Date.getTime(),
+					'date_start_int': getMinDate(new Date(current_date)).getTime(),
+					'date_range': current_date_range
+				});
+				pieData[i].previous_date = formatDate(new Date(previous_date));
+			}
+		}
+		else{
+			current_date_range = formatTime(current_news[i - 1].Date) + " - " + formatTime(current_news[i].Date)
+			labels.push( {
+				'label': current_news[i-1].Title,
+				'value': data[i-1],
+				'date_start_int': current_news[i-1].Date.getTime(),
+				'date_end_int': current_news[i].Date.getTime(),
+				'date_range': current_date_range 
+			});
+		}
+		if (i == 0 && !showPrevious){
+			pieData[i-1].date_range = formatTime(getMinDate(new Date(current_date)))  + " - " + formatTime(current_news[0].Date);
+		}
+		else{
+			pieData[i].date_range = current_date_range;
+		}
 	}
+
+	current_date_range = formatTime(current_news[current_news.length-1].Date) + " - 00:00"
+	labels.push( {
+		'label': current_news[current_news.length-1].Title,
+		'value': data[data.length-1],
+		'date_start_int': current_news[current_news.length-1].Date.getTime(),
+		'date_end_int': getMaxDate(new Date(current_date)).getTime(),
+		'date_range':  current_date_range
+	});
+
+	pieData[pieData.length-1].date_range = current_date_range;
 
 	var key = function(d){
 		var k = d.label;
@@ -386,10 +438,29 @@ function change(data) {
             });
         });
 
-	
+    var textCenter = svg.selectAll(".mainLabel")
+    					.data([0])
+    					.enter()
+    					.append("text")
+    					.attr("id", "mainTextLabel")
+    					.attr("class", "mainLabel")
+    					.style("font-size", 30)
+    					.text("00:00 - 00:00")
+    					.style("opacity", 0)
+    					.attr("transform", "translate("+[-90, 0]+")");
+
+    var textCenterDate = svg.selectAll(".secondLabel")
+    					.data([0])
+    					.enter()
+    					.append("text")
+    					.attr("id", "secondTextLabel")
+    					.attr("class", "secondLabel")
+    					.style("font-size", 30)
+    					.text("00-00-0000")
+    					.style("opacity", 0)
+    					.attr("transform", "translate("+[-70, -33]+")");
 
 	/* ------- TEXT LABELS -------*/
-
 	var text = svg.select(".labels").selectAll(".foreignObject")
 		.data(pieData);
 
@@ -403,12 +474,29 @@ function change(data) {
 		.on("mouseenter", function(d,i){
 			var slice = d3.selectAll("path[data-value='"+i+"']");
 			
-			slice.transition().duration(100).style("opacity", 1)
+			slice.transition().duration(200).style("opacity", 1);
+
+			svg.select("#mainTextLabel").transition()
+				.duration(200)
+				.text(d.date_range)
+				.style("fill", color(i))
+				.style("opacity", 1);
+
+			if (d.previous_date) {
+				svg.select("#secondTextLabel").transition()
+					.duration(200)
+					.text(d.previous_date)
+					.style("fill", color(i))
+					.style("opacity", 1);
+			}
 		})
 		.on("mouseleave", function(d,i){
 			var slice = d3.selectAll("path[data-value='"+i+"']");
 			
-			slice.transition().duration(100).style("opacity", 0.8)
+			slice.transition().duration(200).style("opacity", 0.8);
+
+			svg.select("#mainTextLabel").transition().duration(200).style("opacity", 0);
+			svg.select("#secondTextLabel").transition().duration(200).style("opacity", 0);
 		})
 		.call(drag);
 
@@ -421,7 +509,7 @@ function change(data) {
 		.style("color", function(d, i) { return color(i); })
 		.text(function(d) {
 			var label = labels.filter(function(next_item) {
-				return next_item.date == d.date; 
+				return next_item.date_range == d.date_range;
 			});
 			return label.length ? label[0].label: "";
 		});
@@ -489,14 +577,40 @@ function change(data) {
 };
 
 function showHideLines(value){
-    if (value == 1){
-    	svg.select(".lines").style("display", "block");
-    }
-    else {
-      	svg.select(".lines").style("display", "none");
-    }
- }
+	if (value == 1){
+		svg.select(".lines").style("display", "block");
+	}
+	else {
+	  	svg.select(".lines").style("display", "none");
+	}
+}
 
+ // #### utility functions ####
+function getMinDate(date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 00, 00, 00);	
+}
+function getMaxDate(date) {
+	return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 00);
+}
+function formatDate(date) {
+	var str = (date.getDate() < 10 ? "0"+date.getDate() : date.getDate()) + "-";
+	str += (date.getMonth() < 9 ? "0"+(date.getMonth()+1) : (date.getMonth()+1)) +"-";
+	str += date.getFullYear();
+	return str;
+}
+function formatTime(date) {
+	var hours = date.getHours();
+	var minutes = date.getMinutes();
+
+	function format(num) {
+		if (num < 10) {
+			return "0" + num;
+		}
+		return num;
+	}
+
+	return format(hours) + ":" + format(minutes);
+}
 init();
 //getListOfSheets();
 getNewsFromAllSheets();

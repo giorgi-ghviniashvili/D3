@@ -89,14 +89,16 @@
 </head>
 
 <body translate="no">
-
-    <div class="container centered">
-        <div id="lineChart"></div><div id="bubbleChart"></div>
-    </div>
     <div class="tooltip"></div>
+    <div class="container centered">
+        <div id="lineChart"></div>
+        <div id="bubbleChart"></div>
+        <div id="barChart"></div>
+    </div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/line_chart.js"></script>
     <script src="scripts/bubble_chart.js"></script>
+    <script src="scripts/bar_chart.js"></script>
     <script>
 
         d3.json("data/line_chart.json", function(error, data){
@@ -131,6 +133,25 @@
                 .svgHeight(600)
                 .svgWidth(width)
                 .container('#bubbleChart')
+                .data(data)
+                .debug(true)
+                .run()
+
+        });
+
+        d3.json("data/bar_chart.json", function(error, data){
+
+            // error check
+            if (error) {
+                console.error('Error getting or parsing the data.');
+                throw error;
+            }
+            // draw chart
+            var width = document.getElementById('barChart').getBoundingClientRect().width;
+            var chart = renderBarChart()
+                .svgHeight(600)
+                .svgWidth(width)
+                .container('#barChart')
                 .data(data)
                 .debug(true)
                 .run()

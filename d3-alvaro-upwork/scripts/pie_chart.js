@@ -83,7 +83,7 @@ function renderPieChart(params) {
           .style("fill", function(d) { 
             return color(d.data.name); 
           })
-          .transition()
+          .transition(attrs.id)
           .duration(attrs.animationSpeed)
           .attrTween('d', function(d) {
             var i = d3.interpolate(d.startAngle+0.1, d.endAngle);

@@ -8,7 +8,7 @@ https://github.com/bumbeishvili/d3-coding-conventions/blob/84b538fa99e43647d0d47
 */
 
 function renderBarChart(params) {
-
+  var isFirstLoad = true;
   // Exposed variables
   var attrs = {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
@@ -21,6 +21,7 @@ function renderBarChart(params) {
     axisLeftWidth: 30,
     axisBottomHeight: 20,
     barPadding: 2,
+    animationSpeed: 1000,
     container: 'body',
     data: null
   };
@@ -83,7 +84,7 @@ function renderBarChart(params) {
       xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
           .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
 
-      var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
+      var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
           .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
@@ -101,19 +102,34 @@ function renderBarChart(params) {
 
       // Add a rect for each data value
       var rects = groups.selectAll("rect")
-                    .data(function(d) { return d; })
-                    .enter()
-                    .append("rect")
-                    .attr("x", function(d, i) {
-                      return x(i) + attrs.barPadding / 2;
+                    .data(function(d) { return d; });
+
+       rects.enter()
+            .append("rect")                    
+            .attr("x", function(d, i) {
+              return x(i) + attrs.barPadding / 2;
+            })
+            .attr("width", (x(1) - x(0)) - attrs.barPadding);
+
+      // // animate if it is first load
+      if (isFirstLoad){
+        var t = d3.transition(attrs.id)
+            .duration(attrs.animationSpeed)
+            .ease(d3.easeLinear)
+            .on("start", function(d){})
+            .on("end", function(d){});
+
+        chart.selectAll(".bar rect").transition(t)
+                    .attr("height", function(d) {
+                      return y(d[0]) - y(d[1]);
                     })
                     .attr("y", function(d) {
                       return y(d[1]);
                     })
-                    .attr("height", function(d) {
-                      return y(d[0]) - y(d[1]);
-                    })
-                    .attr("width", (x(1) - x(0)) - attrs.barPadding);
+
+
+        isFirstLoad = !isFirstLoad; // turn off animation
+      }
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

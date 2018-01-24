@@ -9,6 +9,7 @@
     <style type="text/css">
         body{
             padding-top: 50px;
+            min-height: 100%;
         }
         svg{
             display: block;
@@ -36,39 +37,41 @@
             stroke-width: 1px;
           }
 
-          .axis text, .xAxisDescr {
-            font-family: 'Proxima-Nova', sans-serif;
-            font-size: 13px;
-            pointer-events: none;
-            fill: #7e7e7e;
-          }
+      .axis text, .xAxisDescr {
+        font-family: 'Proxima-Nova', sans-serif;
+        font-size: 13px;
+        pointer-events: none;
+        fill: #7e7e7e;
+      }
 
-          .y.axis text {
-            text-anchor: end !important;
-            font-size:14px;
-            fill: #7e7e7e;
-          }
+      .y.axis text {
+        text-anchor: end !important;
+        font-size:14px;
+        fill: #7e7e7e;
+      }
 
-          .domain {
-            display: none;
-          }
+      .domain {
+        display: none;
+      }
 
-          .line {
-            stroke-width: 3px;
-            fill: none;
-          }
+      .line {
+        stroke-width: 3px;
+        fill: none;
+      }
         
         .centered div {
             position: relative;
             width: 50%;
-            margin: auto;
+            margin: 0 auto;
             float: left;
         }
+
         @media(min-width:768px) and (max-width:850px) {
            .centered div{
                 position: relative;
                 width: 80%;
                 margin: auto;
+                float: none;
             }
         }
         @media(max-width:768px) {
@@ -89,18 +92,21 @@
 </head>
 
 <body translate="no">
-    <div class="tooltip"></div>
+    
     <div class="container centered">
         <div id="lineChart"></div>
         <div id="bubbleChart"></div>
+    </div>
+    <div class="container centered">
         <div id="barChart"></div>
+        <div><p>asdkalsdkasd</p></div>
     </div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/line_chart.js"></script>
     <script src="scripts/bubble_chart.js"></script>
     <script src="scripts/bar_chart.js"></script>
     <script>
-
+        var padding = 20;
         d3.json("data/line_chart.json", function(error, data){
 
             // error check
@@ -112,7 +118,7 @@
             var width = document.getElementById('lineChart').getBoundingClientRect().width;
             var chart = renderLineChart()
                 .svgHeight(600)
-                .svgWidth(width)
+                .svgWidth(width - padding)
                 .container('#lineChart')
                 .data(data)
                 .debug(true)
@@ -131,7 +137,7 @@
             var width = document.getElementById('bubbleChart').getBoundingClientRect().width;
             var chart = renderBubbleChart()
                 .svgHeight(600)
-                .svgWidth(width)
+                .svgWidth(width - padding)
                 .container('#bubbleChart')
                 .data(data)
                 .debug(true)
@@ -150,7 +156,7 @@
             var width = document.getElementById('barChart').getBoundingClientRect().width;
             var chart = renderBarChart()
                 .svgHeight(600)
-                .svgWidth(width)
+                .svgWidth(width - padding)
                 .container('#barChart')
                 .data(data)
                 .debug(true)
@@ -159,7 +165,7 @@
         });
     </script>
 
-
+    <div class="tooltip"></div>
 </body>
 
 </html>

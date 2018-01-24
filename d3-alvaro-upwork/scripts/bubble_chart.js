@@ -77,8 +77,8 @@ function renderBubbleChart(params) {
 
       //Add svg
       var svg = container.patternify({ tag: 'svg:svg', selector: 'svg-chart-container' })
-        .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight )
-        .attr("preserveAspectRatio", "xMinYMin")
+        .attr("width", attrs.svgWidth)
+        .attr("height", attrs.svgHeight)
 
       //Add container g element
       var chart = svg.patternify({ tag: 'svg:g', selector: 'chart' })

@@ -1,6 +1,7 @@
 function renderLineChart(params) {
   // we want to have animation only on load
   var isFirstLoad = true;
+  var isFirstLoadCircle = true;
   // Exposed variables
   var attrs = {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
@@ -44,20 +45,7 @@ function renderLineChart(params) {
       calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
 
-      var t = d3.transition()
-            .duration(attrs.animationSpeed)
-            .ease(d3.easeLinear)
-            .on("start", function(d){ console.log("transiton start") })
-            .on("end", function(d){ 
-              console.log("transiton ended");
-              
-              container.selectAll(".dot")
-                       .transition(200)
-                       .ease(d3.easeLinear)
-                       .attr("opacity", 1);
-              
-            });
-
+      
       var line = d3.line()
                   .x(function(d, i) { return x(i); })
                   .y(function(d) { return y(d.value); });
@@ -74,6 +62,20 @@ function renderLineChart(params) {
       var color = d3.scaleOrdinal(d3.schemeCategory10).domain(attrs.data.map(d => { 
         return d[0].name; 
       }));
+      // transition
+      var t = d3.transition(attrs.id)
+            .duration(attrs.animationSpeed)
+            .ease(d3.easeLinear)
+            .on("start", function(d){ console.log("transiton start") })
+            .on("end", function(d){ 
+              console.log("transiton ended");
+              
+              container.selectAll(".dot")
+                       .transition(200)
+                       .ease(d3.easeLinear)
+                       .attr("opacity", 1);
+              
+            });
       //Drawing containers
       var container = d3.select(this);
       container.html('');
@@ -133,6 +135,7 @@ function renderLineChart(params) {
         circleData = circleData.concat(x);
       });
 
+
       var fixeddot = chart.patternify({ tag: 'circle', selector: 'dot', data: circleData })
           .attr("r", 4)
           .attr("cx", function (d, i) {
@@ -141,7 +144,9 @@ function renderLineChart(params) {
           .attr("cy", function (d) {
               return y(d.value);
           })
-          .attr("opacity", 0)
+          .attr("opacity", () => {
+            return isFirstLoadCircle ? 0 : 1;
+          })
           .attr("data-name", d => {
             return d.name;
           })
@@ -169,8 +174,7 @@ function renderLineChart(params) {
             var circle = d3.select(this);
             circle.style("fill", "#fff");
 
-          })
-          ;
+          });
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
                                   .attr("x", x(4))
@@ -206,7 +210,7 @@ function renderLineChart(params) {
                 return color(d);
               })
               .attr("data-selected", "true")
-              .on("dblclick", function(d){
+              .on("click", function(d){
                 var rect = d3.select(this);
                 var isSelected = rect.attr("data-selected");
                 var paths = chart.selectAll(".line[data-name='"+ d +"']");
@@ -243,6 +247,9 @@ function renderLineChart(params) {
                 return d;
               })
               .attr("transform", "translate("+[0,12]+")");
+
+      // remove circle transition
+      isFirstLoadCircle  = false;
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

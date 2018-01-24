@@ -1,13 +1,5 @@
-/*  
-
-This code is based on following convention:
-
-https://github.com/bumbeishvili/d3-coding-conventions/blob/84b538fa99e43647d0d4717247d7b650cb9049eb/README.md
-
-
-*/
-
-function renderBarChart(params) {
+function renderBoxChart(params) {
+  // we want to have animation only on load
   var isFirstLoad = true;
   // Exposed variables
   var attrs = {
@@ -15,32 +7,28 @@ function renderBarChart(params) {
     svgWidth: 400,
     svgHeight: 400,
     marginTop: 5,
-    marginBottom: 5,
+    marginBottom: 15,
     marginRight: 5,
     marginLeft: 5,
-    axisLeftWidth: 30,
-    axisBottomHeight: 20,
-    barPadding: 2,
-    animationSpeed: 1000,
+    animationSpeed: 1500,
+    spacingAfterchart: 50,
+    legendColumnCount: 5,
+    legendRowHeight: 40,
+    tooltipTextColor: '#C5C5C5',
+    tooltipTextFontSize: 12,
+    tooltipBackgroundColor: '#222222',
+    axisLeftWidth : 35,
+    axisBottomHeight : 20,
+    showLabels: true,
     container: 'body',
     data: null
   };
-
-
   //InnerFunctions which will update visuals
   var updateData;
 
   //Main chart object
   var main = function (selection) {
     selection.each(function scope() {
-
-      //Set up stack layout
-      var stack = d3.stack()
-                    .keys(Object.keys(attrs.data[0]).filter(x => x !== 'month'))
-                    .order(d3.stackOrderDescending);
-
-      //Data, stacked
-      var series = stack(attrs.data);
 
       //Calculated properties
       var calc = {}
@@ -51,86 +39,62 @@ function renderBarChart(params) {
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
       calc.legendHeigh = calc.chartHeight * 0.2;
       calc.lineChartHeight = calc.chartHeight * 0.8;
+
+      calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
+      calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
+
+      
+      // ########### layouts ##############
+      var box = d3.box()
+                      .whiskers(iqr(1.5))
+                      .height(calc.lineChartHeight - attrs.axisBottomHeight) 
+                      .domain([attrs.data.minValue, attrs.data.maxValue])
+                      .showLabels(attrs.showLabels)
+      if (isFirstLoad) {
+        box.duration(attrs.animationSpeed);
+        isFirstLoad = !isFirstLoad;
+      }
+      // ############ scales ##############
+      // Compute an ordinal xScale for the keys in boxPlotData
+      var x = d3.scaleBand()     
+                .domain( attrs.data.dataArray.map(function(d) { console.log(d); return d[0] } ) )     
+                .rangeRound([0 , calc.chartWidth])
+                .padding(0.7);
+     
+      var  y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0])
+                               .domain([attrs.data.minValue, attrs.data.maxValue]);
+
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      
       //Drawing containers
       var container = d3.select(this);
       container.html('');
 
       //Add svg
       var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
-                        .attr('width', attrs.svgWidth)
-                        .attr('height', attrs.svgHeight);
-
-      // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
-          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
-          var sum = 0;
-          Object.keys(d).forEach(x => {
-            if (x != 'month'){
-              sum += +d[x];
-            }
-          });
-          return sum;
-      })]);
-
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
+        .attr('width', attrs.svgWidth)
+        .attr('height', attrs.svgHeight);
 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
       // ############# axes ##################
-      var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
+      var xAxis = chart.patternify({ tag: 'g', selector: 'axis-visible axisX' });
 
       xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
+           .call(d3.axisBottom(x));
 
-      var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
+      var yAxis = chart.patternify({ tag: 'g', selector: 'axis-visible axisY'});
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
-          .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
+          .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s'))
           .tickPadding(8));
-      
-      // Add a group for each row of data
-      var groups = chart.patternify({ tag: "g", selector: 'bars' ,data: series})
-        .style("fill", function(d, i) {
-          return color(i);
-        });
-
-      // Add a rect for each data value
-      var rects = groups.selectAll("rect")
-                    .data(function(d) { return d; })
-                    .enter()
-                    .append("rect")                    
-                    .attr("x", function(d, i) {
-                      return x(i) + attrs.barPadding / 2;
-                    })
-                    .attr("width", (x(1) - x(0)) - attrs.barPadding)
-                    .attr("height", function(d) {
-                      return y(d[0]) - y(d[1]);
-                    });
-
-      var t = d3.transition(attrs.id)
-            .duration(attrs.animationSpeed)
-            .ease(d3.easeLinear)
-            .on("start", function(d){})
-            .on("end", function(d){});
-
-      // // animate if it is first load
-      if (isFirstLoad){
-        rects.transition(t)
-              .attr("y", function(d) {
-                return y(d[1]);
-              })
-        isFirstLoad = !isFirstLoad; // turn off animation
-      }
-      else {
-        rects
-              .attr("y", function(d) {
-                return y(d[1]);
-              });
-      }
-
+      // draw the boxplots  
+      chart.patternify({ tag: 'g', selector: 'box', data: attrs.data.dataArray})
+          .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + 0 + ")"; } )
+          .call(box.width(x.bandwidth())); 
+  
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();
@@ -142,12 +106,25 @@ function renderBarChart(params) {
         container.call(main);
       }
 
-
       // Smoothly handle data updating
       updateData = function () {
 
       }
+
       //#########################################  UTIL FUNCS ##################################
+      // Returns a function to compute the interquartile range.
+      function iqr(k) {
+        return function(d, i) {
+          var q1 = d.quartiles[0],
+              q3 = d.quartiles[2],
+              iqr = (q3 - q1) * k,
+              i = -1,
+              j = d.length;
+          while (d[++i] < q1 - iqr);
+          while (d[--j] > q3 + iqr);
+          return [i, j];
+        };
+      }
 
       function debug() {
         if (attrs.isDebug) {
@@ -182,13 +159,13 @@ function renderBarChart(params) {
 
     // Pattern in action
     var selection = container.selectAll('.' + selector).data(data, (d, i) => {
-            if (typeof d === "object") {
-                if (d.id) {
-                    return d.id;
-                }
+        if (typeof d === "object") {
+            if (d.id) {
+                return d.id;
             }
-            return i;
-        })
+        }
+        return i;
+    });
     selection.exit().remove();
     selection = selection.enter().append(elementTag).merge(selection)
     selection.attr('class', selector);
@@ -222,7 +199,7 @@ function renderBarChart(params) {
   //Exposed update functions
   main.data = function (value) {
     if (!arguments.length) return attrs.data;
-    attrs.data = value;
+    attrs.data = preprocessData(value);
     if (typeof updateData === 'function') {
       updateData();
     }
@@ -233,6 +210,47 @@ function renderBarChart(params) {
   main.run = function () {
     d3.selectAll(attrs.container).call(main);
     return main;
+  }
+
+  var preprocessData = function (raw_data) {
+      // using an array of arrays with
+      // data[n][2] 
+      // where n = number of columns in the csv file 
+      // data[i][0] = name of the ith column
+      // data[i][1] = array of values of ith column
+      var keys = Object.keys(raw_data[0]);
+      var data = [];
+      keys.forEach((key,i) => {
+        data[i] = [];
+        data[i][0] = key;
+        data[i][1] = [];
+      });
+      var min = Infinity,
+          max = -Infinity;
+      raw_data.forEach((x) => {
+        var rowMax = +x[keys[0]], rowMin = +x[keys[0]]; // first items
+        keys.forEach((key,i) => {
+          data[i][1].push(+x[key]);
+          var floor = Math.floor(+x[key]);
+          if (floor > rowMax) {
+            rowMax = floor;
+          }
+          if (floor < rowMin) {
+            rowMin = floor;
+          }
+        });
+        if (rowMax > max) {
+          max = rowMax;
+        }
+        if (rowMin < min) {
+          min = rowMin; 
+        }
+      });
+      return {
+        dataArray: data, 
+        minValue: min,
+        maxValue: max
+      };
   }
 
   return main;

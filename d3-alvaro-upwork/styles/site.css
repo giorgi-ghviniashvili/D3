@@ -1,0 +1,123 @@
+        body
+        {
+            min-height: 100%;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        }
+        svg
+        {
+            display: block;
+            margin: auto;
+        }
+        div.tooltip 
+        {
+            position: absolute;
+            text-align: center;
+            padding: 5px;
+            font-weight: bold;
+            border: 0px;
+            border-radius: 8px;
+            opacity: 0;
+        }
+
+        .tooltip p 
+        {
+            margin: 0 4px;
+            padding: 5px;
+        }
+        .axis line 
+        {
+            fill: none;
+            stroke: #ccc;
+            stroke-dasharray: 2px 3px;
+            shape-rendering: crispEdges;
+            stroke-width: 1px;
+        }
+        
+        .axis text,.xAxisDescr 
+        {
+            font-family: 'Proxima-Nova', sans-serif;
+            font-size: 13px;
+            pointer-events: none;
+            fill: #7e7e7e;
+        }
+        .axis text 
+        {
+            text-anchor: end !important;
+            font-size:14px;
+            fill: #7e7e7e;
+        }
+        .axis .domain 
+        {
+            display: none;
+        }
+        .line 
+        {
+            stroke-width: 3px;
+            fill: none;
+        }        
+        .centered div 
+        {
+            position: relative;
+            width: 50%;
+            margin: 0 auto;
+            float: left;
+        }
+        @media(min-width:768px) and (max-width:850px) {
+           .centered div{
+                position: relative;
+                width: 80%;
+                margin: auto;
+                float: none;
+            }
+        }
+        @media(max-width:768px) {
+           .centered div{
+                position: relative;
+                width: 100%;
+                margin: auto;
+            }
+        }
+        .legend_item text, .xAxisDescr, .axis text {
+            cursor: default;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        .box {
+          font: 10px sans-serif;
+        }
+
+        .box line,
+        .box rect,
+        .box circle {
+          stroke: #000;
+          stroke-width: 1px;
+        }
+
+        .box .center {
+          stroke-dasharray: 3,3;
+        }
+
+        .box .outlier {
+          fill: none;
+          stroke: #000;
+        }
+
+        .axis-visible {
+          font: 12px sans-serif;
+        }
+        
+        .axis-visible path,
+        .axis-visible line {
+          fill: none;
+          stroke: #000;
+          shape-rendering: crispEdges;
+        }
+         
+        .axisX path { 
+          fill: none;
+          stroke: #000;
+          shape-rendering: crispEdges;
+        }

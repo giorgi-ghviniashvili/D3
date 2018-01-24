@@ -7,7 +7,7 @@ https://github.com/bumbeishvili/d3-coding-conventions/blob/84b538fa99e43647d0d47
 
 */
 
-function renderBarChart(params) {
+function renderPieChart(params) {
   var isFirstLoad = true;
   // Exposed variables
   var attrs = {
@@ -23,6 +23,7 @@ function renderBarChart(params) {
     barPadding: 2,
     animationSpeed: 1000,
     container: 'body',
+    chartInnerRadius: 50,
     data: null
   };
 
@@ -34,14 +35,6 @@ function renderBarChart(params) {
   var main = function (selection) {
     selection.each(function scope() {
 
-      //Set up stack layout
-      var stack = d3.stack()
-                    .keys(Object.keys(attrs.data[0]).filter(x => x !== 'month'))
-                    .order(d3.stackOrderDescending);
-
-      //Data, stacked
-      var series = stack(attrs.data);
-
       //Calculated properties
       var calc = {}
       calc.id = "ID" + Math.floor(Math.random() * 1000000);  // id for event handlings
@@ -51,6 +44,22 @@ function renderBarChart(params) {
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
       calc.legendHeigh = calc.chartHeight * 0.2;
       calc.lineChartHeight = calc.chartHeight * 0.8;
+      calc.chartOuterRadius = calc.chartWidth / 4;
+
+      // ########## scales #######
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+      // layouts
+      var arc = d3.arc()
+                  .outerRadius(calc.chartOuterRadius)
+                  .innerRadius(attrs.chartInnerRadius);
+
+      var pie = d3.pie()
+          .sort(null)
+          .startAngle(1.1*Math.PI)
+          .endAngle(3.1*Math.PI)
+          .value(function(d) { return +d.value; });
+
       //Drawing containers
       var container = d3.select(this);
       container.html('');
@@ -60,82 +69,29 @@ function renderBarChart(params) {
                         .attr('width', attrs.svgWidth)
                         .attr('height', attrs.svgHeight);
 
-      // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
-          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
-          var sum = 0;
-          Object.keys(d).forEach(x => {
-            if (x != 'month'){
-              sum += +d[x];
-            }
-          });
-          return sum;
-      })]);
-
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
-      // ############# axes ##################
-      var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
+      var slices = chart.patternify({ tag: 'g', selector: 'slices' })
+                        .attr("transform", "translate(" + calc.chartWidth / 2 + "," + calc.chartHeight / 2 + ")");
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
+      var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) });
 
-      var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
-
-      yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
-          .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
-          .tickPadding(8));
-      
-      // Add a group for each row of data
-      var groups = chart.patternify({ tag: "g", selector: 'bars' ,data: series})
-        .style("fill", function(d, i) {
-          return color(i);
-        });
-
-      // Add a rect for each data value
-      var rects = groups.selectAll("rect")
-                    .data(function(d) { return d; })
-                    .enter()
-                    .append("rect")                    
-                    .attr("x", function(d, i) {
-                      return x(i) + attrs.barPadding / 2;
-                    })
-                    .attr("width", (x(1) - x(0)) - attrs.barPadding);
-      var t = d3.transition(attrs.id)
-            .duration(attrs.animationSpeed)
-            .ease(d3.easeLinear)
-            .on("start", function(d){})
-            .on("end", function(d){});
-      // // animate if it is first load
-      if (isFirstLoad){
-        
-
-        rects.transition(t)
-                    .attr("height", function(d) {
-                      return y(d[0]) - y(d[1]);
-                    })
-                    .attr("y", function(d) {
-                      return y(d[1]);
-                    })
-
-
-        isFirstLoad = !isFirstLoad; // turn off animation
-      }
-      else {
-        rects
-              .attr("height", function(d) {
-                return y(d[0]) - y(d[1]);
-              })
-              .attr("y", function(d) {
-                return y(d[1]);
-              });
-      }
-
+      arcs.append("path")
+          .style("fill", function(d) { 
+            return color(d.data.name); 
+          })
+          .transition()
+          .duration(attrs.animationSpeed)
+          .attrTween('d', function(d) {
+            var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
+            return function(t) {
+              d.endAngle = i(t); 
+              return arc(d)
+              }
+          }); 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();

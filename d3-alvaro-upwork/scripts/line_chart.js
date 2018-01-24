@@ -62,20 +62,22 @@ function renderLineChart(params) {
       var color = d3.scaleOrdinal(d3.schemeCategory10).domain(attrs.data.map(d => { 
         return d[0].name; 
       }));
+      
       // transition
       var t = d3.transition(attrs.id)
-            .duration(attrs.animationSpeed)
-            .ease(d3.easeLinear)
-            .on("start", function(d){ console.log("transiton start") })
-            .on("end", function(d){ 
-              console.log("transiton ended");
-              
-              container.selectAll(".dot")
-                       .transition(200)
-                       .ease(d3.easeLinear)
-                       .attr("opacity", 1);
-              
-            });
+                .duration(attrs.animationSpeed)
+                .ease(d3.easeLinear)
+                .on("start", function(d){ console.log("transiton start") })
+                .on("end", function(d){ 
+                  console.log("transiton ended");
+                  
+                  container.selectAll(".dot")
+                           .transition(200)
+                           .ease(d3.easeLinear)
+                           .attr("opacity", 1);
+                  
+                });
+
       //Drawing containers
       var container = d3.select(this);
       container.html('');

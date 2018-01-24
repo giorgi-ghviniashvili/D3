@@ -99,12 +99,13 @@
     </div>
     <div class="container centered">
         <div id="barChart"></div>
-        <div><p>asdkalsdkasd</p></div>
+        <div id="pieChart"></div>
     </div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/line_chart.js"></script>
     <script src="scripts/bubble_chart.js"></script>
     <script src="scripts/bar_chart.js"></script>
+    <script src="scripts/pie_chart.js"></script>
     <script>
         var padding = 20;
         d3.json("data/line_chart.json", function(error, data){
@@ -158,6 +159,25 @@
                 .svgHeight(600)
                 .svgWidth(width - padding)
                 .container('#barChart')
+                .data(data)
+                .debug(true)
+                .run()
+
+        });
+
+        d3.json("data/pie_chart.json", function(error, data){
+
+            // error check
+            if (error) {
+                console.error('Error getting or parsing the data.');
+                throw error;
+            }
+            // draw chart
+            var width = document.getElementById('pieChart').getBoundingClientRect().width;
+            var chart = renderPieChart()
+                .svgHeight(600)
+                .svgWidth(width - padding)
+                .container('#pieChart')
                 .data(data)
                 .debug(true)
                 .run()

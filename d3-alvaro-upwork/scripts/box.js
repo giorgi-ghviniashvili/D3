@@ -19,7 +19,7 @@ d3.box = function() {
       curBar = 1,
       tickFormat = null,
       color = d3.scaleOrdinal(d3.schemeCategory10);
-
+      
   // For each small multiple…
   function box(g) {
     g.each(function(data, i) {

@@ -1,8 +1,3 @@
-
-
-
-
-
 function getChart(params) {
     // exposed variables
     var attrs = {
@@ -13,7 +8,7 @@ function getChart(params) {
         marginRight: 5,
         marginLeft: 5,
         center: [43.5, 44],
-        scale: 250,
+        scale: 200,
         container: 'body',
         geojson: null,
         data: null
@@ -56,9 +51,9 @@ function getChart(params) {
 
 
             /*##################################   BEHAVIORS ####################################### */
-            var behaviors = {};
+            // var behaviors = {};
 
-            behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
+            // behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
 
             //################################ DRAWING ######################  
             //drawing containers
@@ -68,7 +63,7 @@ function getChart(params) {
             var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
                 .attr('width', attrs.svgWidth)
                 .attr('height', attrs.svgHeight)
-                .call(behaviors.zoom);
+                // .call(behaviors.zoom);
             // .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight)
             // .attr("preserveAspectRatio", "xMidYMid meet")
 
@@ -79,7 +74,7 @@ function getChart(params) {
 
             /* ############# PROJECTION ############### */
 
-            var projection = d3.geoMercator()
+            var projection = d3.geoEquirectangular()
                 .scale(attrs.scale)
                 .translate([calc.chartWidth * 0.56, calc.chartHeight * 0.33])
                 .center(attrs.center);
@@ -92,19 +87,26 @@ function getChart(params) {
 
             chart.patternify({ tag: 'path', selector: 'map-path', data: attrs.geojson.features })
                 .attr('d', path)
-                .attr('fill', d => '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6)) //random color
+                .attr('fill', "#9da3ad") //random color
 
-
+            
 
             /* #############################   HANDLER FUNCTIONS    ############################## */
-            handlers.zoomed = function () {
-                var transform = d3.event.transform;
-                chart.attr('transform', transform);
-            }
+            // handlers.zoomed = function () {
+            //     var transform = d3.event.transform;
+            //     chart.attr('transform', transform);
+            // }
 
             // smoothly handle data updating
             updateData = function () {
 
+                chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
+                                .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
+                                .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
+                                .attr("r", "5px")
+                                .attr("fill", d => {
+                                    return d.Class;
+                                })
 
             }
 
@@ -151,7 +153,8 @@ function getChart(params) {
                   }
               }
               return i;
-          })
+          });
+
       selection.exit().remove();
       selection = selection.enter().append(elementTag).merge(selection)
       selection.attr('class', selector);

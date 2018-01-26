@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Geomapping </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+
+</head>
+
+<body translate="no">
+
+    <div class="container centered">
+        <div id="myGraph"></div>
+    </div>
+    <script src="libs/d3.v4.min.js"></script>
+    <script src="scripts/d3script.js"></script>
+    <script src="scripts/points.js"></script>
+
+    <!-- Every two seconds (i.e. use setInterval function)...
+
+    - Pop off one northern point, and one southern point.
+    - Draw the northern and southern points on the map. Point should have a
+    "callout" style label on top of it (not only on hover; it should
+    automatically appear). Label should read like this: "RED event at CITY"
+    (i.e. red is the class string, and city is the city string. Obviously if
+    class is blue, then label will be "BLUE event at CITY".)
+    - Points should not stay on the map forever. They should fade after a
+    few seconds. So let's say every two seconds you draw two new points, but
+    every point fades after three seconds.
+    - The points should be animated - i.e. pulsating, etc.
+    - IMPORTANT: when you reach the end of the lists... start over from the
+    beginning of the list! (So in other words, copy the list. At start of
+    function, check that your copies still have points. If they're empty,
+    "recopy" the original lists and start popping off of there.) -->
+    <script>
+        var chart;
+        d3.json('data/world_countries.json', function (json) {
+            chart = getChart()
+		                .svgHeight(window.innerHeight-30)
+		                .svgWidth(window.innerWidth-30)
+		                .geojson(json)
+		                .data([])
+                
+            d3.select("#myGraph")
+                .call(chart);
+
+            var i = 0;
+            var points = getPoints();
+            
+            var interval = setInterval(function(){
+                var nPoint = points[0][i];
+                var sPoint = points[1][i];
+                chart.data([nPoint, sPoint]);
+                i++;
+                if (i == 500){
+                	i == 0;
+                }
+                console.log(i);
+            }, 2000);
+        })
+        
+        
+    </script>
+
+
+</body>
+
+</html>

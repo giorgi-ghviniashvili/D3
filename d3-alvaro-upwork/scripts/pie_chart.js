@@ -84,14 +84,18 @@ function renderPieChart(params) {
             return color(d.data.name); 
           })
           .transition(attrs.id)
-          .duration(attrs.animationSpeed)
+          .duration(isFirstLoad ? attrs.animationSpeed : 0)
           .attrTween('d', function(d) {
             var i = d3.interpolate(d.startAngle+0.1, d.endAngle);
             return function(t) {
               d.endAngle = i(t); 
               return arc(d)
               }
-          }); 
+          });
+
+      if (isFirstLoad){
+        isFirstLoad = false;
+      }
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();

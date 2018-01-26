@@ -121,3 +121,11 @@
           stroke: #000;
           shape-rendering: crispEdges;
         }
+        path.area {
+            fill: lightsteelblue;
+        }
+        .lineUpper, .lineLower {
+            fill: none;
+            stroke: steelblue;
+            stroke-width: 2px;
+        }

@@ -30,6 +30,7 @@
     <script src="scripts/pie_chart.js"></script>
     <script src="scripts/box.js"></script>
     <script src="scripts/box_chart.js"></script>
+    <script src="scripts/area_chart.js"></script>
     <script>
         var padding = 20;
         d3.json("data/line_chart.json", function(error, data){
@@ -124,6 +125,25 @@
                 .data(data)
                 .debug(true)
                 .run()
+
+        });
+
+        d3.json("data/area_chart.json", function(error, data){
+
+        // error check
+        if (error) {
+            console.error('Error getting or parsing the data.');
+            throw error;
+        }
+        // draw chart
+        var width = document.getElementById('areaChart').getBoundingClientRect().width;
+        var chart = renderAreaChart()
+            .svgHeight(600)
+            .svgWidth(width - padding)
+            .container('#areaChart')
+            .data(data)
+            .debug(true)
+            .run()
 
         });
     </script>

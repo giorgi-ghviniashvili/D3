@@ -8,7 +8,7 @@ function getChart(params) {
         marginRight: 5,
         marginLeft: 5,
         center: [43.5, 44],
-        scale: 200,
+        scale: 250,
         container: 'body',
         geojson: null,
         data: null
@@ -48,8 +48,6 @@ function getChart(params) {
                 zoomed: null
             }
 
-
-
             /*##################################   BEHAVIORS ####################################### */
             // var behaviors = {};
 
@@ -68,28 +66,24 @@ function getChart(params) {
             // .attr("preserveAspectRatio", "xMidYMid meet")
 
             var chart = svg.patternify({ tag: 'g', selector: 'chart' })
-                .attr('width', calc.chartWidth)
-                .attr('height', calc.chartHeight)
+                // .attr('width', calc.chartWidth)
+                // .attr('height', calc.chartHeight)
                 .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')')
 
             /* ############# PROJECTION ############### */
 
             var projection = d3.geoEquirectangular()
                 .scale(attrs.scale)
-                .translate([calc.chartWidth * 0.56, calc.chartHeight * 0.33])
+                .translate([calc.chartWidth * 0.6, calc.chartHeight * 0.2])
                 .center(attrs.center);
 
             var path = d3.geoPath()
                 .projection(projection);
 
             /* ##############  DRAWING ################# */
-
-
             chart.patternify({ tag: 'path', selector: 'map-path', data: attrs.geojson.features })
                 .attr('d', path)
-                .attr('fill', "#9da3ad") //random color
-
-            
+                .attr('fill', "steelblue")
 
             /* #############################   HANDLER FUNCTIONS    ############################## */
             // handlers.zoomed = function () {
@@ -106,7 +100,7 @@ function getChart(params) {
                                 .attr("r", "5px")
                                 .attr("fill", d => {
                                     return d.Class;
-                                })
+                                });
 
             }
 
@@ -136,8 +130,7 @@ function getChart(params) {
 
         });
     }
-
-
+    
     //----------- PROTOTYEPE FUNCTIONS  ----------------------
     d3.selection.prototype.patternify = function (params) {
       var container = this;
@@ -155,7 +148,7 @@ function getChart(params) {
               return i;
           });
 
-      selection.exit().remove();
+      selection.exit().transition().delay(3000).remove();
       selection = selection.enter().append(elementTag).merge(selection)
       selection.attr('class', selector);
       return selection;

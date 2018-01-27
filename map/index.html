@@ -18,8 +18,10 @@
             border: 0px;        
             border-radius: 8px;         
             pointer-events: none;
+            color: red;
             z-index: 999;       
         }
+
     </style>
 </head>
 
@@ -69,26 +71,15 @@
             var interval = setInterval(function(){
                 var nPoint = points[0][i];
                 var sPoint = points[1][i];
-                sPoint._class = "newPoint";
-                nPoint._class = "newPoint";
+                
                 var data = [nPoint, sPoint];
-                if (i > 0){
-                    data = data.concat([oldnPoint, oldSPoint]);
-                }
+               
                 chart.data(data);
                 i++;
 
                 if (i == 500){
                 	i == 0;
                 }
-                setTimeout(d => {
-                    d3.selectAll('.oldPoint').remove();
-                    d3.selectAll('.tooltipoldPoint').remove();
-                }, 5000);
-                oldnPoint = nPoint;
-                oldSPoint = sPoint;
-                oldSPoint._class = "oldPoint";
-                oldnPoint._class = "oldPoint";
             }, 2000);
         })
         

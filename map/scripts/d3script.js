@@ -9,6 +9,7 @@ function getChart(params) {
         marginLeft: 5,
         center: [43.5, 44],
         scale: 250,
+        dotDeleteTime: 3000,
         container: 'body',
         geojson: null,
         data: null
@@ -93,17 +94,50 @@ function getChart(params) {
 
             // smoothly handle data updating
             updateData = function () {
+                
+                var dots = chart.selectAll(".dot").data(attrs.data, d => {
+                    return d.id;
+                });
 
-                var dots = chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
-                                .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
-                                .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
-                                .attr("r", "5px")
-                                .attr("class", d => {
-                                    return d._class;
-                                })
-                                .attr("fill", d => {
-                                    return d.Class;
-                                });
+                var tooltip = chart.selectAll('.tooltip').data(attrs.data, d => {
+                    return d.id;
+                });
+
+                setTimeout(() => {
+                    dots.exit().remove();
+                    tooltip.exit().remove();
+                }, attrs.dotDeleteTime/ 2);
+              //   <animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="5%" to="25%"/>
+              // <animate attributeType="CSS" attributeName="stroke-width" begin="0s"  dur="1.5s" repeatCount="indefinite" from="3%" to="0%" />
+              // <animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
+                
+                dots.enter().append("circle").merge(dots).attr("class", "dot")
+                            .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
+                            .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
+                            .attr("r", "1")
+                            // .attr("class", d => {
+                            //     return d._class;
+                            // })
+                            .attr("fill", d => {
+                                return d.Class;
+                            })
+                            .append("animate")
+                            .attr("attributeType", "SVG")
+                                  .attr( "attributeName","r")
+                                   .attr( "begin","0s")
+                                    .attr("dur","1.5s")
+                                    .attr("repeatCount", "indefinite")
+                                    .attr("from","0%")
+                                    .attr("to","1%")
+
+                                    //.attr("attributeType","CSS").attr("attributeName","stroke-width").attr("begin","0s").attr("dur","1.5s").attr("repeatCount","indefinite").attr("from","1%").attr("to","0%")
+                            ;
+
+                tooltip.enter().append("text").merge(tooltip).attr("class", "tooltip")
+                            .attr("x", function (d) { return projection([d.Longitude, d.Latitude])[0] + 15; })
+                            .attr("y", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
+                            .text(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); })
+                            .style("fill", "red");
 
                 // Define the div for the tooltip
                 // container.patternify({ tag: "div", selector: "tooltip", data: attrs.data })
@@ -146,8 +180,6 @@ function getChart(params) {
       var selector = params.selector;
       var elementTag = params.tag;
       var data = params.data || [selector];
-      // container.select('.chart').selectAll('.newPoint').remove();
-      // container.select('.chart').selectAll('.tooltipnewPoint').remove();
       // Pattern in action
       var selection = container.selectAll('.' + selector).data(data, (d, i) => {
               if (typeof d === "object") {

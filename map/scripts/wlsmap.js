@@ -12,7 +12,7 @@ function getPoints(){
         nPoints.push({
         id: "nPointRed" + i,
         Latitude: a,
-        Longitude: b,
+        Longitude: i % 2 == 0 ? -b : b,
         Class: "red",
         City: "New York"
         });
@@ -25,7 +25,7 @@ function getPoints(){
         nPoints.push({
         id: "nPointBlue" + i,
         Latitude: a,
-        Longitude: b,
+        Longitude: i % 2 == 0 ? -b: b,
         Class: "blue",
         City: "New York"
         });
@@ -38,7 +38,7 @@ function getPoints(){
         sPoints.push({
         id: "sPointRed" + i,
         Latitude: -a,
-        Longitude: b,
+        Longitude: i % 2 == 0 ? -b : b,
         Class: "red",
         City: "New York"
         });
@@ -51,7 +51,7 @@ function getPoints(){
         sPoints.push({
         id: "sPointBlue" + i,
         Latitude: -a,
-        Longitude: b,
+        Longitude: i % 2 == 0 ? -b : b,
         Class: "blue",
         City: "New York"
         });

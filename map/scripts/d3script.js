@@ -94,14 +94,23 @@ function getChart(params) {
             // smoothly handle data updating
             updateData = function () {
 
-                chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
+                var dots = chart.patternify({ tag: 'circle', selector: 'dot', data: attrs.data })
                                 .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
                                 .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
                                 .attr("r", "5px")
+                                .attr("class", d => {
+                                    return d._class;
+                                })
                                 .attr("fill", d => {
                                     return d.Class;
                                 });
 
+                // Define the div for the tooltip
+                // container.patternify({ tag: "div", selector: "tooltip", data: attrs.data })
+                //      .attr("class", d => { return "tooltip " + "tooltip" + d._class; })
+                //      .style("top", function (d) { return 300 + "px"; })
+                //      .style("left", function (d) { return 300 + "px"; })
+                //      .html(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); });
             }
 
             //#########################################  UTIL FUNCS ##################################
@@ -137,7 +146,8 @@ function getChart(params) {
       var selector = params.selector;
       var elementTag = params.tag;
       var data = params.data || [selector];
-  
+      // container.select('.chart').selectAll('.newPoint').remove();
+      // container.select('.chart').selectAll('.tooltipnewPoint').remove();
       // Pattern in action
       var selection = container.selectAll('.' + selector).data(data, (d, i) => {
               if (typeof d === "object") {
@@ -148,7 +158,7 @@ function getChart(params) {
               return i;
           });
 
-      selection.exit().transition().delay(3000).remove();
+      selection.exit().remove();
       selection = selection.enter().append(elementTag).merge(selection)
       selection.attr('class', selector);
       return selection;

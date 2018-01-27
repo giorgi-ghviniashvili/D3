@@ -6,10 +6,21 @@
     <meta charset="UTF-8">
     <title>Geomapping </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-
-
+    <style type="text/css">
+       div.tooltip {    
+            position: absolute;         
+            text-align: center;         
+            width: 60px;                    
+            height: 28px;                   
+            padding: 2px;               
+            font: 12px sans-serif;      
+            background: lightsteelblue; 
+            border: 0px;        
+            border-radius: 8px;         
+            pointer-events: none;
+            z-index: 999;       
+        }
+    </style>
 </head>
 
 <body translate="no">
@@ -18,6 +29,7 @@
         <div id="myGraph"></div>
     </div>
     <script src="libs/d3.v4.min.js"></script>
+    <script src="libs/d3-tip.js"></script>
     <script src="scripts/d3script.js"></script>
     <script src="scripts/wlsmap.js"></script>
 
@@ -37,9 +49,11 @@
     beginning of the list! (So in other words, copy the list. At start of
     function, check that your copies still have points. If they're empty,
     "recopy" the original lists and start popping off of there.) -->
+
     <script>
         var chart;
-        d3.json('data/world_countries.json', function (json) {
+        d3.json('data/world_countries.json', function (error, json) {
+           
             chart = getChart()
 		                .svgHeight(window.innerHeight-30)
 		                .svgWidth(window.innerWidth-30)
@@ -51,16 +65,30 @@
 
             var i = 0;
             var points = getPoints();
-            
+            var oldnPoint, oldSPoint;
             var interval = setInterval(function(){
                 var nPoint = points[0][i];
                 var sPoint = points[1][i];
-                chart.data([nPoint, sPoint]);
+                sPoint._class = "newPoint";
+                nPoint._class = "newPoint";
+                var data = [nPoint, sPoint];
+                if (i > 0){
+                    data = data.concat([oldnPoint, oldSPoint]);
+                }
+                chart.data(data);
                 i++;
+
                 if (i == 500){
                 	i == 0;
                 }
-                console.log(i);
+                setTimeout(d => {
+                    d3.selectAll('.oldPoint').remove();
+                    d3.selectAll('.tooltipoldPoint').remove();
+                }, 5000);
+                oldnPoint = nPoint;
+                oldSPoint = sPoint;
+                oldSPoint._class = "oldPoint";
+                oldnPoint._class = "oldPoint";
             }, 2000);
         })
         

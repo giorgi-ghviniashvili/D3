@@ -22,6 +22,9 @@ function renderPieChart(params) {
     axisBottomHeight: 20,
     barPadding: 2,
     animationSpeed: 1000,
+    spacingAfterchart: 50,
+    legendColumnCount: 3,
+    legendRowHeight: 20,
     container: 'body',
     chartInnerRadius: 50,
     data: null
@@ -43,12 +46,18 @@ function renderPieChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
       calc.legendHeigh = calc.chartHeight * 0.2;
-      calc.lineChartHeight = calc.chartHeight * 0.8;
+      calc.chartBruttoHeight = calc.chartHeight * 0.8;
       calc.chartOuterRadius = calc.chartWidth / 4;
+
+      calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
+      calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
 
       // ########## scales #######
       var color = d3.scaleOrdinal(d3.schemeCategory10);
 
+      var x = d3.scaleLinear()
+                .range([10, calc.chartWidth])
+                .domain([0, attrs.data.length]);
       // layouts
       var arc = d3.arc()
                   .outerRadius(calc.chartOuterRadius)
@@ -75,7 +84,7 @@ function renderPieChart(params) {
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
       var slices = chart.patternify({ tag: 'g', selector: 'slices' })
-                        .attr("transform", "translate(" + calc.chartWidth / 2 + "," + calc.chartHeight / 2 + ")");
+                        .attr("transform", "translate(" + calc.chartWidth / 2 + "," + calc.chartBruttoHeight / 2 + ")");
 
       var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) });
 
@@ -92,6 +101,55 @@ function renderPieChart(params) {
               return arc(d)
               }
           });
+
+      arcs.append("text")
+        .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+        .attr("dx", -10)
+        .text(function(d) { return d.value; })
+        .style("fill", "#fff");
+
+      var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
+                                  .attr("x", x(2))
+                                  .attr("y", calc.chartBruttoHeight + 20)
+                                  .text("Registered users number x Time");
+
+      // ##### legend #####
+      var legend = chart.patternify({ tag: 'g', selector: 'legend' })
+                        .attr('transform', (d,i) => {
+                              return "translate("+ [0, calc.chartBruttoHeight + attrs.spacingAfterchart] +")"
+                        })
+                        
+
+      var legend_items = legend.patternify({ 
+                                         tag: 'g', 
+                                         selector: 'legend_item', 
+                                         data: attrs.data.map(d => { 
+                                            return d.name;
+                                         })
+                                       })
+                                 .attr('transform', function (d, i) {
+                                      return "translate(" + ((i % attrs.legendColumnCount) * calc.eachLegendWidth + calc.eachLegendWidth / 3)  + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
+                                  });
+
+      legend_items.append("rect")
+              .attr("width", 15)
+              .attr("height", 15)
+              .attr('rx', 2)
+              .attr("fill", (d, i) => {
+                return color(d);
+              })
+              
+
+      legend_items.append("text")
+              .attr("stroke", (d, i) => {
+                return color(d);
+              })
+              .attr("stroke-width", 0.9)
+              .text(d => {
+                return d;
+              })
+              .attr("transform", "translate("+[18,12]+")");
+
 
       if (isFirstLoad){
         isFirstLoad = false;

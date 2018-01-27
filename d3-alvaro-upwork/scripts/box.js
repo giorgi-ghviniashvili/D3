@@ -231,7 +231,7 @@ d3.box = function() {
   if(showLabels == true) {
       whiskerTick.enter().append("text")
           .attr("class", "whisker")
-          .attr("dy", ".3em")
+          //.attr("dy", ".3em")
           .attr("dx", 6)
           .attr("x", width)
           .attr("y", x0)

@@ -21,6 +21,9 @@ function renderBarChart(params) {
     axisLeftWidth: 30,
     axisBottomHeight: 20,
     barPadding: 2,
+    spacingAfterchart: 50,
+    legendColumnCount: 3,
+    legendRowHeight: 20,
     animationSpeed: 1000,
     container: 'body',
     data: null
@@ -50,7 +53,10 @@ function renderBarChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
       calc.legendHeigh = calc.chartHeight * 0.2;
-      calc.lineChartHeight = calc.chartHeight * 0.8;
+      calc.chartBruttoHeight = calc.chartHeight * 0.8;
+
+      calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
+
       //Drawing containers
       var container = d3.select(this);
       container.html('');
@@ -61,9 +67,9 @@ function renderBarChart(params) {
                         .attr('height', attrs.svgHeight);
 
       // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
-          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
+      var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data.length]),
+          y = d3.scaleLinear().range([calc.chartBruttoHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
           var sum = 0;
           Object.keys(d).forEach(x => {
             if (x != 'month'){
@@ -82,9 +88,9 @@ function renderBarChart(params) {
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
-
+      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.chartBruttoHeight - attrs.axisBottomHeight) + ")")
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.chartBruttoHeight));
+      xAxis.selectAll("text").attr("dx", 12);
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
@@ -92,10 +98,10 @@ function renderBarChart(params) {
           .tickPadding(8));
       
       // Add a group for each row of data
-      var groups = chart.patternify({ tag: "g", selector: 'bars' ,data: series})
-        .style("fill", function(d, i) {
-          return color(i);
-        });
+      var groups = chart.patternify({ tag: "g", selector: 'bars', data: series})
+                        .style("fill", function(d, i) {
+                          return color(i);
+                        }); 
 
       // Add a rect for each data value
       var rects = groups.selectAll("rect")
@@ -103,7 +109,7 @@ function renderBarChart(params) {
                     .enter()
                     .append("rect")                    
                     .attr("x", function(d, i) {
-                      return x(i) + attrs.barPadding / 2;
+                      return x(i) + attrs.barPadding / 2 - (x(1) - x(0)) / 2;
                     })
                     .attr("width", (x(1) - x(0)) - attrs.barPadding)
                     .attr("height", function(d) {
@@ -130,6 +136,46 @@ function renderBarChart(params) {
                 return y(d[1]);
               });
       }
+
+      var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
+                                  .attr("x", x(2))
+                                  .attr("y", calc.chartBruttoHeight + 20)
+                                  .text("Registered users number x Time");
+
+      // ##### legend #####
+      var legend = chart.patternify({ tag: 'g', selector: 'legend' })
+                        .attr('transform', (d,i) => {
+                              return "translate("+ [0, calc.chartBruttoHeight + attrs.spacingAfterchart] +")"
+                        })
+                        
+
+      var legend_items = legend.patternify({ 
+                                         tag: 'g', 
+                                         selector: 'legend_item', 
+                                         data: Object.keys(attrs.data[0]).filter(x => x !== 'month')
+                                       })
+                                 .attr('transform', function (d, i) {
+                                      return "translate(" + ((i % attrs.legendColumnCount) * calc.eachLegendWidth + calc.eachLegendWidth / 3)  + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
+                                  });
+
+      legend_items.append("rect")
+              .attr("width", 15)
+              .attr("height", 15)
+              .attr('rx', 2)
+              .attr("fill", (d, i) => {
+                return color(i);
+              })
+              
+
+      legend_items.append("text")
+              .attr("stroke", (d, i) => {
+                return color(i);
+              })
+              .attr("stroke-width", 0.9)
+              .text(d => {
+                return d;
+              })
+              .attr("transform", "translate("+[18,12]+")");
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

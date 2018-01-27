@@ -20,7 +20,7 @@ function renderBubbleChart(params) {
     marginLeft: 5,
     bubbleMinRadius: 20,
     bubbleMaxRadius: 50,
-    minimumDistance: 250,
+    minimumDistance: 180,
     container: 'body',
     data: null
   };
@@ -62,6 +62,10 @@ function renderBubbleChart(params) {
               .attr("cy", function(d) {
                   return d.y;
               });
+
+          text
+              .attr("x", d => { return d.x - 5; })
+              .attr("y", d => { return d.y + 5; })
       }
 
       // ###### scales ######
@@ -110,21 +114,27 @@ function renderBubbleChart(params) {
             })
             .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
             .on("mouseover", function(d) {
+                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
                 tooltip.html("name: " + d[columnForColors] + "<br>number: " + d[columnForRadius] + "");
                 return tooltip.style("visibility", "visible");
             })
             .on("mousemove", function() {
+                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
                 return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
             })
             .on("mouseout", function() {
+                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
                 tooltip.style("left", (0) + "px")
                 return tooltip.style("visibility", "hidden");
             });
 
-      
+      var text = chart.patternify({ tag: 'text', selector: 'bubble-text', data: attrs.data })
+          .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
+          .style("fill", "#fff")
+          .text(d => { return d.name; })
 
       function collide(node) {
-        var r = node.radius + 16,
+        var r = scaleRadius(node[columnForRadius])*2,
             nx1 = node.x - r,
             nx2 = node.x + r,
             ny1 = node.y - r,

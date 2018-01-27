@@ -6,7 +6,7 @@ function renderBoxChart(params) {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
     svgWidth: 400,
     svgHeight: 400,
-    marginTop: 5,
+    marginTop: 15,
     marginBottom: 15,
     marginRight: 5,
     marginLeft: 5,
@@ -57,8 +57,8 @@ function renderBoxChart(params) {
       // ############ scales ##############
       // Compute an ordinal xScale for the keys in boxPlotData
       var x = d3.scaleBand()     
-                .domain( attrs.data.dataArray.map(function(d) { console.log(d); return d[0] } ) )     
-                .rangeRound([0 , calc.chartWidth])
+                .domain( attrs.data.dataArray.map(function(d) { console.log(d); return d[0]; } ) )     
+                .range([attrs.axisLeftWidth, calc.chartWidth])
                 .padding(0.7);
      
       var  y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0])
@@ -82,19 +82,21 @@ function renderBoxChart(params) {
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis-visible axisX' });
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
-           .call(d3.axisBottom(x));
+      xAxis
+          .attr("transform", "translate(0," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
+          .call(d3.axisBottom(x));
 
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis-visible axisY'});
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
           .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s'))
           .tickPadding(8));
+
       // draw the boxplots  
       chart.patternify({ tag: 'g', selector: 'box', data: attrs.data.dataArray})
           .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + 0 + ")"; } )
           .call(box.width(x.bandwidth())); 
-  
+      console.log("bandwidth:", x.bandwidth())
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();

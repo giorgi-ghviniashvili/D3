@@ -6,7 +6,7 @@ function renderAreaChart(params) {
       id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
       svgWidth: 400,
       svgHeight: 400,
-      marginTop: 5,
+      marginTop: 15,
       marginBottom: 15,
       marginRight: 5,
       marginLeft: 5,
@@ -109,7 +109,9 @@ function renderAreaChart(params) {
   
         xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
             .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
-  
+
+        xAxis.selectAll("text").attr("dx", 25);
+
         var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
   
         yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")

@@ -51,8 +51,8 @@ function renderLineChart(params) {
                   .y(function(d) { return y(d.value); });
 
       // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data[0].length]),
+      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
+      var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data[0].length]),
           y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
         return d3.max(d, function(x){
           return +x.value;
@@ -94,8 +94,10 @@ function renderLineChart(params) {
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
+      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
           .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
+
+      xAxis.selectAll("text").attr("dx", 12);
 
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
 

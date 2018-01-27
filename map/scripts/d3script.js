@@ -133,11 +133,25 @@ function getChart(params) {
                                     //.attr("attributeType","CSS").attr("attributeName","stroke-width").attr("begin","0s").attr("dur","1.5s").attr("repeatCount","indefinite").attr("from","1%").attr("to","0%")
                             ;
 
-                tooltip.enter().append("text").merge(tooltip).attr("class", "tooltip")
-                            .attr("x", function (d) { return projection([d.Longitude, d.Latitude])[0] + 15; })
-                            .attr("y", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
-                            .text(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); })
-                            .style("fill", "red");
+                var groups = tooltip.enter().append("g").merge(tooltip).attr("class", "tooltip")
+                            .attr("transform", d => {
+                                var x = projection([d.Longitude, d.Latitude])[0] + 15;
+                                var y = projection([d.Longitude, d.Latitude])[1] - 15;
+                                return "translate("+[x,y]+")"})
+                            
+                groups.append("rect")
+                       .attr("width", 180)
+                       .attr("height", 30)
+                       .attr("rx", 5)
+                       .attr("fill", "#667")
+
+                var texts = groups.append("text")
+                      .attr("dx", 0)
+                      .attr("dy", 20)
+                      .style("fill",d => {
+                                return d.Class;
+                            })
+                      .text(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); });
 
                 // Define the div for the tooltip
                 // container.patternify({ tag: "div", selector: "tooltip", data: attrs.data })

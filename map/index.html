@@ -75,12 +75,14 @@
                 var data = [nPoint, sPoint];
                
                 chart.data(data);
-                i++;
+                
 
-                if (i == 500){
-                	i == 0;
+                if (i == 499){
+                	i = 0;
                 }
-            }, 2000);
+
+                i++;
+            }, 100);
         })
         
         

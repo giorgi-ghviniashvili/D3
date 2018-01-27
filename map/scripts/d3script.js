@@ -8,7 +8,7 @@ function getChart(params) {
         marginRight: 5,
         marginLeft: 5,
         center: [43.5, 44],
-        scale: 250,
+        scale: 150,
         dotDeleteTime: 3000,
         container: 'body',
         geojson: null,
@@ -134,13 +134,14 @@ function getChart(params) {
                             ;
 
                 var groups = tooltip.enter().append("g").merge(tooltip).attr("class", "tooltip")
-                            .attr("transform", d => {
-                                var x = projection([d.Longitude, d.Latitude])[0] + 15;
-                                var y = projection([d.Longitude, d.Latitude])[1] - 15;
+                                    .attr("transform", d => {
+                                    var x = projection([d.Longitude, d.Latitude])[0] + 15;
+                                    var y = projection([d.Longitude, d.Latitude])[1] - 15;
+
                                 return "translate("+[x,y]+")"})
                             
                 groups.append("rect")
-                       .attr("width", 180)
+                       .attr("width", 190)
                        .attr("height", 30)
                        .attr("rx", 5)
                        .attr("fill", "#667")

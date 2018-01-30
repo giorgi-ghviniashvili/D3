@@ -80,24 +80,26 @@ function renderBarChart(params) {
       })]);
 
       var color = d3.scaleOrdinal(d3.schemeCategory10);
-      
-      // tooltip
-      var tooltip = d3.componentsTooltip()
-                    .container(svg)
-                    .content([
-                      {
-                        left: "default id",
-                        right: "{id}"
-                      },
-                      {
-                        left: "default value",
-                        right: "{value}"
-                      },
-                    ]);
-                    
+                 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
+
+      var div = d3.select("body").selectAll(".barTooltip")
+        .data([1])
+        .enter()
+        .append("div")
+        .attr("class", "lineTooltip")
+        .style("position", "absolute")
+        .style("visibility", "hidden")
+        .style("color", "white")
+        .style("padding", "8px")
+        .style("background-color", "#626D71")
+        .style("border-radius", "6px")
+        .style("text-align", "center")
+        .style("font-family", "monospace")
+        .style("width", "100px")
+        .text("");
 
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
@@ -110,7 +112,7 @@ function renderBarChart(params) {
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
           .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
           .tickPadding(8));
-      
+      console.log("series:", series);
       // Add a group for each row of data
       var groups = chart.patternify({ tag: "g", selector: 'bars', data: series})
                         .style("fill", function(d, i) {
@@ -129,15 +131,19 @@ function renderBarChart(params) {
                     .attr("height", function(d) {
                       return y(d[0]) - y(d[1]);
                     })
-                    .on("mouseenter", (d,i) => {
-                      tooltip
-                              .x(d3.event.pageX)
-                              .y(d3.event.pageY)
-                              .direction("bottom")
-                              .show({id:1,value:"some value",name:"Some large name"})
+                    .on("mouseover", function(d) {
+                        var tooltip = d3.select("body").selectAll(".barTooltip");
+                        tooltip.html("name: " + d.data.month);
+                        return tooltip.style("visibility", "visible");
                     })
-                    .on('mouseleave', function (d) {
-                      tooltip.hide();
+                    .on("mousemove", function() {
+                        var tooltip = d3.select("body").selectAll(".barTooltip");
+                        return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
+                    })
+                    .on("mouseout", function() {
+                        var tooltip = d3.select("body").selectAll(".barTooltip");
+                        tooltip.style("left", (0) + "px")
+                        return tooltip.style("visibility", "hidden");
                     });
       
 

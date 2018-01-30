@@ -8,22 +8,6 @@
             display: block;
             margin: auto;
         }
-        div.tooltip 
-        {
-            position: absolute;
-            text-align: center;
-            padding: 5px;
-            font-weight: bold;
-            border: 0px;
-            border-radius: 8px;
-            opacity: 0;
-        }
-
-        .tooltip p 
-        {
-            margin: 0 4px;
-            padding: 5px;
-        }
         .axis line 
         {
             fill: none;
@@ -32,7 +16,6 @@
             shape-rendering: crispEdges;
             stroke-width: 1px;
         }
-        
         .axis text,.xAxisDescr 
         {
             font-family: 'Proxima-Nova', sans-serif;

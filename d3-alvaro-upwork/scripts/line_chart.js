@@ -127,11 +127,21 @@ function renderLineChart(params) {
         isFirstLoad = !isFirstLoad; // turn off animation
       }
 
-      var div = d3.select(".tooltip")
-                  .style("opacity", 0)
-                  .style("background", attrs.tooltipBackgroundColor)
-                  .style("color", attrs.tooltipTextColor)
-                  .style("font-size", attrs.tooltipTextFontSize);
+      var div = d3.select("body").selectAll(".lineTooltip")
+            .data([1])
+            .enter()
+            .append("div")
+            .attr("class", "lineTooltip")
+            .style("position", "absolute")
+            .style("visibility", "hidden")
+            .style("color", "white")
+            .style("padding", "8px")
+            .style("background-color", "#626D71")
+            .style("border-radius", "6px")
+            .style("text-align", "center")
+            .style("font-family", "monospace")
+            .style("width", "100px")
+            .text("");
 
       // ############## circles ###############
       var circleData = [];
@@ -164,20 +174,20 @@ function renderLineChart(params) {
                circle.style("fill", d => {
                 return color(d.name);
                });
-               div.transition()
-                  .duration(100)
-                  .style("opacity", .9);
-              div.html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
+
+               var tooltip = d3.select("body").selectAll(".lineTooltip")
+               
+               tooltip.style("visibility", "visible")
+               .html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
                   .style("left", (d3.event.pageX + 10) + "px")
                   .style("top", (d3.event.pageY - 28) + "px");  
           })
           .on("mouseout", function(){
-
-            div.style("opacity", 0);
-            div.style("left", (0) + "px")
             var circle = d3.select(this);
             circle.style("fill", "#fff");
 
+            var tooltip = d3.select("body").selectAll(".lineTooltip");
+                     tooltip.style("visibility", "hidden");
           });
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })

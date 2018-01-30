@@ -69,7 +69,7 @@ function renderAreaChart(params) {
                   .on("end", function(d){ 
                     
                   });
-  
+
         // ############ scales ##############
         var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth]);
         var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth])
@@ -89,8 +89,6 @@ function renderAreaChart(params) {
           return d[0].name; 
         }));
         
-        
-  
         //Drawing containers
         var container = d3.select(this);
         container.html('');

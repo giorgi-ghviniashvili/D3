@@ -80,7 +80,21 @@ function renderBarChart(params) {
       })]);
 
       var color = d3.scaleOrdinal(d3.schemeCategory10);
-
+      
+      // tooltip
+      var tooltip = d3.componentsTooltip()
+                    .container(svg)
+                    .content([
+                      {
+                        left: "default id",
+                        right: "{id}"
+                      },
+                      {
+                        left: "default value",
+                        right: "{value}"
+                      },
+                    ]);
+                    
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
@@ -114,7 +128,18 @@ function renderBarChart(params) {
                     .attr("width", (x(1) - x(0)) - attrs.barPadding)
                     .attr("height", function(d) {
                       return y(d[0]) - y(d[1]);
+                    })
+                    .on("mouseenter", (d,i) => {
+                      tooltip
+                              .x(d3.event.pageX)
+                              .y(d3.event.pageY)
+                              .direction("bottom")
+                              .show({id:1,value:"some value",name:"Some large name"})
+                    })
+                    .on('mouseleave', function (d) {
+                      tooltip.hide();
                     });
+      
 
       var t = d3.transition(attrs.id)
             .duration(attrs.animationSpeed)

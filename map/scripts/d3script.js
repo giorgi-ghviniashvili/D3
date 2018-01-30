@@ -107,25 +107,27 @@ function getChart(params) {
                     dots.exit().remove();
                     tooltip.exit().remove();
                 }, attrs.dotDeleteTime / 2);
-              //   <animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="5%" to="25%"/>
+                
+              // <animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="5%" to="25%"/>
               // <animate attributeType="CSS" attributeName="stroke-width" begin="0s"  dur="1.5s" repeatCount="indefinite" from="3%" to="0%" />
               // <animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
                 
-                dots.enter().append("circle").merge(dots).attr("class", "dot")
-                            .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
-                            .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
-                            .attr("r", "1")
-                            .attr("fill", d => {
-                                return d.Class;
-                            })
-                            .append("animate")
-                            .attr("attributeType", "SVG")
-                            .attr( "attributeName","r")
-                            .attr( "begin","0s")
-                            .attr("dur","1.5s")
-                            .attr("repeatCount", "indefinite")
-                            .attr("from","0%")
-                            .attr("to","1%");
+                dots.enter()
+                    .append("circle").merge(dots).attr("class", "dot")
+                    .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
+                    .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
+                    .attr("r", "1")
+                    .attr("fill", d => {
+                        return d.Class;
+                    })
+                    .append("animate")
+                    .attr("attributeType", "SVG")
+                    .attr( "attributeName","r")
+                    .attr( "begin","0s")
+                    .attr("dur","1.5s")
+                    .attr("repeatCount", "indefinite")
+                    .attr("from","0%")
+                    .attr("to","1%");
 
                 var groups = tooltip.enter().append("g").merge(tooltip).attr("class", "tooltip")
                                     .attr("transform", d => {

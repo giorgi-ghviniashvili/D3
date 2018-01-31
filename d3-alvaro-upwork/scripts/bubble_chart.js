@@ -89,49 +89,47 @@ function renderBubbleChart(params) {
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
       // ###### tooltip #####
-      var tooltip = d3.select("body").selectAll(".bubbleTooltip")
-            .data([1])
-            .enter()
-            .append("div")
-            .attr("class", "bubbleTooltip")
-            .style("position", "absolute")
-            .style("visibility", "hidden")
-            .style("color", "white")
-            .style("padding", "8px")
-            .style("background-color", "#626D71")
-            .style("border-radius", "6px")
-            .style("text-align", "center")
-            .style("font-family", "monospace")
-            .style("width", "100px")
-            .text("");
+      var tooltip = d3
+                      .componentsTooltip()
+                      .container(svg)
+                      .content([
+                        {
+                          left: "name:",
+                          right: "{name}"
+                        },
+                        {
+                          left: "Value:",
+                          right: "{value}"
+                        }
+                      ]);
 
       var node = chart.patternify({ tag: 'svg:circle', selector: 'bubble', data: attrs.data })
-            .attr('r', function(d) {
-                return scaleRadius(d[columnForRadius])
-            })
-            .style("fill", function(d) {
-                return colorCircles(d[columnForColors])
-            })
-            .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
-            .on("mouseover", function(d) {
-                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
-                tooltip.html("name: " + d[columnForColors] + "<br>number: " + d[columnForRadius] + "");
-                return tooltip.style("visibility", "visible");
-            })
-            .on("mousemove", function() {
-                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
-                return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
-            })
-            .on("mouseout", function() {
-                var tooltip = d3.select("body").selectAll(".bubbleTooltip");
-                tooltip.style("left", (0) + "px")
-                return tooltip.style("visibility", "hidden");
-            });
+                      .attr('r', function(d) {
+                          return scaleRadius(d[columnForRadius])
+                      })
+                      .style("fill", function(d) {
+                          return colorCircles(d[columnForColors])
+                      })
+                      .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
+                      .on("mouseover", function(d) {
+                           var circle = d3.select(this);
+                           var x = calc.chartWidth / 2 + d.x + 4;
+                           var y = calc.chartHeight / 2 + d.y - scaleRadius(d[columnForRadius]) / 2;
+                           tooltip
+                              .textColor("white")
+                              .tooltipFill(colorCircles(d[columnForColors]))
+                              .x(x)
+                              .y(y)
+                              .show({ name: d.name, value: d.number });
+                      })
+                      .on("mouseout", function() {
+                          tooltip.hide();
+                      });
 
       var text = chart.patternify({ tag: 'text', selector: 'bubble-text', data: attrs.data })
-          .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
-          .style("fill", "#fff")
-          .text(d => { return d.name; })
+                      .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
+                      .style("fill", "#fff")
+                      .text(d => { return d.name; })
 
       function collide(node) {
         var r = scaleRadius(node[columnForRadius])*2,

@@ -49,15 +49,15 @@ function renderLineChart(params) {
       var line = d3.line()
                   .x(function(d, i) { return x(i); })
                   .y(function(d) { return y(d.value); });
-
-      // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data[0].length]),
-          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
+      var max = d3.max(attrs.data, function(d){
         return d3.max(d, function(x){
           return +x.value;
         });
-      })]);
+      });
+      // ############ scales ##############
+      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
+      var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data[0].length]),
+          y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, max]);
 
       var color = d3.scaleOrdinal(d3.schemeCategory10).domain(attrs.data.map(d => { 
         return d[0].name; 
@@ -127,21 +127,7 @@ function renderLineChart(params) {
         isFirstLoad = !isFirstLoad; // turn off animation
       }
 
-      var div = d3.select("body").selectAll(".lineTooltip")
-            .data([1])
-            .enter()
-            .append("div")
-            .attr("class", "lineTooltip")
-            .style("position", "absolute")
-            .style("visibility", "hidden")
-            .style("color", "white")
-            .style("padding", "8px")
-            .style("background-color", "#626D71")
-            .style("border-radius", "6px")
-            .style("text-align", "center")
-            .style("font-family", "monospace")
-            .style("width", "100px")
-            .text("");
+      
 
       // ############## circles ###############
       var circleData = [];
@@ -149,6 +135,19 @@ function renderLineChart(params) {
         circleData = circleData.concat(x);
       });
 
+      var tooltip = d3
+                      .componentsTooltip()
+                      .container(svg)
+                      .content([
+                        {
+                          left: "Month:",
+                          right: "{month}"
+                        },
+                        {
+                          left: "Value:",
+                          right: "{value}"
+                        }
+                      ]);
 
       var fixeddot = chart.patternify({ tag: 'circle', selector: 'dot', data: circleData })
           .attr("r", 4)
@@ -174,20 +173,32 @@ function renderLineChart(params) {
                circle.style("fill", d => {
                 return color(d.name);
                });
-
-               var tooltip = d3.select("body").selectAll(".lineTooltip")
-               
-               tooltip.style("visibility", "visible")
-               .html("<p>" + d.month + "</p> <p>value:" + d.value + "</p>")
-                  .style("left", (d3.event.pageX + 10) + "px")
-                  .style("top", (d3.event.pageY - 28) + "px");  
+               var direction;
+               if (d.month === "January") {
+                direction = "left";
+               }
+               else if (d.month === "December") {
+                direction = "right";
+               }
+               else if (d.value == max){
+                direction = "top";
+               }
+               else {
+                direction = "bottom";
+               }
+               tooltip
+                    .textColor("white")
+                    .tooltipFill(color(d.name))
+                    .x(+circle.attr("cx") + 4)
+                    .y(+circle.attr("cy"))
+                    .direction(direction)
+                    .show({ month: d.month, value: d.value});
           })
           .on("mouseout", function(){
             var circle = d3.select(this);
             circle.style("fill", "#fff");
 
-            var tooltip = d3.select("body").selectAll(".lineTooltip");
-                     tooltip.style("visibility", "hidden");
+            tooltip.hide();
           });
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })

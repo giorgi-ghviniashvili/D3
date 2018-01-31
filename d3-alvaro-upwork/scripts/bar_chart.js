@@ -85,22 +85,6 @@ function renderBarChart(params) {
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
-      var div = d3.select("body").selectAll(".barTooltip")
-        .data([1])
-        .enter()
-        .append("div")
-        .attr("class", "lineTooltip")
-        .style("position", "absolute")
-        .style("visibility", "hidden")
-        .style("color", "white")
-        .style("padding", "8px")
-        .style("background-color", "#626D71")
-        .style("border-radius", "6px")
-        .style("text-align", "center")
-        .style("font-family", "monospace")
-        .style("width", "100px")
-        .text("");
-
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
@@ -132,18 +116,13 @@ function renderBarChart(params) {
                       return y(d[0]) - y(d[1]);
                     })
                     .on("mouseover", function(d) {
-                        var tooltip = d3.select("body").selectAll(".barTooltip");
-                        tooltip.html("name: " + d.data.month);
-                        return tooltip.style("visibility", "visible");
+                       
                     })
                     .on("mousemove", function() {
-                        var tooltip = d3.select("body").selectAll(".barTooltip");
-                        return tooltip.style("top", (d3.event.pageY - 10) + "px").style("left", (d3.event.pageX + 10) + "px");
+                        
                     })
                     .on("mouseout", function() {
-                        var tooltip = d3.select("body").selectAll(".barTooltip");
-                        tooltip.style("left", (0) + "px")
-                        return tooltip.style("visibility", "hidden");
+                       
                     });
       
 

@@ -112,3 +112,6 @@
             stroke: steelblue;
             stroke-width: 2px;
         }
+        .bubble-text{
+           pointer-events: none;
+        }

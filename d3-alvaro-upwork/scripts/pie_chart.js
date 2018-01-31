@@ -26,7 +26,6 @@ function renderPieChart(params) {
     legendColumnCount: 3,
     legendRowHeight: 20,
     container: 'body',
-    chartInnerRadius: 50,
     data: null
   };
 
@@ -48,9 +47,13 @@ function renderPieChart(params) {
       calc.legendHeigh = calc.chartHeight * 0.2;
       calc.chartBruttoHeight = calc.chartHeight * 0.8;
       calc.chartOuterRadius = calc.chartWidth / 4;
-
+      calc.chartInnerRadius = calc.chartWidth / 20;
       calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
+
+      var sum = d3.sum(attrs.data, function(d){
+        return +d.value;
+      });
 
       // ########## scales #######
       var color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -61,13 +64,13 @@ function renderPieChart(params) {
       // layouts
       var arc = d3.arc()
                   .outerRadius(calc.chartOuterRadius)
-                  .innerRadius(attrs.chartInnerRadius);
+                  .innerRadius(calc.chartInnerRadius);
 
       var pie = d3.pie()
-          .sort(null)
-          .startAngle(1.1*Math.PI)
-          .endAngle(3.1*Math.PI)
-          .value(function(d) { return +d.value; });
+                  .sort(null)
+                  .startAngle(1.1*Math.PI)
+                  .endAngle(3.1*Math.PI)
+                  .value(function(d) { return +d.value; });
 
       //Drawing containers
       var container = d3.select(this);
@@ -86,7 +89,35 @@ function renderPieChart(params) {
       var slices = chart.patternify({ tag: 'g', selector: 'slices' })
                         .attr("transform", "translate(" + calc.chartWidth / 2 + "," + calc.chartBruttoHeight / 2 + ")");
 
-      var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) });
+      // ##### tooltip #######
+      var tooltip = d3
+                    .componentsTooltip()
+                    .container(svg)
+                    .content([
+                      {
+                        left: "Name:",
+                        right: "{name}"
+                      },
+                      {
+                        left: "Percentage:",
+                        right: "{percent}"
+                      }
+                    ]);
+
+      var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) })
+                        .on("mouseover", function (d) {
+                          var x = calc.chartWidth / 2 + arc.centroid(d)[0] + 20;
+                          var y = calc.chartBruttoHeight / 2 + arc.centroid(d)[1] - 30;
+                           tooltip
+                                .textColor("white")
+                                .tooltipFill(color(d.data.name))
+                                .x(x)
+                                .y(y)
+                                .show({ name: d.data.name, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
+                        })
+                        .on("mouseout", function(){
+                            tooltip.hide();
+                        });
 
       arcs.append("path")
           .style("fill", function(d) { 
@@ -104,7 +135,7 @@ function renderPieChart(params) {
 
       arcs.append("text")
         .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-        .attr("dx", -10)
+        .attr("dx", -20)
         .text(function(d) { return d.value; })
         .style("fill", "#fff");
 

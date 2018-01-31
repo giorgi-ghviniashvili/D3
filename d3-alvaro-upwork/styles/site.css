@@ -31,7 +31,7 @@
         }
         .axis .domain 
         {
-            display: none;
+            visibility: hidden;
         }
         .line 
         {

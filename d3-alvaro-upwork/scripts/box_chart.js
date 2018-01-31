@@ -92,11 +92,52 @@ function renderBoxChart(params) {
           .call(d3.axisLeft(y).ticks(5).tickFormat(d3.format('.2s'))
           .tickPadding(8));
 
+
+      // ##### tooltip #######
+      var tooltip = d3
+                    .componentsTooltip()
+                    .container(svg)
+                    .content([
+                      {
+                        left: "Max:",
+                        right: "{max}"
+                      },
+                      {
+                        left: "Median:",
+                        right: "{median}"
+                      },
+                      {
+                        left: "Min:",
+                        right: "{min}"
+                      }
+                    ]);
+
       // draw the boxplots  
-      chart.patternify({ tag: 'g', selector: 'box', data: attrs.data.dataArray})
+      var rects = chart.patternify({ tag: 'g', selector: 'box', data: attrs.data.dataArray})
           .attr("transform", function(d) { return "translate(" +  x(d[0])  + "," + 0 + ")"; } )
-          .call(box.width(x.bandwidth())); 
+          .call(box.width(x.bandwidth()))
+
+
+          rects.select("rect.box")
+                .on("mouseover", function (d,i) {
+                           var rect = d3.select(this);
+                           var mouse = d3.mouse(this);
+                           tooltip
+                                .textColor("white")
+                                .tooltipFill(rect.style("fill"))
+                                .x(x(d[0]) + (+rect.attr("width")) / 2 + 4)
+                                .y(mouse[1])
+                                .show({ max: d3.max(d[1]), median: 4000, min: d3.min(d[1]) });
+
+                        })
+                        .on("mouseout", function(){
+                            tooltip.hide();
+                        });; 
       console.log("bandwidth:", x.bandwidth())
+
+
+
+
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();

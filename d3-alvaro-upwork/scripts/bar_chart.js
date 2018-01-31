@@ -79,6 +79,21 @@ function renderBarChart(params) {
           return sum;
       })]);
 
+      // ###### tooltip #####
+      var tooltip = d3
+                      .componentsTooltip()
+                      .container(svg)
+                      .content([
+                        {
+                          left: "Month:",
+                          right: "{month}"
+                        },
+                        {
+                          left: "Value:",
+                          right: "{value}"
+                        }
+                      ]);
+
       var color = d3.scaleOrdinal(d3.schemeCategory10);
                  
       //Add container g element
@@ -115,14 +130,33 @@ function renderBarChart(params) {
                     .attr("height", function(d) {
                       return y(d[0]) - y(d[1]);
                     })
-                    .on("mouseover", function(d) {
-                       
+                    .on("mouseover", function(d, i) {
+                      var direction;
+                      if (d.data.month === "January") {
+                       direction = "left";
+                      }
+                      else if (d.data.month === "December") {
+                       direction = "right";
+                      }
+                      else if (d[1] == y.domain()[1]){
+                       direction = "top";
+                      }
+                      else {
+                       direction = "bottom";
+                      }
+                       tooltip.textColor("white")
+                              .tooltipFill(d3.select(this.parentNode).style("fill"))
+                              .x(x(i))
+                              .y(y(d[1]) + 20)
+                              .direction(direction)
+                              .show({ month: d.data.month, value: d[1] - d[0] });
+
                     })
                     .on("mousemove", function() {
                         
                     })
                     .on("mouseout", function() {
-                       
+                      tooltip.hide();
                     });
       
 

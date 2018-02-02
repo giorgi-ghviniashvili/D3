@@ -44,10 +44,10 @@ function renderPieChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
-      calc.legendHeigh = calc.chartHeight * 0.2;
-      calc.chartBruttoHeight = calc.chartHeight * 0.8;
-      calc.chartOuterRadius = calc.chartWidth / 4;
-      calc.chartInnerRadius = calc.chartWidth / 20;
+      calc.chartOuterRadius = calc.chartWidth < calc.chartHeight ? calc.chartHeight / 4 : calc.chartHeight / 3;
+      calc.chartInnerRadius = calc.chartWidth < calc.chartHeight ? calc.chartHeight / 20 : calc.chartHeight / 10;
+      calc.chartBruttoHeight = calc.chartOuterRadius * 2;
+      calc.legendHeigh = calc.chartHeight - calc.chartBruttoHeight;
       calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
 
@@ -87,7 +87,7 @@ function renderPieChart(params) {
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
       var slices = chart.patternify({ tag: 'g', selector: 'slices' })
-                        .attr("transform", "translate(" + calc.chartWidth / 2 + "," + calc.chartBruttoHeight / 2 + ")");
+                        .attr("transform", "translate(" + calc.chartWidth / 2 + "," + (calc.chartOuterRadius) + ")");
 
       // ##### tooltip #######
       var tooltip = d3
@@ -97,6 +97,10 @@ function renderPieChart(params) {
                       {
                         left: "Name:",
                         right: "{name}"
+                      },
+                      {
+                        left: "Value:",
+                        right: "{value}"
                       },
                       {
                         left: "Percentage:",
@@ -109,11 +113,9 @@ function renderPieChart(params) {
                           var x = calc.chartWidth / 2 + arc.centroid(d)[0] + 20;
                           var y = calc.chartBruttoHeight / 2 + arc.centroid(d)[1] - 30;
                            tooltip
-                                .textColor("white")
-                                .tooltipFill(color(d.data.name))
                                 .x(x)
                                 .y(y)
-                                .show({ name: d.data.name, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
+                                .show({ name: d.data.name, value: d.data.value, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
                         })
                         .on("mouseout", function(){
                             tooltip.hide();
@@ -147,7 +149,7 @@ function renderPieChart(params) {
       // ##### legend #####
       var legend = chart.patternify({ tag: 'g', selector: 'legend' })
                         .attr('transform', (d,i) => {
-                              return "translate("+ [0, calc.chartBruttoHeight + attrs.spacingAfterchart] +")"
+                              return "translate("+ [0, calc.chartBruttoHeight + 40] +")"
                         })
                         
 
@@ -193,6 +195,7 @@ function renderPieChart(params) {
       function setDimensions() {
         var width = container.node().getBoundingClientRect().width;
         main.svgWidth(width);
+        main.svgHeight(window.innerWidth < 768 ? 400 : 600);
         container.call(main);
       }
 

@@ -97,7 +97,13 @@ function renderLineChart(params) {
       xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
           .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
 
-      xAxis.selectAll("text").attr("dx", 12);
+      xAxis.selectAll("text")
+           .style("text-anchor", "end")
+           .attr("dx", "-.18em")
+           .attr("dy", "1.15em")
+           .attr("transform", function(d) {
+               return "rotate(-45)" 
+           });
 
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
 
@@ -140,6 +146,10 @@ function renderLineChart(params) {
                       .container(svg)
                       .content([
                         {
+                          left: "Name:",
+                          right: "{name}"
+                        },
+                        {
                           left: "Month:",
                           right: "{month}"
                         },
@@ -180,19 +190,17 @@ function renderLineChart(params) {
                else if (d.month === "December") {
                 direction = "right";
                }
-               else if (d.value == max){
+               else if (+d.value + 100 >= max){
                 direction = "top";
                }
                else {
                 direction = "bottom";
                }
                tooltip
-                    .textColor("white")
-                    .tooltipFill(color(d.name))
                     .x(+circle.attr("cx") + 4)
                     .y(+circle.attr("cy"))
                     .direction(direction)
-                    .show({ month: d.month, value: d.value});
+                    .show({ name: d.name, month: d.month, value: d.value});
           })
           .on("mouseout", function(){
             var circle = d3.select(this);
@@ -203,7 +211,7 @@ function renderLineChart(params) {
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
                                   .attr("x", x(4))
-                                  .attr("y", calc.lineChartHeight + 20)
+                                  .attr("y", calc.lineChartHeight + 35)
                                   .text("Registered users number x Time");
 
       // ##### legend #####

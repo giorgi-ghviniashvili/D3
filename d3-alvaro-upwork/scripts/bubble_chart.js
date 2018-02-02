@@ -42,20 +42,25 @@ function renderBubbleChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
-
+      // ###### scales ######
+      var colorCircles = d3.scaleOrdinal(d3.schemeCategory20);
+      var scaleRadius = d3.scaleLinear().domain([d3.min(attrs.data, function(d) {
+          return +d[columnForRadius];
+      }), d3.max(attrs.data, function(d) {
+          return +d[columnForRadius];
+      })]).range([attrs.bubbleMinRadius, attrs.bubbleMaxRadius]);
       // ###### layouts #######
       var simulation = d3.forceSimulation(attrs.data)
-            .force("charge", d3.forceManyBody().strength([-attrs.minimumDistance]))
+            .force("collide", d3.forceCollide()
+                                .radius(function(d) { 
+                                  return scaleRadius(d[columnForRadius]) + 0.5; 
+                                })
+                                .iterations(60))
             .force("x", d3.forceX())
             .force("y", d3.forceY())
             .on("tick", ticked);
 
       function ticked(e) {
-          var q = d3.quadtree(attrs.data),
-              i = 0,
-              n = attrs.data.length;
-
-          while (++i < n) q.visit(collide(attrs.data[i]));
           node.attr("cx", function(d) {
                   return d.x;
               })
@@ -67,15 +72,6 @@ function renderBubbleChart(params) {
               .attr("x", d => { return d.x - 5; })
               .attr("y", d => { return d.y + 5; })
       }
-
-      // ###### scales ######
-      var colorCircles = d3.scaleOrdinal(d3.schemeCategory20);
-      var scaleRadius = d3.scaleLinear().domain([d3.min(attrs.data, function(d) {
-          return +d[columnForRadius];
-      }), d3.max(attrs.data, function(d) {
-          return +d[columnForRadius];
-      })]).range([attrs.bubbleMinRadius, attrs.bubbleMaxRadius]);
-
       //Drawing containers
       var container = d3.select(this);
 
@@ -94,7 +90,7 @@ function renderBubbleChart(params) {
                       .container(svg)
                       .content([
                         {
-                          left: "name:",
+                          left: "Name:",
                           right: "{name}"
                         },
                         {
@@ -115,11 +111,17 @@ function renderBubbleChart(params) {
                            var circle = d3.select(this);
                            var x = calc.chartWidth / 2 + d.x + 4;
                            var y = calc.chartHeight / 2 + d.y - scaleRadius(d[columnForRadius]) / 2;
+                           var direction = "bottom";
+                           if (calc.chartWidth / 2 + x + 60 >= calc.chartWidth){
+                            direction = "right";
+                           }
+                           else if (x - 60 < 0){
+                             direction = "left";
+                           }
                            tooltip
-                              .textColor("white")
-                              .tooltipFill(colorCircles(d[columnForColors]))
                               .x(x)
                               .y(y)
+                              .direction(direction)
                               .show({ name: d.name, value: d.number });
                       })
                       .on("mouseout", function() {
@@ -129,31 +131,7 @@ function renderBubbleChart(params) {
       var text = chart.patternify({ tag: 'text', selector: 'bubble-text', data: attrs.data })
                       .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
                       .style("fill", "#fff")
-                      .text(d => { return d.name; })
-
-      function collide(node) {
-        var r = scaleRadius(node[columnForRadius])*2,
-            nx1 = node.x - r,
-            nx2 = node.x + r,
-            ny1 = node.y - r,
-            ny2 = node.y + r;
-        return function(quad, x1, y1, x2, y2) {
-          if (quad.point && (quad.point !== node)) {
-            var x = node.x - quad.point.x,
-                y = node.y - quad.point.y,
-                l = Math.sqrt(x * x + y * y),
-                r = node.radius + quad.point.radius;
-            if (l < r) {
-              l = (l - r) / l * .5;
-              node.x -= x *= l;
-              node.y -= y *= l;
-              quad.point.x += x;
-              quad.point.y += y;
-            }
-          }
-          return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
-        };
-      }
+                      .text(d => { return d.name; });
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

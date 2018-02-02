@@ -85,6 +85,10 @@ function renderBarChart(params) {
                       .container(svg)
                       .content([
                         {
+                          left: "Name:",
+                          right: "{name}"
+                        },
+                        {
                           left: "Month:",
                           right: "{month}"
                         },
@@ -105,7 +109,14 @@ function renderBarChart(params) {
 
       xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.chartBruttoHeight - attrs.axisBottomHeight) + ")")
           .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.chartBruttoHeight));
-      xAxis.selectAll("text").attr("dx", 12);
+      
+      xAxis.selectAll("text")
+          .style("text-anchor", "end")
+          .attr("dx", "-.18em")
+          .attr("dy", "1.15em")
+          .attr("transform", function(d) {
+              return "rotate(-45)" 
+          });
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
@@ -144,12 +155,18 @@ function renderBarChart(params) {
                       else {
                        direction = "bottom";
                       }
-                       tooltip.textColor("white")
-                              .tooltipFill(d3.select(this.parentNode).style("fill"))
-                              .x(x(i))
-                              .y(y(d[1]) + 20)
-                              .direction(direction)
-                              .show({ month: d.data.month, value: d[1] - d[0] });
+                      var value = d[1] - d[0];
+                      var name = "";
+                      Object.keys(d.data).forEach(k => {
+                        if (+d.data[k] == value){
+                          name = k;
+                        }
+                      });
+                      tooltip
+                            .x(x(i))
+                            .y(y(d[1]) + 20)
+                            .direction(direction)
+                            .show({ name: name, month: d.data.month, value: value });
 
                     })
                     .on("mousemove", function() {
@@ -182,8 +199,8 @@ function renderBarChart(params) {
       }
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", x(2))
-                                  .attr("y", calc.chartBruttoHeight + 20)
+                                  .attr("x", x(4))
+                                  .attr("y", calc.chartBruttoHeight + 35)
                                   .text("Registered users number x Time");
 
       // ##### legend #####

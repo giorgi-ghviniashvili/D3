@@ -103,8 +103,16 @@ function renderBoxChart(params) {
                         right: "{max}"
                       },
                       {
-                        left: "Median:",
-                        right: "{median}"
+                        left: "Quartile 1:",
+                        right: "{q1}"
+                      },
+                      {
+                        left: "Quartile 2:",
+                        right: "{q2}"
+                      },
+                      {
+                        left: "Quartile 3:",
+                        right: "{q3}"
                       },
                       {
                         left: "Min:",
@@ -123,11 +131,9 @@ function renderBoxChart(params) {
                            var rect = d3.select(this);
                            var mouse = d3.mouse(this);
                            tooltip
-                                .textColor("white")
-                                .tooltipFill(rect.style("fill"))
                                 .x(x(d[0]) + (+rect.attr("width")) / 2 + 4)
                                 .y(mouse[1])
-                                .show({ max: d3.max(d[1]), median: 4000, min: d3.min(d[1]) });
+                                .show({ max: d3.max(d[1]), q1: d[1].quartiles[0], q2: d[1].quartiles[1], q3: d[1].quartiles[2], min: d3.min(d[1]) });
 
                         })
                         .on("mouseout", function(){

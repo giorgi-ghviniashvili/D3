@@ -97,18 +97,37 @@ function renderAreaChart(params) {
         var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
           .attr('width', attrs.svgWidth)
           .attr('height', attrs.svgHeight);
-  
+        // ###### tooltip #####
+        var tooltip = d3
+          .componentsTooltip()
+          .container(svg)
+          .content([
+            {
+              left: "Date: ",
+              right: "{date}"
+            },
+            {
+              left: "Temperate range:",
+              right: "{range}"
+            }
+          ]);
         //Add container g element
         var chart = svg.patternify({ tag: 'g', selector: 'chart' })
           .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
-  
+        
         // ############# axes ##################
         var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
   
         xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
             .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
 
-        xAxis.selectAll("text").attr("dx", 25);
+        xAxis.selectAll("text")
+            .style("text-anchor", "end")
+            .attr("dx", calc.chartWidth < 600 ? "-.1em" : "")
+            .attr("dy", calc.chartWidth < 600 ? "1.2em" : "2.5em")
+            .attr("transform", function(d) {
+                return "rotate(-65)" 
+            });
 
         var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'});
   
@@ -155,7 +174,7 @@ function renderAreaChart(params) {
 
         var mouseG = chart.append("g")
                         .attr("class", "mouse-over-effects")
-                        .attr("transform", "translate(" + attrs.axisLeftWidth + "," + -20 + ")")
+                        //.attr("transform", "translate(" + attrs.axisLeftWidth + "," + 0 + ")")
 
         mouseG.append("path") // this is the black vertical line to follow mouse
               .attr("class", "mouse-line")
@@ -184,7 +203,7 @@ function renderAreaChart(params) {
         var lines = [lineUpper.node(), lineLower.node()];
         
         mouseG.append('svg:rect') // append a rect to catch mouse movements on canvas
-            .attr('width', calc.chartWidth - attrs.axisLeftWidth) // can't catch mouse events on a g element
+            .attr('width', calc.chartWidth) // can't catch mouse events on a g element
             .attr('height', calc.lineChartHeight)
             .attr('fill', 'none')
             .attr('pointer-events', 'all')
@@ -195,6 +214,7 @@ function renderAreaChart(params) {
                 .style("opacity", "0");
               d3.selectAll(".mouse-per-line text")
                 .style("opacity", "0");
+              tooltip.hide();
             })
             .on('mouseover', function() { // on mouse in show line, circles and text
               d3.select(".mouse-line")
@@ -206,19 +226,32 @@ function renderAreaChart(params) {
             })
             .on('mousemove', function() { // mouse moving over canvas
                 var mouse = d3.mouse(this);
+                if (mouse[0] < attrs.axisLeftWidth - 1){
+                  d3.select(".mouse-line")
+                    .style("opacity", "0");
+                  d3.selectAll(".mouse-per-line circle")
+                    .style("opacity", "0");
+                  d3.selectAll(".mouse-per-line text")
+                    .style("opacity", "0");
+                  tooltip.hide();
+                }
+                else{
+                  d3.select(".mouse-line")
+                .style("opacity", "1");
+                d3.selectAll(".mouse-per-line circle")
+                  .style("opacity", "1");
+                d3.selectAll(".mouse-per-line text")
+                .style("opacity", "1");
+                }
                 d3.select(".mouse-line")
                   .attr("d", function() {
-                    var d = "M" + mouse[0] + "," + calc.lineChartHeight;
-                    d += " " + mouse[0] + "," + 0;
+                    var d = "M" + mouse[0] + "," + (calc.lineChartHeight - 20);
+                    d += " " + mouse[0] + "," + (-20);
                     return d;
                   });
 
                 d3.selectAll(".mouse-per-line")
                   .attr("transform", function(d, i) {
-                    var xDate = x.invert(mouse[0]),
-                        bisect = d3.bisector(function(d) { return d.date; }).right;
-                        idx = bisect(d.values, xDate);
-                    
                     var beginning = 0,
                         end = lines[i].getTotalLength(),
                         target = null;
@@ -233,10 +266,36 @@ function renderAreaChart(params) {
                       else if (pos.x < mouse[0]) beginning = target;
                       else break; //position found
                     }
+
+                    var xDate = Math.floor(x.invert(mouse[0]));
+                    var dataValue = findDate(xDate);
                     
-                    d3.select(this).select('text')
-                      .text(y.invert(pos.y).toFixed(2));
-                      
+                    if (dataValue.length > 0){
+                      var date = new Date(dataValue["0"][0]);
+                      var dd = date.getDate();
+                      var mm = date.getMonth()+1; //January is 0!
+
+                      var yyyy = date.getFullYear();
+                      if(dd<10){
+                          dd='0'+dd;
+                      } 
+                      if(mm<10){
+                          mm='0'+mm;
+                      } 
+                      var dateStr = dd+'-'+mm+'-'+yyyy;
+                      var direction = "left";
+                      if (mouse[0] + 120 >= calc.chartWidth){
+                        direction = "right";
+                       }
+                       else if (mouse[0] - 120 < attrs.axisLeftWidth){
+                         direction = "left";
+                       }
+                      tooltip
+                            .x(mouse[0] + 10)
+                            .y(pos.y)
+                            .direction(direction)
+                            .show({ date: dateStr, range: dataValue["0"][1] + " - " + dataValue["0"][2]})
+                    }
                     return "translate(" + mouse[0] + "," + pos.y +")";
                   });
             });
@@ -258,7 +317,10 @@ function renderAreaChart(params) {
         }
   
         //#########################################  UTIL FUNCS ##################################
-  
+        function findDate(dateInt){
+          return attrs.data.filter((x,i) => x[0] >= dateInt && attrs.data[i-1][0] <= dateInt);
+        }
+
         function debug() {
           if (attrs.isDebug) {
             //Stringify func

@@ -316,7 +316,7 @@ function renderAreaChart(params) {
   
         }
   
-        //#########################################  UTIL FUNCS ##################################
+        //#########################################  UTIL FUNCS #################################
         function findDate(dateInt){
           return attrs.data.filter((x,i) => x[0] >= dateInt && attrs.data[i-1][0] <= dateInt);
         }

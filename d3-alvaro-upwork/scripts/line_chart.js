@@ -54,8 +54,14 @@ function renderLineChart(params) {
           return +x.value;
         });
       });
+
+      var firstMonth = attrs.data[0][0];
+      var lastMonth = attrs.data[0][attrs.data[0].length - 1];
+      
+      var dateRange = getDataRange(firstMonth, lastMonth);
+
       // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
+      var xLabels = d3.scaleTime().domain(dateRange).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
       var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data[0].length]),
           y = d3.scaleLinear().range([calc.lineChartHeight - attrs.axisBottomHeight, 0]).domain([0, max]);
 
@@ -95,7 +101,7 @@ function renderLineChart(params) {
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
       xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.lineChartHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.lineChartHeight));
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).ticks(attrs.data[0].length).tickSize(-calc.lineChartHeight));
 
       xAxis.selectAll("text")
            .style("text-anchor", "end")
@@ -210,7 +216,7 @@ function renderLineChart(params) {
           });
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", x(4))
+                                  .attr("x", x(Math.floor(attrs.data[0].length / 3)))
                                   .attr("y", calc.lineChartHeight + 35)
                                   .text("Registered users number x Time");
 
@@ -373,6 +379,7 @@ function renderLineChart(params) {
                       name: x
                   });
               });
+              // some sorting is needed
               arr.push(tempArr);
           }
       });

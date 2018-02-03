@@ -110,12 +110,30 @@ function renderPieChart(params) {
 
       var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) })
                         .on("mouseover", function (d) {
-                          var x = calc.chartWidth / 2 + arc.centroid(d)[0] + 20;
-                          var y = calc.chartBruttoHeight / 2 + arc.centroid(d)[1] - 30;
-                           tooltip
-                                .x(x)
-                                .y(y)
-                                .show({ name: d.data.name, value: d.data.value, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
+                        var centroidX = arc.centroid(d)[0];
+                        var centroidY = arc.centroid(d)[1];
+                        var x = calc.chartWidth / 2 + centroidX;
+                        var y = calc.chartBruttoHeight / 2 + centroidY;
+                        var direction;
+                        if (y - 80 < 0)
+                        {
+                          direction = "top";
+                        }
+                        else if (centroidX > 0){
+                          direction = "right";
+                        }
+                        else if (centroidX < 0){
+                          direction = "left";
+                        }
+                        else {
+                          direction = "bottom";
+                        }
+                        tooltip
+                              .x(x)
+                              .y(y)
+                              .direction(direction)
+                              .show({ name: d.data.name, value: d.data.value, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
+                        
                         })
                         .on("mouseout", function(){
                             tooltip.hide();
@@ -137,7 +155,7 @@ function renderPieChart(params) {
 
       arcs.append("text")
         .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-        .attr("dx", -20)
+        .attr("text-anchor", "middle")
         .text(function(d) { return d.value; })
         .style("fill", "#fff");
 
@@ -205,7 +223,6 @@ function renderPieChart(params) {
 
       }
       //#########################################  UTIL FUNCS ##################################
-
       function debug() {
         if (attrs.isDebug) {
           //Stringify func

@@ -66,9 +66,15 @@ function renderBarChart(params) {
                         .attr('width', attrs.svgWidth)
                         .attr('height', attrs.svgHeight);
 
+      var firstMonth = attrs.data[0];
+      var lastMonth = attrs.data[attrs.data.length - 1];
+
+      // get date range
+      var dateRange = getDataRange(firstMonth, lastMonth);
+
       // ############ scales ##############
-      var xLabels = d3.scaleTime().domain([new Date(2018, 0, 1), new Date(2018, 11, 31)]).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
-      var x = d3.scaleLinear().range([attrs.axisLeftWidth * 2, calc.chartWidth]).domain([0, attrs.data.length]),
+      var xLabels = d3.scaleTime().domain(dateRange).range([0, calc.chartWidth - attrs.axisLeftWidth * 2]);
+      var x = d3.scaleLinear().range([attrs.axisLeftWidth, calc.chartWidth]).domain([0, attrs.data.length]),
           y = d3.scaleLinear().range([calc.chartBruttoHeight - attrs.axisBottomHeight, 0]).domain([0, d3.max(attrs.data, function(d){
           var sum = 0;
           Object.keys(d).forEach(x => {
@@ -107,9 +113,15 @@ function renderBarChart(params) {
       // ############# axes ##################
       var xAxis = chart.patternify({ tag: 'g', selector: 'axis axis--x' });
 
-      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth * 2 + "," + (calc.chartBruttoHeight - attrs.axisBottomHeight) + ")")
-          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).tickSize(-calc.chartBruttoHeight));
+      xAxis.attr("transform", "translate(" + attrs.axisLeftWidth + "," + (calc.chartBruttoHeight - attrs.axisBottomHeight) + ")")
+          .call(d3.axisBottom(xLabels).tickFormat(d3.timeFormat("%b")).ticks(attrs.data.length).tickSize(-calc.chartBruttoHeight));
       
+      xAxis.selectAll(".tick")
+           .attr("transform", (d,i) => {
+              var barWidth = x(1) - x(0) - attrs.barPadding;
+              return "translate("+[barWidth / 2 + i * (barWidth + attrs.barPadding), 0]+")";
+         });
+
       xAxis.selectAll("text")
           .style("text-anchor", "end")
           .attr("dx", "-.18em")
@@ -117,12 +129,13 @@ function renderBarChart(params) {
           .attr("transform", function(d) {
               return "rotate(-45)" 
           });
+
       var yAxis = chart.patternify({ tag: 'g', selector: 'axis axis--y'})
 
       yAxis.attr("transform", "translate("+attrs.axisLeftWidth+", 0)")
           .call(d3.axisLeft(y).ticks(5).tickSize(-calc.chartWidth)
           .tickPadding(8));
-      console.log("series:", series);
+
       // Add a group for each row of data
       var groups = chart.patternify({ tag: "g", selector: 'bars', data: series})
                         .style("fill", function(d, i) {
@@ -135,13 +148,14 @@ function renderBarChart(params) {
                     .enter()
                     .append("rect")                    
                     .attr("x", function(d, i) {
-                      return x(i) + attrs.barPadding / 2 - (x(1) - x(0)) / 2;
+                      return x(i);
                     })
                     .attr("width", (x(1) - x(0)) - attrs.barPadding)
                     .attr("height", function(d) {
                       return y(d[0]) - y(d[1]);
                     })
                     .on("mouseover", function(d, i) {
+                      var thisElement = d3.select(this);
                       var direction;
                       if (d.data.month === "January") {
                        direction = "left";
@@ -163,8 +177,8 @@ function renderBarChart(params) {
                         }
                       });
                       tooltip
-                            .x(x(i))
-                            .y(y(d[1]) + 20)
+                            .x(+thisElement.attr("x") + (+thisElement.attr("width")) / 2 + attrs.barPadding)
+                            .y(+thisElement.attr("y") + (+thisElement.attr("height") / 2) + 4)
                             .direction(direction)
                             .show({ name: name, month: d.data.month, value: value });
 

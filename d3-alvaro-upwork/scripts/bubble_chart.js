@@ -21,6 +21,7 @@ function renderBubbleChart(params) {
     bubbleMinRadius: 20,
     bubbleMaxRadius: 50,
     minimumDistance: 180,
+    bubbleTextLimit: 5,
     container: 'body',
     data: null
   };
@@ -69,7 +70,7 @@ function renderBubbleChart(params) {
               });
 
           text
-              .attr("x", d => { return d.x - 5; })
+              .attr("x", d => { return d.x; })
               .attr("y", d => { return d.y + 5; })
       }
       //Drawing containers
@@ -108,16 +109,15 @@ function renderBubbleChart(params) {
                       })
                       .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
                       .on("mouseover", function(d) {
-                           var circle = d3.select(this);
-                           var x = calc.chartWidth / 2 + d.x + 4;
-                           var y = calc.chartHeight / 2 + d.y - scaleRadius(d[columnForRadius]) / 2;
                            var direction = "bottom";
-                           if (calc.chartWidth / 2 + x + 60 >= calc.chartWidth){
-                            direction = "right";
+                           if (d.x > 0){
+                              direction = "right";
+                           } else{
+                              direction = "left";
                            }
-                           else if (x - 60 < 0){
-                             direction = "left";
-                           }
+                           var x = calc.chartWidth / 2 + d.x;
+                           var y = calc.chartHeight / 2 + d.y;
+                           
                            tooltip
                               .x(x)
                               .y(y)
@@ -131,7 +131,20 @@ function renderBubbleChart(params) {
       var text = chart.patternify({ tag: 'text', selector: 'bubble-text', data: attrs.data })
                       .attr('transform', 'translate(' + [calc.chartWidth / 2, calc.chartHeight / 2] + ')')
                       .style("fill", "#fff")
-                      .text(d => { return d.name; });
+                      .attr("text-anchor","middle")
+                      .text(function(d) {
+                        // measure text size and compate to the bubble rect
+                        var limit = attrs.bubbleTextLimit;
+                        var diameter = scaleRadius(d[columnForRadius]) * 2;
+                        var width = d3.select(this).node().getBoundingClientRect().width;
+                        if ((limit * 8 + 3 * 4) > diameter){
+                          limit = 3;
+                        }
+                        if (d.name.length <= limit){
+                          return d.name;
+                        }
+                        return d.name.substr(0, limit) + "..."; 
+                      });
 
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {

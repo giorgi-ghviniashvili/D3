@@ -1,0 +1,13 @@
+Adjust 1: --Done-- 
+Example: In case I don't need all the "Months" and delete some objects in the data file, all the months still in the legend even tho I just present 4 'datas' in the json.
+
+Adjust 2: --Done--
+In case I write a big name in the "Bubble charts" its overwritting another texts. 
+To fix this issue i suggest to put a "limit" of characters in the bubble eg. this this case: "Gabrie..." and finish it with 3 dots to show that there's more text and then on hover ( tooltip) you can show the entire name. 
+It's also better if the name is centralized. 
+If you have another suggestions to fix the issues please share.
+
+Adjust 3: 
+	--Done--  a.In case I imput a very small value the tooltip seems to belong to another part of the graphic when im actually hovering the blue part.
+	--Done--  b.On the responsive mode of the bubble graphics sometimes the tooltip is going outside the screen
+	--Done--  c.Also for the pie chart the tooltip is not showing entirely depending on where you hover and when the part is too small the number is not exactly in the middle

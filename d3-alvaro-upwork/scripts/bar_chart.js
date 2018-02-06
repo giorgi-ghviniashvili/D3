@@ -36,10 +36,11 @@ function renderBarChart(params) {
   //Main chart object
   var main = function (selection) {
     selection.each(function scope() {
+      var selectedStackGroups = Object.keys(attrs.data[0]).filter(x => x !== 'month');
 
       //Set up stack layout
       var stack = d3.stack()
-                    .keys(Object.keys(attrs.data[0]).filter(x => x !== 'month'))
+                    .keys(selectedStackGroups)
                     .order(d3.stackOrderDescending);
 
       //Data, stacked
@@ -104,7 +105,7 @@ function renderBarChart(params) {
                         }
                       ]);
 
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var color = d3.scaleOrdinal(d3.schemeCategory10).domain(selectedStackGroups);
                  
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
@@ -137,9 +138,10 @@ function renderBarChart(params) {
           .tickPadding(8));
 
       // Add a group for each row of data
-      var groups = chart.patternify({ tag: "g", selector: 'bars', data: series})
+      var groups = chart.patternify({ tag: "g", selector: 'bars', data: series })
+                        .attr("data-name", d => {return d.key;})
                         .style("fill", function(d, i) {
-                          return color(i);
+                          return color(d.key);
                         }); 
 
       // Add a rect for each data value
@@ -191,26 +193,26 @@ function renderBarChart(params) {
                     });
       
 
-      var t = d3.transition(attrs.id)
-            .duration(attrs.animationSpeed)
-            .ease(d3.easeLinear)
-            .on("start", function(d){})
-            .on("end", function(d){});
+          var t = d3.transition(attrs.id)
+                .duration(attrs.animationSpeed)
+                .ease(d3.easeLinear)
+                .on("start", function(d){})
+                .on("end", function(d){});
 
-      // // animate if it is first load
-      if (isFirstLoad){
-        rects.transition(t)
-              .attr("y", function(d) {
-                return y(d[1]);
-              })
-        isFirstLoad = !isFirstLoad; // turn off animation
-      }
-      else {
-        rects
-              .attr("y", function(d) {
-                return y(d[1]);
-              });
-      }
+          // // animate if it is first load
+          if (isFirstLoad){
+            rects.transition(t)
+                  .attr("y", function(d) {
+                    return y(d[1]);
+                  })
+            isFirstLoad = !isFirstLoad; // turn off animation
+          }
+          else {
+            rects
+                  .attr("y", function(d) {
+                    return y(d[1]);
+                  });
+          }
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
                                   .attr("x", x(4))
@@ -238,13 +240,127 @@ function renderBarChart(params) {
               .attr("height", 15)
               .attr('rx', 2)
               .attr("fill", (d, i) => {
-                return color(i);
+                return color(d);
+              })
+              .attr("data-selected", "true")
+              .on("click", function(d){
+                var rect = d3.select(this);
+                var isSelected = rect.attr("data-selected");
+                if (isSelected == "true") {
+                  rect.style("opacity", 0.5).attr("data-selected", "false");
+                  selectedStackGroups.splice(selectedStackGroups.indexOf(d), 1);
+
+                  stack.keys(selectedStackGroups);
+
+                  series = stack(attrs.data.map(k => {
+                    var obj = [];
+                    selectedStackGroups.forEach(p => {
+                      obj[p] = k[p];
+                    })
+                    obj.month = k.month;
+                    return obj;
+                  }));
+
+                  var groups = chart.patternify({ tag: "g", selector: 'bars', data: series })
+                                    .style("fill", function(d, i) {
+                                          return color(d.key);
+                                    });
+                  
+                  groups.selectAll("rect")
+                    .data(function(d) { return d; })
+                    .attr("y", function(d) {
+                      return y(d[1]);
+                    })
+                    .attr("height", function(d) {
+                      return y(d[0]) - y(d[1]);
+                    })
+                }
+                else {
+                  rect.style("opacity", 1).attr("data-selected", "true");
+                  selectedStackGroups.push(d);
+
+                  stack.keys(selectedStackGroups);
+
+                  series = stack(attrs.data.map(k => {
+                    var obj = [];
+                    selectedStackGroups.forEach(p => {
+                      obj[p] = k[p];
+                    })
+                    obj.month = k.month;
+                    return obj;
+                  }));
+
+                  var groups = chart.patternify({ tag: "g", selector: 'bars', data: series })
+                                  .style("fill", function(d, i) {
+                                          return color(d.key);
+                                        }); ;
+                        
+                  var rects = groups.selectAll("rect")
+                    .data(function(d) { return d; })
+                    .attr("y", function(d) {
+                      return y(d[1]);
+                    })
+                    .attr("height", function(d) {
+                      return y(d[0]) - y(d[1]);
+                    })
+
+                  rects.enter()
+                    .append("rect")                    
+                    .attr("x", function(d, i) {
+                      return x(i);
+                    })
+
+                    .attr("width", (x(1) - x(0)) - attrs.barPadding)
+                    .attr("height", function(d) {
+                      return y(d[0]) - y(d[1]);
+                    })
+                    .attr("y", function(d) {
+                      return y(d[1]);
+                    })
+                    .on("mouseover", function(d, i) {
+                      var thisElement = d3.select(this);
+                      var direction;
+                      if (d.data.month === "January") {
+                       direction = "left";
+                      }
+                      else if (d.data.month === "December") {
+                       direction = "right";
+                      }
+                      else if (d[1] == y.domain()[1]){
+                       direction = "top";
+                      }
+                      else {
+                       direction = "bottom";
+                      }
+                      var value = d[1] - d[0];
+                      var name = "";
+                      Object.keys(d.data).forEach(k => {
+                        if (+d.data[k] == value){
+                          name = k;
+                        }
+                      });
+                      tooltip
+                            .x(+thisElement.attr("x") + (+thisElement.attr("width")) / 2 + attrs.barPadding)
+                            .y(+thisElement.attr("y") + (+thisElement.attr("height") / 2) + 4)
+                            .direction(direction)
+                            .show({ name: name, month: d.data.month, value: value });
+
+                    })
+                    .on("mousemove", function() {
+                        
+                    })
+                    .on("mouseout", function() {
+                      tooltip.hide();
+                    })
+
+                    ;
+                }
               })
               
 
       legend_items.append("text")
               .attr("stroke", (d, i) => {
-                return color(i);
+                return color(d);
               })
               .attr("stroke-width", 0.9)
               .text(d => {
@@ -306,6 +422,9 @@ function renderBarChart(params) {
             if (typeof d === "object") {
                 if (d.id) {
                     return d.id;
+                }
+                if (d.key){
+                  return d.key;
                 }
             }
             return i;

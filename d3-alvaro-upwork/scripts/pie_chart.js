@@ -55,8 +55,10 @@ function renderPieChart(params) {
         return +d.value;
       });
 
+      var selectedSectors = attrs.data.map(d => { return d.name;});
+
       // ########## scales #######
-      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var color = d3.scaleOrdinal(d3.schemeCategory10).domain(selectedSectors);
 
       var x = d3.scaleLinear()
                 .range([10, calc.chartWidth])
@@ -80,7 +82,6 @@ function renderPieChart(params) {
       var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
                         .attr('width', attrs.svgWidth)
                         .attr('height', attrs.svgHeight);
-
 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
@@ -174,9 +175,7 @@ function renderPieChart(params) {
       var legend_items = legend.patternify({ 
                                          tag: 'g', 
                                          selector: 'legend_item', 
-                                         data: attrs.data.map(d => { 
-                                            return d.name;
-                                         })
+                                         data: selectedSectors
                                        })
                                  .attr('transform', function (d, i) {
                                       return "translate(" + ((i % attrs.legendColumnCount) * calc.eachLegendWidth + calc.eachLegendWidth / 3)  + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
@@ -189,7 +188,84 @@ function renderPieChart(params) {
               .attr("fill", (d, i) => {
                 return color(d);
               })
-              
+              .attr("data-selected", "true")
+              .on("click", function(d){
+                var rect = d3.select(this);
+                var isSelected = rect.attr("data-selected");
+                if (isSelected == "true") {
+                  rect.style("opacity", 0.5).attr("data-selected", "false");
+                  selectedSectors.splice(selectedSectors.indexOf(d), 1);
+                  var arcs = slices.selectAll("g.arc")
+                                   .data(pie(attrs.data.filter(x => {
+                                        if (selectedSectors.indexOf(x.name) > -1){
+                                          return true;
+                                        }
+                                        return false
+                                    })), function(d) {
+                                      return d.data.name;
+                                    })
+
+                  arcs.exit().remove();
+
+                  // .patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data.filter(x => {
+                  //     if (selectedSectors.indexOf(x.name) > -1){
+                  //       return true;
+                  //     }
+                  //     return false
+                  // })) })
+
+                  arcs.select("path")
+                      .attr("fill", (d, i) => {
+                        return color(d);
+                      })
+                      .transition(attrs.id)
+                      .duration(attrs.animationSpeed)
+                      .attrTween('d', acrTween);
+
+                  arcs.selectAll("text").exit().remove();
+
+                  arcs.select("text")
+                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                      .attr("text-anchor", "middle")
+                      .text(function(d) { return d.value; })
+                }
+                else {
+                  rect.style("opacity", 1).attr("data-selected", "true");
+                  selectedSectors.push(d);
+                  var arcs = slices.selectAll("g.arc")
+                                   .data(pie(attrs.data.filter(x => {
+                                        if (selectedSectors.indexOf(x.name) > -1){
+                                          return true;
+                                        }
+                                        return false
+                                    })), function(d) {
+                                      return d.data.name;
+                                    })
+
+                  arcs.exit().remove();
+
+                  arcs.select("path")
+                      .transition(attrs.id)
+                      .duration(attrs.animationSpeed)
+                      .attrTween('d', acrTween);
+
+                  arcs.append("path")
+                      .style("fill", function(d) { 
+                        return color(d.data.name); 
+                      })
+                      .transition(attrs.id)
+                      .duration(attrs.animationSpeed)
+                      .attrTween('d', acrTween);
+
+                  arcs.enter()
+                      .append("text")
+                      .merge(arcs)
+                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
+                      .attr("text-anchor", "middle")
+                      .text(function(d) { return d.value; })
+                      .style("fill", "#fff");
+                }
+              })
 
       legend_items.append("text")
               .attr("stroke", (d, i) => {
@@ -205,6 +281,7 @@ function renderPieChart(params) {
       if (isFirstLoad){
         isFirstLoad = false;
       }
+
       //RESPONSIVENESS
        d3.select(window).on('resize.' + attrs.id, function () {
         setDimensions();
@@ -217,6 +294,15 @@ function renderPieChart(params) {
         container.call(main);
       }
 
+      function acrTween(d) {
+        var i = d3.interpolate(this._current, d);
+
+          this._current = i(0);
+
+          return function(t) {
+            return arc(i(t))
+          }
+      }
 
       // Smoothly handle data updating
       updateData = function () {
@@ -259,6 +345,9 @@ function renderPieChart(params) {
             if (typeof d === "object") {
                 if (d.id) {
                     return d.id;
+                }
+                if (d.data && d.data.name){
+                  return d.data.name;
                 }
             }
             return i;

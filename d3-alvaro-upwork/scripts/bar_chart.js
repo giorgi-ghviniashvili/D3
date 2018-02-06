@@ -25,6 +25,8 @@ function renderBarChart(params) {
     legendColumnCount: 3,
     legendRowHeight: 20,
     animationSpeed: 1000,
+    chartTitleXCoord: 4,
+    chartTitle: "",
     container: 'body',
     data: null
   };
@@ -57,7 +59,7 @@ function renderBarChart(params) {
       calc.chartBruttoHeight = calc.chartHeight * 0.8;
 
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
-
+      calc.chartTitleXCoord = (calc.chartWidth - 5 * attrs.chartTitle.length) / 2;
       //Drawing containers
       var container = d3.select(this);
       container.html('');
@@ -215,9 +217,9 @@ function renderBarChart(params) {
           }
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", x(4))
+                                  .attr("x", calc.chartTitleXCoord)
                                   .attr("y", calc.chartBruttoHeight + 35)
-                                  .text("Registered users number x Time");
+                                  .text(attrs.chartTitle);
 
       // ##### legend #####
       var legend = chart.patternify({ tag: 'g', selector: 'legend' })

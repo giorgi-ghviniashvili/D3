@@ -25,6 +25,8 @@ function renderPieChart(params) {
     spacingAfterchart: 50,
     legendColumnCount: 3,
     legendRowHeight: 20,
+    chartTitleXCoord: 2,
+    chartTitle: "",
     container: 'body',
     data: null
   };
@@ -50,7 +52,7 @@ function renderPieChart(params) {
       calc.legendHeigh = calc.chartHeight - calc.chartBruttoHeight;
       calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
-
+      calc.chartTitleXCoord = (calc.chartWidth - 5 * attrs.chartTitle.length) / 2;
       var sum = d3.sum(attrs.data, function(d){
         return +d.value;
       });
@@ -110,32 +112,7 @@ function renderPieChart(params) {
                     ]);
 
       var arcs = slices.patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data) })
-                        .on("mouseover", function (d) {
-                        var centroidX = arc.centroid(d)[0];
-                        var centroidY = arc.centroid(d)[1];
-                        var x = calc.chartWidth / 2 + centroidX;
-                        var y = calc.chartBruttoHeight / 2 + centroidY;
-                        var direction;
-                        if (y - 80 < 0)
-                        {
-                          direction = "top";
-                        }
-                        else if (centroidX > 0){
-                          direction = "right";
-                        }
-                        else if (centroidX < 0){
-                          direction = "left";
-                        }
-                        else {
-                          direction = "bottom";
-                        }
-                        tooltip
-                              .x(x)
-                              .y(y)
-                              .direction(direction)
-                              .show({ name: d.data.name, value: d.data.value, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
-                        
-                        })
+                        .on("mouseover", showTooltip)
                         .on("mouseout", function(){
                             tooltip.hide();
                         });
@@ -161,9 +138,9 @@ function renderPieChart(params) {
         .style("fill", "#fff");
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", x(2))
+                                  .attr("x", calc.chartTitleXCoord)
                                   .attr("y", calc.chartBruttoHeight + 20)
-                                  .text("Registered users number x Time");
+                                  .text(attrs.chartTitle);
 
       // ##### legend #####
       var legend = chart.patternify({ tag: 'g', selector: 'legend' })
@@ -194,25 +171,23 @@ function renderPieChart(params) {
                 var isSelected = rect.attr("data-selected");
                 if (isSelected == "true") {
                   rect.style("opacity", 0.5).attr("data-selected", "false");
+
                   selectedSectors.splice(selectedSectors.indexOf(d), 1);
-                  var arcs = slices.selectAll("g.arc")
-                                   .data(pie(attrs.data.filter(x => {
+                  var newData = attrs.data.filter(x => {
                                         if (selectedSectors.indexOf(x.name) > -1){
                                           return true;
                                         }
                                         return false
-                                    })), function(d) {
+                                    });
+                  var arcs = slices.selectAll("g.arc")
+                                   .data(pie(newData), function(d) {
                                       return d.data.name;
                                     })
+                  sum = d3.sum(newData, d => {
+                    return +d.value;
+                  });
 
                   arcs.exit().remove();
-
-                  // .patternify({ tag: 'g', selector: 'arc', data: pie(attrs.data.filter(x => {
-                  //     if (selectedSectors.indexOf(x.name) > -1){
-                  //       return true;
-                  //     }
-                  //     return false
-                  // })) })
 
                   arcs.select("path")
                       .attr("fill", (d, i) => {
@@ -227,43 +202,63 @@ function renderPieChart(params) {
                   arcs.select("text")
                       .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
                       .attr("text-anchor", "middle")
-                      .text(function(d) { return d.value; })
+                      .text(function(d) { return d.value; });
+
+
                 }
                 else {
                   rect.style("opacity", 1).attr("data-selected", "true");
                   selectedSectors.push(d);
-                  var arcs = slices.selectAll("g.arc")
-                                   .data(pie(attrs.data.filter(x => {
+                  
+                  var newData = attrs.data.filter(x => {
                                         if (selectedSectors.indexOf(x.name) > -1){
                                           return true;
                                         }
                                         return false
-                                    })), function(d) {
-                                      return d.data.name;
                                     })
-
-                  arcs.exit().remove();
-
-                  arcs.select("path")
-                      .transition(attrs.id)
-                      .duration(attrs.animationSpeed)
-                      .attrTween('d', acrTween);
-
-                  arcs.append("path")
+                  sum = d3.sum(newData, d => {
+                    return +d.value;
+                  });
+                  var arcs = slices.selectAll("g.arc")
+                                   .data(pie(newData), function(d) {
+                                      return d.data.name;
+                                    });
+                  var enterSel = arcs.enter()
+                      .append("g")
+                      .attr("class", "arc");
+                  enterSel.append("path")
                       .style("fill", function(d) { 
                         return color(d.data.name); 
                       })
+                      .on("mouseover", showTooltip)
+                      .on("mouseout", function(){
+                          tooltip.hide();
+                      })
                       .transition(attrs.id)
                       .duration(attrs.animationSpeed)
-                      .attrTween('d', acrTween);
+                      .attrTween('d', acrTween)
+                      ;
 
-                  arcs.enter()
+                  arcs.merge(arcs).select("path")
+                      .transition(attrs.id)
+                      .duration(attrs.animationSpeed)
+                      .attrTween('d', acrTween)
+
+                  arcs.exit().remove();
+                        
+                  enterSel
                       .append("text")
-                      .merge(arcs)
-                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-                      .attr("text-anchor", "middle")
                       .text(function(d) { return d.value; })
-                      .style("fill", "#fff");
+                      .style("fill", "#fff")
+                      .attr("text-anchor", "middle")
+                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; });
+
+                  arcs.select("text")
+                      .transition(attrs.id)
+                      .duration(attrs.animationSpeed)
+                      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; });
+                      
+                      
                 }
               })
 
@@ -291,9 +286,35 @@ function renderPieChart(params) {
         var width = container.node().getBoundingClientRect().width;
         main.svgWidth(width);
         main.svgHeight(window.innerWidth < 768 ? 400 : 600);
+
         container.call(main);
       }
-
+      function showTooltip(d) {
+          var centroidX = arc.centroid(d)[0];
+          var centroidY = arc.centroid(d)[1];
+          var x = calc.chartWidth / 2 + centroidX;
+          var y = calc.chartBruttoHeight / 2 + centroidY;
+          var direction;
+          if (y - 80 < 0)
+          {
+            direction = "top";
+          }
+          else if (centroidX > 0){
+            direction = "right";
+          }
+          else if (centroidX < 0){
+            direction = "left";
+          }
+          else {
+            direction = "bottom";
+          }
+          tooltip
+                .x(x)
+                .y(y)
+                .direction(direction)
+                .show({ name: d.data.name, value: d.data.value, percent: (( +d.data.value / sum ) * 100).toFixed(2) + "%"});
+          
+      }
       function acrTween(d) {
         var i = d3.interpolate(this._current, d);
 

@@ -21,6 +21,7 @@ function renderLineChart(params) {
     axisLeftWidth : 30,
     axisBottomHeight : 20,
     container: 'body',
+    chartTitle: "",
     data: null
   };
 
@@ -45,7 +46,8 @@ function renderLineChart(params) {
       calc.legendRowCount = Math.ceil(attrs.data.length / attrs.legendColumnCount);
       calc.eachLegendWidth = calc.chartWidth / attrs.legendColumnCount;
 
-      
+      calc.chartTitleXCoord = (calc.chartWidth - 5 * attrs.chartTitle.length) / 2;
+
       var line = d3.line()
                   .x(function(d, i) { return x(i); })
                   .y(function(d) { return y(d.value); });
@@ -216,9 +218,9 @@ function renderLineChart(params) {
           });
 
       var xAxisDescription = chart.patternify({ tag: 'text', selector: 'xAxisDescr' })
-                                  .attr("x", x(Math.floor(attrs.data[0].length / 3)))
+                                  .attr("x", calc.chartTitleXCoord)
                                   .attr("y", calc.lineChartHeight + 35)
-                                  .text("Registered users number x Time");
+                                  .text(attrs.chartTitle);
 
       // ##### legend #####
       var legend = chart.patternify({ tag: 'g', selector: 'legend' })
@@ -235,7 +237,7 @@ function renderLineChart(params) {
                                          })
                                        })
                                  .attr('transform', function (d, i) {
-                                    return "translate(" + (i % attrs.legendColumnCount * calc.eachLegendWidth - 17.5) + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
+                                    return "translate(" + (i % attrs.legendColumnCount * calc.eachLegendWidth - 27.5) + "," + Math.floor(i / attrs.legendColumnCount) * attrs.legendRowHeight + ")"
                                   });
 
       legend_items.append("rect")

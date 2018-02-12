@@ -7,6 +7,7 @@
     <title>Chart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <style type="text/css">
         .domain {
             stroke: #fff;
@@ -75,13 +76,15 @@
           align-items: flex-end;
         }
         .inputDiv input {
-          margin-bottom: 0px;
+          margin-bottom: 2px !important;
         }
         .inputDiv p {
           margin: 0px;
         }
-        .inputDivHomePrice input{
-          margin-bottom: 20px;
+        .icon{
+          float: right;
+          margin-top: 2px;
+          color: rgba(0, 0, 0, 0.54);
         }
     </style>
 </head>
@@ -98,7 +101,12 @@
           <p>lorem ipsum lorem ipsum</p>
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2 inputDivHomePrice">
-              <input>
+                <div>
+                  <input type="text" class="validate" >
+                  <i class="tiny material-icons icon">cancel</i>
+                </div>
+                
+                <p>Home Price <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="home-price" class="chart-container col s10">
             </div>
@@ -110,7 +118,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>lorem ipsum</p>
+              <p>lorem ipsum <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="how-long" class="chart-container col s10">
             </div>
@@ -121,8 +129,8 @@
           <h5>What Are Your Mortgage Details?</h5>
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
-              <input>
-              <p>Mortgage rate</p>
+              <input type="text" class="validate">
+              <p>Mortgage rate <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="mortgage-rate" class="chart-container col s10">
             </div>
@@ -131,8 +139,8 @@
           <div class="indicator-container valign-wrapper">
             
             <div class="inputDiv col s2">
-              <input>
-              <p>Down payment</p>
+              <input type="text" class="validate">
+              <p>Down payment <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="down-rate" class="chart-container col s10">
             </div>
@@ -141,8 +149,8 @@
            <div class="indicator-container valign-wrapper">
             
             <div class="inputDiv col s2">
-              <input>
-              <p>Length of Mortgage</p>
+              <input type="text" class="validate">
+              <p>Length <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="mortgage-period" class="chart-container col s10">
             </div>
@@ -154,7 +162,7 @@
             
             <div class="inputDiv col s2">
               <input>
-              <p>Home price growth</p>
+              <p>Home growth <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="home-price-growth-rate" class="chart-container col s10">
             </div>
@@ -163,7 +171,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Rent price growth</p>
+              <p>Rent growth <i class="tiny material-icons icon">help</i></p>
           </div>
             <div id="rent-growth-rate" class="chart-container col s10">
             </div>
@@ -172,7 +180,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Investment return rate</p>
+              <p>Invest rate <i class="tiny material-icons icon">help</i></p>
           </div>
             <div id="investment-return-rate" class="chart-container col s10">
             </div>
@@ -181,7 +189,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Inflation rate</p>
+              <p>Inflation rate <i class="tiny material-icons icon">help</i></p>
           </div>
             <div id="inflation-rate" class="chart-container col s10">
             </div>
@@ -193,7 +201,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Property tax rate</p>
+              <p>Property tax rate <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="property-tax-rate" class="chart-container col s10">
             </div>
@@ -201,7 +209,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>marginal tax rate</p>
+              <p>marginal tax rate <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="marginal-tax-rate" class="chart-container col s10">
             </div>
@@ -213,7 +221,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Costs of buying home</p>
+              <p>Buying cost <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="costs-of-buying-home" class="chart-container col s10">
             </div>
@@ -221,7 +229,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Costs of selling home</p>
+              <p>Selling cost <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="costs-of-selling-home" class="chart-container col s10">
             </div>
@@ -233,7 +241,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>maintainance/renovation</p>
+              <p>maintainance/renovation <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="maintainance-renovation" class="chart-container col s10">
             </div>
@@ -241,7 +249,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Homeowner's insurance</p>
+              <p>Homeowner's insurance <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="insurance" class="chart-container col s10">
             </div>
@@ -249,7 +257,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Mothly utilities</p>
+              <p>Mothly utilities <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="mothly-utilities" class="chart-container col s10">
             </div>
@@ -257,7 +265,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Mothly common fees</p>
+              <p>Mothly common fees <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="mothly-common-fees" class="chart-container col s10">
             </div>
@@ -265,7 +273,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Common fees deduction</p>
+              <p>Common fees deduction <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="common-fees-deduction" class="chart-container col s10">
             </div>
@@ -277,7 +285,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Security deposit</p>
+              <p>Security deposit <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="security-deposit" class="chart-container col s10">
             </div>
@@ -285,7 +293,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Broker's fee</p>
+              <p>Broker's fee <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="brokers-fee" class="chart-container col s10">
             </div>
@@ -293,7 +301,7 @@
           <div class="indicator-container valign-wrapper">
             <div class="inputDiv col s2">
               <input>
-              <p>Rent's insurance</p>
+              <p>Rent's insurance <i class="tiny material-icons icon">help</i></p>
             </div>
             <div id="rents-insurance" class="chart-container col s10">
             </div>
@@ -337,7 +345,6 @@
               difference *= 1.1;
               i++;
           }
-          console.log(data);
           return data;
     }
 
@@ -353,21 +360,21 @@
                         .exponent(0.2)
                         .domain([30000, 3000000]),
         data: getData(),
-        dragCallback: function(value){
+        dragCallback: function(value) {
           currentIndicators.homePrice = value;
 
-            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
-                currentIndicators.mortgageRate, currentIndicators.downRate);
+          var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
+              currentIndicators.mortgageRate, currentIndicators.downRate);
 
-            currentPayment = p;
+          currentPayment = p;
 
-            charts.forEach(chart => {
-              chart.updateChart(value);
-            });
+          charts.forEach(chart => {
+            chart.updateChart(value);
+          });
 
-            var result = document.getElementById("result");
+          var result = document.getElementById("result");
 
-            result.innerText = "$ " + Math.round(p) + " per month";
+          result.innerText = "$ " + Math.round(p) + " per month";
         }
       },
       // living period

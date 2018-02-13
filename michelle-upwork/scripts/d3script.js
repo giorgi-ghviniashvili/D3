@@ -28,9 +28,7 @@ function renderChart(params) {
       calc.chartTopMargin = attrs.marginTop;
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
-      var k = calc.chartHeight / calc.chartWidth,
-              x0 = [-4.5, 4.5],
-              y0 = [-4.5 * k, 4.5 * k]
+     
 
       //Scales
       var x = d3.scaleLinear()
@@ -54,7 +52,8 @@ function renderChart(params) {
         .on('drag', dragged)
         .on('end', dragended);
 
-      var brush = d3.brush().on("end", brushended),
+      var brush = d3.brush()
+                    .on("end", brushended),
           idleTimeout,
           idleDelay = 350;
 
@@ -93,15 +92,29 @@ function renderChart(params) {
           .style('cursor', 'pointer')
           .style('fill', '#fff')
           .style('stroke-width', 1)
-          .style('stroke', "red")
-          
+          .style('stroke', "red");
+
+      var brushGroup = svg.append("g")
+                          .attr("class", "brush");
+
       chart.selectAll('.circle').call(drag);
 
-      svg.append("g")
-          .attr("class", "brush")
-          .call(brush);
+      var zoomEnalbed = false;
+      d3.select("#zoom").on("click", function(){
+        if (!zoomEnalbed){
+          brushGroup
+            .call(brush);
+          d3.select(this).style("color", "black");
+        }
+        else {
+          brushGroup.html("");
+          d3.select(this).style("color", "grey");
+        }
+        zoomEnalbed = !zoomEnalbed;
+      });
+      
 
-      //Behavior funcitons
+      //###################### Drag ############################
       function dragstarted(d) {
           d3.select(this).raise().classed('active', true);
       }
@@ -120,13 +133,14 @@ function renderChart(params) {
       function dragended(d) {
           d3.select(this).classed('active', false);
       }
-      //Zoom
+
+      //######################## Zoom ##########################
       function brushended() {
         var s = d3.event.selection;
         if (!s) {
           if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-          x.domain(x0);
-          y.domain(y0);
+          x.domain(d3.extent(attrs.data, function(d) { return d[0]; }));
+          y.domain(d3.extent(attrs.data, function(d) { return d[1]; }));;
         } else {
           x.domain([s[0][0], s[1][0]].map(x.invert, x));
           y.domain([s[1][1], s[0][1]].map(y.invert, y));
@@ -150,6 +164,7 @@ function renderChart(params) {
             return line(d); 
           });
       }
+
       // Smoothly handle data updating
       updateData = function () {
 

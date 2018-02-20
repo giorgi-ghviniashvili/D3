@@ -33,11 +33,11 @@ function renderHeart(params) {
       
       //Scales
       var xScale = d3.scaleLinear()
-            .domain([d3.min(data, function(d) { return d[0]; }), d3.max(data, function(d) { return d[0]; })])
+            .domain([d3.min(attrs.data, function(d) { return d[0]; }), d3.max(attrs.data, function(d) { return d[0]; })])
             .range([ 0, calc.chartWidth ]);
 
       var yScale = d3.scaleLinear()
-            .domain([d3.min(data, function(d) { return d[1]; }), d3.max(data, function(d) { return d[1]; })])
+            .domain([d3.min(attrs.data, function(d) { return d[1]; }), d3.max(attrs.data, function(d) { return d[1]; })])
             .range([ calc.chartHeight, 0 ]);
 
       var line = d3.line()

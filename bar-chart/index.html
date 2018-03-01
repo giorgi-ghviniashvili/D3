@@ -38,18 +38,29 @@
 					margin: auto;
 				}
 
+				.svgCont {
+					width: 50%;
+					display: block;
+					float: left;
+					margin-top: 15px;
+				}
+				#svgCont{
+					margin-top: 20px;
+				}
 		</style>
 	</head>
 		<div>
 			<button class="button1">Get Random Data</button>
 		</div>
-		<div id="svgCont">
+		<div id="svgCont" class="svgCont">
+		</div>
+		<div id="svgLine" class="svgCont">
 		</div>
 		<script type="text/javascript">
 
 			//Width and height
-			var w = 600;
-			var h = 500;
+			var w = document.getElementById("svgCont").getBoundingClientRect().width;
+			var h = 250;
 			
 			var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
 							11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
@@ -61,7 +72,7 @@
 
 			var yScale = d3.scaleLinear()
 							.domain([0, d3.max(dataset)])
-							.range([0, h/2]);
+							.range([0, h]);
 			
 			//Create SVG element
 			var svg = d3.select("#svgCont")
@@ -109,24 +120,45 @@
 			   .attr("font-size", "11px")
 			   .attr("fill", "white");
 
-			// var circle = svg.append("circle")
-			// 				.attr("r", 10)
-			// 				.attr("cx", xScale(0) + xScale.bandwidth() / 2)
-			// 				.attr("cy", h - yScale(dataset[0]) - 15)
-			// 				.attr("fill", color(dataset[0]));
+			var svgLine = d3.select("#svgLine")
+							.append("svg")
+							.attr("width", w)
+							.attr("height", h + 25);
+
+			var lineChart = svgLine.append("g")
+									.attr("class", "lineChart")
+									.attr("transform", "translate(" + [xScale.bandwidth(), 5] + ")");
+			var xScaleLine = d3.scaleLinear()
+							.domain([0, d3.max(dataset)])
+							.range([0, w]);
+			var yScaleLine = d3.scaleLinear()
+							.domain([0, d3.max(dataset)])
+							.range([h, 0]);
+
+			var xAxis = d3.axisBottom()
+						  .scale(xScaleLine);
+			var yAxis = d3.axisLeft()
+						  .scale(yScaleLine);
+			
+			lineChart.append("g").attr("class", "axis--y").call(yAxis)
+
+			lineChart.append("g").attr("class", "axis--x").call(xAxis).attr("transform", "translate(" + [0, h] + ")");
 
 			var line = d3.line()
 			  .curve(d3.curveCardinal)
 			  .x(function(d,i){ return xScale(i) + xScale.bandwidth() / 2})
-			  .y(function(d){ return h - yScale(d) - 200})
-			var path = svg.selectAll("path")
+			  .y(function(d){ return h - yScale(d)})
+
+			lineChart.selectAll("path.line")
 				.data([dataset])
 				.enter()
 				.append("path")
+				.attr("class", "line")
 				.attr("d", line)
 				.style("fill", "none")
 				.style("stroke", "teal")
-				.style("stroke-width", "2")
+				.style("stroke-width", "2");
+
 			//On click, update with new data			
 			d3.select("button")
 				.on("click", function() {
@@ -139,7 +171,7 @@
 						dataset.push(newNumber);			 			//Add new number to array
 					}
 
-					svg.selectAll("path")
+					lineChart.selectAll("path.line")
 						.data([dataset])
 						.transition()
 						.duration(500)

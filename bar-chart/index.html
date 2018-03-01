@@ -49,7 +49,7 @@
 
 			//Width and height
 			var w = 600;
-			var h = 250;
+			var h = 500;
 			
 			var dataset = [ 5, 10, 13, 19, 21, 25, 22, 18, 15, 13,
 							11, 12, 15, 20, 18, 17, 16, 18, 23, 25 ];
@@ -61,7 +61,7 @@
 
 			var yScale = d3.scaleLinear()
 							.domain([0, d3.max(dataset)])
-							.range([0, h]);
+							.range([0, h/2]);
 			
 			//Create SVG element
 			var svg = d3.select("#svgCont")
@@ -109,9 +109,24 @@
 			   .attr("font-size", "11px")
 			   .attr("fill", "white");
 
+			// var circle = svg.append("circle")
+			// 				.attr("r", 10)
+			// 				.attr("cx", xScale(0) + xScale.bandwidth() / 2)
+			// 				.attr("cy", h - yScale(dataset[0]) - 15)
+			// 				.attr("fill", color(dataset[0]));
 
-
-
+			var line = d3.line()
+			  .curve(d3.curveCardinal)
+			  .x(function(d,i){ return xScale(i) + xScale.bandwidth() / 2})
+			  .y(function(d){ return h - yScale(d) - 200})
+			var path = svg.selectAll("path")
+				.data([dataset])
+				.enter()
+				.append("path")
+				.attr("d", line)
+				.style("fill", "none")
+				.style("stroke", "teal")
+				.style("stroke-width", "2")
 			//On click, update with new data			
 			d3.select("button")
 				.on("click", function() {
@@ -123,6 +138,12 @@
 						var newNumber = Math.floor(Math.random() * 23 + 2); //New random integer (0-24)
 						dataset.push(newNumber);			 			//Add new number to array
 					}
+
+					svg.selectAll("path")
+						.data([dataset])
+						.transition()
+						.duration(500)
+						.attr("d", line);
 
 					//Update all rects
 					svg.selectAll("rect")
@@ -158,10 +179,51 @@
 					   .attr("y", function(d) {
 					   		return h - yScale(d) + 14;
 					   });
-					   				
+					
+					// var points = [];
+					// for(let k = 0; k < dataset.length - 1; k++){
+					// 	var a = {
+					// 	x: xScale(k) + xScale.bandwidth() / 2,
+					// 	y: h - yScale(dataset[k]) - 15
+					// 	};
+					// 	var b = {
+					// 		x: xScale(k+1) + xScale.bandwidth() / 2,
+					// 		y: h - yScale(dataset[k+1]) - 15
+					// 	};
+					// 	points = points.concat(getCurvePoints(a,b));
+
+					// }
+					// var  i = 0;
+					// var intervalId = setInterval(function(){
+					// 	if (i == points.length){
+					// 		clearInterval(intervalId);
+					// 	}
+					// 	var p = points[i];
+					// 	circle.attr("cx", p[0]).attr("cy", p[1])
+					// 	i++;
+					// }, 10); 				
 				});
 
-			
+			function getCurvePoints(a, b) {
+
+				function getQuadraticFunc () {
+					l = (b.y - a.y) / Math.pow((b.x - a.x), 2);
+					return function(x){
+						if ( l > 0 ) {
+							l = -l;
+						}
+						return l * Math.pow((x - a.x), 2) + b.y;
+					}
+				}
+
+				var list = [];
+				var func = getQuadraticFunc();
+				for(var x = a.x; x <= b.x; x+= 0.5) {
+					list.push([x, func(x)]);
+				}
+				return list;
+
+			}
 		</script>
 </body>
 </html>

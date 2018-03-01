@@ -128,9 +128,12 @@
 			var lineChart = svgLine.append("g")
 									.attr("class", "lineChart")
 									.attr("transform", "translate(" + [xScale.bandwidth(), 5] + ")");
-			var xScaleLine = d3.scaleLinear()
-							.domain([0, d3.max(dataset)])
-							.range([0, w]);
+
+			var xScaleLine = d3.scaleBand()
+							.domain(d3.range(1,dataset.length))
+							.rangeRound([0, w - xScale.bandwidth()])
+							.paddingInner(0.05);
+
 			var yScaleLine = d3.scaleLinear()
 							.domain([0, d3.max(dataset)])
 							.range([h, 0]);

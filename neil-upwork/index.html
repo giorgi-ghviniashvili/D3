@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #FAFAFA;
+        }
+
+        svg {
+            background-color: #ccc;
+		    /*display: block;
+		    margin: auto;*/
+        }
+
+        #myGraph {
+        	width: 45%;
+        	height: auto;
+        	margin: auto;
+        }
+
+    </style>
+</head>
+
+<body translate="no">
+
+    <div class="container centered">
+        <div id="myGraph"></div>
+    </div>
+    <script src="libs/d3.v4.min.js"></script>
+   	<script src="scripts/d3script.js"></script>
+
+    <script>
+    
+    var width = document.getElementById('myGraph').getBoundingClientRect().width;
+    var height = width;
+	var center = {
+		x: width / 2,
+		y: height / 2
+	};
+
+	var pointsOuter = getPoints(24, 220);
+	var pointsInner = getPoints(12, 100);
+	var links = [
+	    {s: 0, t: 0},
+	    {s: 1, t: 4},
+	    {s: 18, t: 9},
+	    {s: 12, t: 5},
+	    {s: 9, t: 4},
+	    {s: 19, t: 5},
+	    {s: 4, t: 3},
+	    {s: 16, t: 8},
+	    {s: 16, t: 1}
+	];
+
+	var dataset = {
+		outerPoints: pointsOuter,
+		innerPoints: pointsInner,
+		links: links
+	};
+
+    var chart = renderChart()
+        .svgHeight(height)
+        .svgWidth(width)
+        .container('#myGraph')
+        .data(dataset)
+        .debug(true)
+        .run()
+
+	function getPoints(n, r){
+        var coords = [];
+        var radian = 2 * Math.PI / n;
+        for(var i = 0; i < n; i++){
+          var angle = i * radian;
+          var x = center.x + r * Math.cos(angle);
+          var y = center.y + r * Math.sin(angle);
+          coords.push({
+            x: x,
+            y: y
+          });
+        }
+        return coords;
+    }
+
+    </script>
+
+
+</body>
+
+</html>

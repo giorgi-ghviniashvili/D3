@@ -54,22 +54,69 @@ function renderChart(params) {
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
-      chart.patternify({ tag: "circle", selector: 'nodes', data: getPointsData() })
-           .attr("r", 5)
-           .attr("cx",function(d) {return d.x;})
-           .attr("cy", function(d) {return d.y;})
-           .attr("stroke-width", 2)
-           .attr("fill", "white")
-           .attr("stroke", "#000080");
+      var line = d3.line()
+                    .curve(d3.curveCatmullRom)
+                    .x(function(d){ return d.x })
+                    .y(function(d){ return d.y })
+
+      chart.patternify({tag: "path", selector: "outerCircle", data: [attrs.data.outerPoints.concat(attrs.data.outerPoints[0])] })
+             .attr("d",line)
+             .style("fill", "none")
+             .style("stroke-dasharray", "5, 5")
+             .style("stroke", "#000080")
+
+      chart.patternify({tag: "path", selector: "innerCircle", data: [attrs.data.innerPoints.concat(attrs.data.innerPoints[0])] })
+             .attr("d", line)
+             .style("fill", "none")
+             .style("stroke-dasharray", "5, 5")
+             .style("stroke", "#000080")
 
       chart.patternify({ tag: "path", selector: "line", data: attrs.data.links })
            .style("fill", "none")
            .style("stroke", "#fff")
+           .attr("data-source", function(d){
+              return d.s;
+           })
            .attr("d", function(d){
-               var source = pointsOuter[d.s];
-               var target = pointsInner[d.t];
+               var source = attrs.data.outerPoints[d.s];
+               var target = attrs.data.innerPoints[d.t];
                return link({source: source, target: target});
          })
+
+      var pointsData = getPointsData();
+
+      chart.patternify({ tag: "circle", selector: 'nodes', data: pointsData })
+           .attr("r", 5)
+           .attr("cx",function(d) {return d.x;})
+           .attr("cy", function(d) {return d.y;})
+           .style("stroke-width", 2)
+           .style("fill", "white")
+           .style("stroke", "#000080")
+           .on("mouseenter", function(d){
+              var i = attrs.data.outerPoints.indexOf(d);
+              d3.select(this)
+                .transition()
+                .duration(100)
+                .style("fill", "#000080");
+              chart.selectAll('path[data-source="' + i + '"]')
+                   .transition()
+                   .duration(100)
+                   .style("stroke", "#000080");
+
+           })
+           .on("mouseleave", function(d){
+              var i = pointsData.indexOf(d);
+              d3.select(this)
+                .transition()
+                .duration(100)
+                .style("fill", "#fff");
+              chart.selectAll('path[data-source="' + i + '"]')
+                   .transition()
+                   .duration(100)
+                   .style("stroke", "#fff");
+           });
+
+
 
       // Smoothly handle data updating
       updateData = function () {
@@ -78,10 +125,10 @@ function renderChart(params) {
 
       //#########################################  UTIL FUNCS ##################################
       function link(d) {
-        return "M" + d.source.y + "," + d.source.x
-            + "C" + (d.source.y + d.target.y) / 2 + "," + d.source.x
-            + " " + (d.source.y + d.target.y) / 2 + "," + d.target.x
-            + " " + d.target.y + "," + d.target.x;
+        return "M" + d.source.x + "," + d.source.y
+            + "C" + d.source.x + "," + (d.source.y + d.target.y) / 2
+            + " " + d.target.x + "," + (d.source.y + d.target.y) / 2
+            + " " + d.target.x + "," + d.target.y;
       }
 
       function getPointsData () {

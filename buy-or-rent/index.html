@@ -1,770 +1,1055 @@
-<!DOCTYPE html>
-
 <html>
-
-<head>
-    <meta charset="UTF-8">
-    <title>Chart</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
-     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-    <style type="text/css">
-        .domain {
-            stroke: #fff;
-          }
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: "nyt-cheltenham",georgia,"times new roman",times,serif;
+            color: #333;
+            background-color: #fff;
+        }
+        /* Browser warning */
 
-        svg {
+        .lt-ie9 #g-fixed-container,
+        .lt-ie9 .g-section,
+        .lt-ie9 .g-method-section {
+          display: none;
+        }
+
+        .g-browser-warning {
+          font-family: georgia, times, serif;
+          font-size: 24px;
+          line-height: 30px;
+          font-weight: normal;
+        }
+
+        /* Scoop overrides */
+
+        #shell {
+          padding-top: 0 !important; /* hide-ribbon hack? */
+        }
+
+        .interactive-byline {
+          margin-top: 10px;
+          margin-bottom: 0px !important;
+        }
+
+        .dateline {
+          display: none;
+        }
+
+        .interactive-leadin.summary {
+          margin-top: 10px;
+        }
+
+        .viewport-medium-10 .interactive-leadin.summary {
+          font-size: 17px;
+        }
+
+        .story.theme-interactive .interactive-headline {
+          font-size: 24px !important;
+          line-height: 1.15em !important;
+        }
+
+        #upshot-sharetools {
           display: block;
+          margin: 2em auto 0 auto;
+        }
+
+
+        .g-browser-warning,
+        .interactive-leadin.summary,
+        .interactive-graphic p,
+        .story-footer p {
+          max-width: 650px;
+        }
+
+        .g-browser-warning,
+        .interactive-leadin.summary,
+        .interactive-graphic p {
+          font-family: nyt-franklin, arial, sans-serif;
+          font-weight: 300;
+          font-size: 16px;
+          line-height: 1.437em;
+        }
+        /* End scoop overrides */
+
+        .main {
+          position: relative;
+        }
+
+        #g-fixed-container {
+          /*margin-top: 46px;*/
+          font-family: nyt-franklin;
+          font-weight: 300;
+          line-height: 26px;
+          line-height: 1.437em;
+        }
+
+        #g-fixed {
+          background-color: #fff;
+        }
+
+        .g-primary-cost-before,
+        .g-primary-cost-after {
+          font-weight: 700;
+          line-height: 1.2em;
+          text-align: center;
+          white-space: nowrap;
           margin: auto;
         }
 
-        .container {
+        .g-primary-cost {
+          border-radius: 4px;
+          text-align: center;
+          background: #bad80a;
+          padding: 15px 0 10px 0;
+          margin: 15px 0;
+          -webkit-transition: color 250ms linear;
+          -moz-transition: color 250ms linear;
+          -ms-transition: color 250ms linear;
+          -o-transition: color 250ms linear;
+          transition: color 250ms linear;
+        }
+
+        .g-if-negative,
+        .g-if-positive {
+          display: none;
+        }
+
+        .g-negative .g-if-negative,
+        .g-positive .g-if-positive {
+          display: block;
+        }
+
+        .g-primary-cost-value {
+          font-size: 34px;
+          font-weight: 700;
+        }
+
+        .g-negative .g-primary-cost {
+          background: #555;
+        }
+
+        .g-negative .g-primary-cost-value,
+        .g-negative .g-primary-cost-unit {
+          color: #bad80a;
+        }
+
+        .g-primary-cost-unit {
+          display: inline-block;
+          text-align: left;
+          line-height: 1em;
+          font-size: 14px;
+        }
+
+        .g-primary-cost-after {
           margin-bottom: 30px;
         }
 
-        .ticks {
-          font: 10px sans-serif;
+        .g-secondary-costs,
+        .g-secondary-costs-before {
+          clear: right;
+          color: #999;
+          margin-top: 10px;
+          padding-top: 10px;
+          font-size: 14px;
         }
 
-        .track,
-        .track-inset,
-        .track-overlay {
+        .g-secondary-costs-before .g-secondary-cost-value {
+          padding-bottom: 5px;
+        }
+
+        .g-secondary-costs {
+          border-top: solid 1px #ddd;
+        }
+
+        .g-secondary-cost-value {
+          width: 85px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: right;
+          float: right;
+        }
+
+        .g-explainer {
+          color: #555;
+          font-size: 14px;
+          margin-top: 2em;
+        }
+
+        .g-explainer-hed {
+          font-weight: 700;
+        }
+
+        /*#g-fixed-container,
+        #g-fixed {
+          width: 300px;
+          height: 520px;
+        }*/
+
+        #g-fixed {
+          border-top: solid 1px #ddd;
+          padding-top: 20px;
+        }
+
+        #g-fixed.g-fixed {
+          position: fixed;
+          top: 47px; /* 130px with ribbon */
+        }
+
+        #g-fixed-container + .g-section {
+          border-top: solid 1px #ddd;
+          padding-top: 30px;
+        }
+
+        .g-section {
+          margin-top: 2em;
+          margin-bottom: 4em;
+        }
+
+        .viewport-medium-10 .g-section {
+          margin-top: 4em;
+        }
+
+        .g-section-copy {
+          font-family: "nyt-franklin";
+          font-weight: 300;
+          margin: 0.2em 140px 0.2em 0;
+          line-height: 1.4em;
+        }
+
+        .g-method-hed,
+        .g-section-title {
+          color: #333;
+          font-family: "nyt-franklin";
+          font-weight: 500;
+          font-size: 24px;
+          display: block;
+        }
+
+        .g-question {
+          margin-top: 1em;
+        }
+
+        .g-question-answer {
+          display: inline-block;
+          margin-left: 1em;
+          white-space: nowrap;
+        }
+
+        .g-question label {
+          margin-left: .3em;
+          font: inherit;
+          color: #aaa;
+        }
+
+        .g-question-answer input:checked + label {
+          color: #000;
+        }
+
+        .g-parameters {
+          position: relative;
+        }
+
+        .g-parameters:after {
+          display: block;
+          content: "";
+          clear: left;
+        }
+
+        .g-parameter {
+          -webkit-tap-highlight-color: rgba(0,0,0,0);
+          -webkit-user-select: none;
+          user-select: none;
+          display: block;
+          position: relative;
+          height: 120px;
+        }
+
+        .g-parameter-label,
+        .g-parameter-sublabel {
+          bottom: 15px;
+          font-size: 14px;
+          color: #555;
+          white-space: nowrap;
+        }
+
+        .g-question-label,
+        .g-parameter-label {
+          cursor: default;
+          position: relative;
+        }
+
+        .g-parameter-sublabel {
+          color: #999;
+          bottom: -3px;
+        }
+
+        .g-parameter-label-tip {
+          display: none;
+          position: absolute;
+          font-size: 14px;
+          font-weight: 500;
+          line-height: 15px;
+          line-height: .9375rem;
+          left: -10px;
+          top: 100%;
+          background: #fff;
+          padding: 10px;
+          border: solid 1px #ccc;
+          box-shadow: 0 2px 5px rgba(0,0,0,.2);
+          z-index: 2;
+          width: 240px;
+          white-space: normal;
+          text-transform: none;
+        }
+
+        .g-parameter-tip {
+          z-index: 1;
+          pointer-events: none;
+          position: absolute;
+          left: 50%;
+          text-anchor: middle;
+        }
+
+        .g-parameter-tip path {
+          fill: #bad80a;
+        }
+
+        .g-negative .g-parameter-tip path {
+          fill: #555;
+        }
+
+        .g-negative .g-parameter-tip text {
+          fill: #bad80a;
+        }
+
+        .g-question-label:hover .g-parameter-label-tip,
+        .g-parameter-label:hover .g-parameter-label-tip {
+          display: inline;
+        }
+
+        .g-parameter-input,
+        .g-parameter-label,
+        .g-parameter-sublabel {
+          position: absolute;
+          width: 20%;
+          min-width: 160px;
+        }
+
+        .g-parameter-input {
+          bottom: 34px;
+        }
+
+        .g-parameter-chart {
+          position: absolute;
+          right: 0;
+          bottom: 0;
+        }
+
+        .g-parameter-chart svg {
+          overflow: hidden;
+        }
+
+        .g-parameter input {
+          height: 22px;
+          color: black;
+          margin: 0px;
+          width: 100%;
+          border: none;
+          border-radius: 0;
+          border-bottom: solid 1px #ddd;
+          font: inherit;
+          font-size: 20px;
+          font-weight: 300;
+          line-height: 14px;
+          padding: 4px 0;
+        }
+
+        .g-parameter input:disabled {
+          opacity: 1;
+        }
+
+        .g-parameter input.g-parameter-input--negative {
+          color: red;
+        }
+
+        .g-parameter input:focus {
+          outline: none;
+          border-bottom: solid 1px #000;
+        }
+
+        .g-parameter-reset {
+          display: none;
+          cursor: pointer;
+          position: absolute;
+          bottom: 6px;
+          right: 0;
+        }
+
+        .g-parameter-input--modified .g-parameter-reset {
+          display: inline;
+        }
+
+        .g-parameter-reset circle {
+          fill: #aaa;
+        }
+
+        .g-parameter-reset:hover circle {
+          fill: #ccc;
+        }
+
+        .g-parameter-reset:active circle {
+          fill: #888;
+        }
+
+        .g-parameter-reset path {
+          fill: white;
+        }
+
+        .g-bar {
+          fill: #e0e0e0;
+        }
+
+        .g-bar--active {
+          fill: #bad80a;
+        }
+
+        .g-parameter-value path {
+          fill: #fff;
+          stroke: #777;
+        }
+
+        .g-axis .tick line {
+          stroke: #aaa;
+          shape-rendering: crispEdges;
+        }
+
+        .g-axis-label {
+          position: absolute;
+          right: -37px;
+          top: -39px;
+          width: 80px;
+          color: #aaa;
+          font-size: 12px;
+          font-size: .75rem;
+          font-weight: 500;
+          font-family: nyt-franklin;
+        }
+
+        .g-parameter-value text,
+        .g-axis text {
+          fill: #aaa;
+          text-transform: uppercase;
+        }
+
+        .g-parameter-value text {
+          fill: #000;
+        }
+
+        .g-axis path {
+          display: none;
+        }
+
+        .g-axis--y .tick:first-of-type,
+        .g-axis--y-inner .tick text {
+          display: none;
+        }
+
+        .g-axis--y-inner .tick line {
+          stroke: #fff;
+          stroke-opacity: .65;
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+          .g-axis--y-inner .tick line {
+            stroke-width: .5px;
+          }
+        }
+
+        .g-axis--x .tick text {
+          -webkit-transition: opacity 250ms linear;
+          -moz-transition: opacity 250ms linear;
+          -ms-transition: opacity 250ms linear;
+          -o-transition: opacity 250ms linear;
+          transition: opacity 250ms linear;
+        }
+
+        .g-baseline {
+          stroke: #eee;
+          stroke-width: 4px;
           stroke-linecap: round;
         }
 
-        .track {
-          stroke: #000;
-          stroke-opacity: 0.3;
-          stroke-width: 10px;
+        .g-baseline-halo {
+          stroke: #bbb;
+          stroke-width: 6px;
+          stroke-linecap: round;
         }
 
-        .track-inset {
-          stroke: #ddd;
-          stroke-width: 8px;
+        .g-parameter-help {
+          display: inline-block;
+          color: #fff;
+          background: #aaa;
+          border: solid 1px #fff;
+          border-radius: 12px;
+          height: 12px;
+          width: 12px;
+          text-align: center;
+          font: 10px sans-serif;
         }
 
-        .track-overlay {
-          pointer-events: stroke;
-          /*stroke-width: 50px;*/
-          stroke: transparent;
-          
+        .g-question-label {
+          display: inline-block;
         }
 
-        .handle {
-          fill: #fff;
-          stroke: #000;
-          stroke-opacity: 0.5;
-          stroke-width: 1.25px;
-          cursor: ew-resize;
-        }
-        .result{
-            background-color: rgb(186, 216, 10);
-            border-radius: 5px;
-            padding: 10px;
-            text-align: center;
-        }
-        .axis text {
-          fill: #89919e;
+        .g-question-label:hover .g-parameter-help,
+        .g-parameter-label:hover .g-parameter-help {
+          border-color: #777;
+          background: #fff;
+          color: #777;
           font-weight: bold;
-          font-size: 11px;
         }
-        .axis line {
-          stroke: #89919e;
-          stroke-width: 1.5px; 
+
+        .g-mobile-fixed-content {
+          display: none;
         }
-        .indicator-container{
-          align-items: flex-end;
+
+        .g-method-section {
+          margin-top: 60px;
+          border-top: 1px solid #ddd;
         }
-        .inputDiv input {
-          margin-bottom: 2px !important;
+
+        .g-method-hed {
+          margin-top: 60px;
+          margin-bottom: 12px;
         }
-        .inputDiv p {
-          margin: 0px;
+
+        .g-method-text strong {
+          color: #777;
         }
-        .icon{
-          float: right;
-          margin-top: 2px;
-          color: rgba(0, 0, 0, 0.54);
+
+        .g-mobile-axis-label {
+          display: none;
+          position: absolute;
+          top: -30px;
+          right: -2px;
+          width: 40px;
+          color: #AAA;
+          font-size: 10px;
+          line-height: 1.2em;
         }
-        label{
-          color: black;
+        .g-mobile-fixed-content .g-value {
+          white-space: nowrap;
+        }
+        @media only screen and (max-width: 768px) {
+            .g-parameter-label,
+            .g-parameter-sublabel {
+              width: 100%;
+            }
+
+            .g-parameter-input {
+              position: absolute;
+              bottom: 120px;
+              width: 100%;
+              width: calc(100% - 55px);
+            }
+
+            .g-parameter-input input {
+              background: white;
+            }
+
+            .g-parameter-label {
+              bottom: 160px;
+              text-transform: none;
+              font-size: 15px;
+            }
+
+            .g-parameter-reset {
+              right: 8px;
+            }
+            .g-question {
+              color: #555;
+              font-size: 15px;
+              font-weight: 500;
+              padding-bottom: 1em;
+            }
+
+            .viewport-medium-10 .g-question {
+              white-space: nowrap;
+            }
+
+            .g-question-answer {
+              display: inline-block;
+              margin: 0;
+            }
+
+            .g-parameter {
+              display: block;
+              height: 18px;
+              margin-bottom: 100px;
+              margin-top: 50px;
+            }
+
+            .g-parameter[data-parameter="buyPrice"] .g-parameter-input {
+              bottom: 170px;
+              width: 40%;
+            }
+            .g-parameter-chart{
+              position: relative;
+            }
+            .g-section-copy {
+                margin-right: 45px;
+                margin-bottom: 70px;
+            }
+            .g-parameter-sublabel{
+              display: none;
+            }
+             
+            #g-fixed-container {
+                position: fixed;
+                bottom: 0;
+                margin-top: 0;
+                z-index: 10;
+                height: auto;
+                overflow: hidden;
+            }
+            #g-fixed-container,  #g-fixed,  .g-parameter-label,  .g-parameter-sublabel {
+                width: 90% !important;
+          }
+        }
+        @media only screen and (max-width: 992px){
+          
+
+          .g-mobile-fixed-content {
+            display: block;
+            background-color: #bad80a;
+            padding: 30px 10px;
+            text-align: center;
+            font-size: 20px;
+            line-height: 1.4em;
+          }
+          #g-fixed-container,  #g-fixed,  .g-parameter-label,  .g-parameter-sublabel {
+                width: 100%;
+          }
+          .g-negative .g-mobile-fixed-content {
+            background-color: #555;
+            color: #bad80a;
+          }
+
+          .g-mobile-fixed-content {
+            font-size: 16px;
+            padding: 10px;
+            display: block;
+          }
+
+          .g-mobile-fixed-content .g-value {
+            font-weight: 700;
+          }
+          .g-if-negative, .g-if-positive {
+              display: block;
+          }
+
         }
     </style>
-</head>
-
-<body translate="no">
-    <main>
-  <div class="container">
-    <div class="row">
-      <div class="col s12 m8 l9">
-        
-        <div class="divider"></div>
-        <div class="section">
-          <h5>Home Price</h5>
-          <p>lorem ipsum lorem ipsum</p>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2 inputDivHomePrice">
-              
-                <div>
-                  <input type="text" class="validate" >
-                  <i class="tiny material-icons icon">cancel</i>
-                </div>
-                
-                <p>Home Price <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="home-price" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="section">
-          <h5>How Long Do You Plan to Stay?</h5>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>lorem ipsum <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="how-long" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="divider"></div>
-        <div class="section">
-          <h5>What Are Your Mortgage Details?</h5>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input type="text" class="validate">
-              <p>Mortgage rate <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="mortgage-rate" class="chart-container col s10">
-            </div>
-          </div>
+    <script src="https://d3js.org/d3.v3.min.js"></script>
+    <script src="scripts/d3script.js">
           
-          <div class="indicator-container valign-wrapper">
-            
-            <div class="inputDiv col s2">
-              <input type="text" class="validate">
-              <p>Down payment <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="down-rate" class="chart-container col s10">
-            </div>
-          </div>
-          
-           <div class="indicator-container valign-wrapper">
-            
-            <div class="inputDiv col s2">
-              <input type="text" class="validate">
-              <p>Length <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="mortgage-period" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <h5>What Does the Future Hold?</h5>
-          <div class="indicator-container valign-wrapper">
-            
-            <div class="inputDiv col s2">
-              <input>
-              <p>Home growth <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="home-price-growth-rate" class="chart-container col s10">
-            </div>
-          </div>
-
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Rent growth <i class="tiny material-icons icon">help</i></p>
-          </div>
-            <div id="rent-growth-rate" class="chart-container col s10">
-            </div>
-          </div>
-
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Invest rate <i class="tiny material-icons icon">help</i></p>
-          </div>
-            <div id="investment-return-rate" class="chart-container col s10">
-            </div>
-          </div>
-
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Inflation rate <i class="tiny material-icons icon">help</i></p>
-          </div>
-            <div id="inflation-rate" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <h5>Taxes</h5>
-          <p>Property taxes and mortgage-interest costs are significant but also deductible. The higher your marginal tax rate is, the bigger the deduction.</p>
-          <div class="g-question">
-          <div class="g-question-label">
-            How do you file your taxes:
-            <i class="tiny material-icons">help</i> 
-            <input type="radio" name="capitalGainsExclusion" id="capitalGainsExclusion_250000" value="250000"><label for="capitalGainsExclusion_250000">Individual Return</label>
-            <input type="radio" name="capitalGainsExclusion" id="capitalGainsExclusion_500000" value="500000" checked=""><label for="capitalGainsExclusion_500000">Joint Return</label>
-          </div>
-        </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Property tax rate <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="property-tax-rate" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>marginal tax rate <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="marginal-tax-rate" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <h5>Closing Costs</h5>
-          <p>You’ll have to pay various fees when you buy your home, as well as when you sell it.</p>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Buying cost <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="costs-of-buying-home" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Selling cost <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="costs-of-selling-home" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <h5>Maintenance and Fees</h5>
-          <p>Owning a home comes with a surprising variety of expenses that renters do not directly pay.</p>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>maintainance/renovation <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="maintainance-renovation" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Homeowner's insurance <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="insurance" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Mothly utilities <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="mothly-utilities" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Mothly common fees <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="mothly-common-fees" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Common fees deduction <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="common-fees-deduction" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-        <div class="section">
-          <h5>Additional Renting Costs</h5>
-          <p>These are the costs on top of rent, such as the fee you pay to a broker and the opportunity cost on your security deposit. But these expenses typically have a negligible impact.</p>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Security deposit <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="security-deposit" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Broker's fee <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="brokers-fee" class="chart-container col s10">
-            </div>
-          </div>
-          <div class="indicator-container valign-wrapper">
-            <div class="inputDiv col s2">
-              <input>
-              <p>Rent's insurance <i class="tiny material-icons icon">help</i></p>
-            </div>
-            <div id="rents-insurance" class="chart-container col s10">
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col hide-on-small-only m4 l3">
-        <div class="toc-wrapper pinned" style="top: 30px;">
-
-          <div>
-            If you can rent a similar home with less then ...
-          </div>
-          <div id="result" class="result"></div>
-          <div> ... Then renting is better</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</main>
-    <script src="libs/d3.v4.min.js"></script>
-    <script src="scripts/constants.js"></script>
-    <script src="scripts/logic.js"></script>
-    <script src="scripts/d3script.js"></script>
-    <script>
-    var chartWidth = document.getElementsByClassName("chart-container")[0].clientWidth;
-    var homePriceChartHeight = 300;
-    var otherChartHeight = 180;
-    function getData() {
-          var startNumber = 30000;
-          var endNumber = 3000000;
-          var numberOfBars = 50;
-          var data = [startNumber];
-          var difference = 1000;
-          var i = 0;
-
-          while(true){
-              var number = data[i] + difference;
-              if (number >= endNumber)
-                    break;
-              data.push(number);
-              difference *= 1.1;
-              i++;
-          }
-          return data;
-    }
-
-    var chartsData = [
-      // home price
-      { 
-        name: "home-price",
-        container: "#home-price",
-        indicator: "homePrice",
-        width: chartWidth, 
-        height: homePriceChartHeight,
-        xScaleExtern: d3.scalePow()
-                        .exponent(0.2)
-                        .domain([30000, 3000000]),
-        data: getData(),
-        dragCallback: function(value) {
-          currentIndicators.homePrice = value;
-
-          var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, 
-              currentIndicators.mortgageRate, currentIndicators.downRate);
-
-          currentPayment = p;
-
-          charts.forEach(chart => {
-            chart.updateChart(value);
-          });
-
-          var result = document.getElementById("result");
-
-          result.innerText = "$ " + Math.round(p) + " per month";
-        }
-      },
-      // living period
-      { 
-        name: "living-period",
-        container: "#how-long",
-        indicator: "livingLength",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xAxisFormat: d3.format(""),
-        xScaleExtern: d3.scaleLinear()
-                        .domain([1, 40]),
-        data: d3.range(1, 40, 1),
-        dragCallback: function(value){
-
-            
-        }
-      },
-      // mortgage rate
-      { 
-        name: "mortgage-rate",
-        container: "#mortgage-rate",
-        indicator: "mortgageRate",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 15]),
-        xAxisFormat: d3.format(""),
-        data: d3.range(0, 15, 0.3),
-        dragCallback: function(value){
-
-            currentIndicators.mortgageRate = value;
-
-            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, value, currentIndicators.downRate);
-
-            currentPayment = p;
-
-            charts.forEach(chart => {
-              chart.updateChart(currentIndicators.homePrice);
-            });
-
-            var result = document.getElementById("result");
-
-            result.innerText = "$ " + Math.round(p) + " per month";
-
-
-        }
-      },
-      // down-rate
-      { 
-        name: "down-rate",
-        container: "#down-rate",
-        indicator: "downRate",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 100]),
-        data: d3.range(0, 100, 3),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-            currentIndicators.downRate = value;
-
-            var p = getPayment(currentIndicators.homePrice, currentIndicators.mortgageYears, currentIndicators.mortgageRate, value);
-
-            currentPayment = p;
-
-            charts.forEach(chart => {
-              chart.updateChart(currentIndicators.homePrice);
-            });
-
-            var result = document.getElementById("result");
-
-            result.innerText = "$ " + Math.round(p) + " per month";
-
-
-        }
-      },
-      // mortgage period
-      { 
-        name: "mortgage-period",
-        container: "#mortgage-period",
-        indicator: "mortgageYears",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 40]),
-        data: d3.range(1, 41),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-            currentIndicators.mortgageYears = value;
-
-            var p = getPayment(currentIndicators.homePrice, value, currentIndicators.mortgageRate, currentIndicators.downRate);
-
-            currentPayment = p;
-
-            charts.forEach(chart => {
-              chart.updateChart(currentIndicators.homePrice);
-            });
-
-            var result = document.getElementById("result");
-
-            result.innerText = "$ " + Math.round(p) + " per month";
-
-
-        }
-      },
-      // home price growth rate
-      { 
-        name: "home-price-growth-rate",
-        container: "#home-price-growth-rate",
-        indicator: "annualAppreciation",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([-5, 15]),
-        data: d3.range(-5, 15, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // rent growth rate
-      { 
-        name: "rent-growth-rate",
-        container: "#rent-growth-rate",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([-5, 15]),
-        data: d3.range(-5, 15, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // Investment return rate
-      { 
-        name: "investment-return-rate",
-        container: "#investment-return-rate",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([1, 40]),
-        data: d3.range(1, 41),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // inflation rate
-      { 
-        name: "inflation-rate",
-        container: "#inflation-rate",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([1, 40]),
-        data: d3.range(1, 40),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // property tax
-      { 
-        name: "rent-growth-rate",
-        container: "#property-tax-rate",
-        indicator: "propertyTaxRate",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 10]),
-        data: d3.range(0, 10, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // pmarginal tax
-      { 
-        name: "rmarginal-tax-rate",
-        container: "#marginal-tax-rate",
-        indicator: "marginalIncomeTaxRate",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs of buying home
-      { 
-        name: "costs-of-buying-home",
-        container: "#costs-of-buying-home",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "costs-of-selling-home",
-        container: "#costs-of-selling-home",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "maintainance-renovation",
-        container: "#maintainance-renovation",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "insurance",
-        container: "#insurance",
-        indicator: "insurance",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "mothly-utilities",
-        container: "#mothly-utilities",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "mothly-common-fees",
-        container: "#mothly-common-fees",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "common-fees-deduction",
-        container: "#common-fees-deduction",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "security-deposit",
-        container: "#security-deposit",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "brokers-fee",
-        container: "#brokers-fee",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      },
-      // costs-of selling
-      { 
-        name: "rents-insurance",
-        container: "#rents-insurance",
-        indicator: "",
-        width: chartWidth, 
-        height: otherChartHeight,
-        xScaleExtern: d3.scaleLinear()
-                        .domain([0, 50]),
-        data: d3.range(0, 50, 1),
-        xAxisFormat: d3.format(""),
-        dragCallback: function(value){
-
-        }
-      }
-    ];
-
-    var charts = [];
-
-    chartsData.forEach(chartObj => {
-
-      var chart = 
-            renderChart()
-            .chartName(chartObj.name)
-            .svgHeight(chartObj.height)
-            .svgWidth(chartObj.width)
-            .marginBottom(30)
-            .marginRight(50)
-            .container(chartObj.container)
-            .data(chartObj.data)
-            .xScaleExtern(chartObj.xScaleExtern)
-            .indicator(chartObj.indicator)
-            .onDrag(chartObj.dragCallback)
-            ;
-
-      if (chartObj.xAxisFormat){
-        chart.xAxisFormat(chartObj.xAxisFormat);
-      }
-
-      chart.debug(true)
-            .run();
-
-      charts.push(chart);
-
-    });
     </script>
-</body>
+  </head>
+  <body>
+    <main>
+      <div class="container">
+        <div class="row">
+          <div id="buy-rent-calculator" class="interactive-graphic col s12 m12 l8">
+            <div id="g-section-homePrice" class="g-section">
+              <span class="g-section-title">Home Price</span>
+              <div class="g-section-copy" style="width:240px;position:absolute;z-index:1;">
+                A very important factor, but not the only one. Our estimate will improve as you enter more details below.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyPrice"
+                    data-value="250000"
+                    data-type="bigDollars"
+                    data-restrict="Math.max(3e4, Math.min(3e6, d3.round(v < 1000 ? v * 1000 : v, -3)))"
+                    data-scale="d3.scale.log().domain([3e4, 3e6])"
+                    data-scale-format="$s"
+                    data-height="240">
+                  <div class="g-parameter-label"></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">How Long Do You Plan to Stay?</span>
+              <div class="g-section-copy">
+                Buying tends to be better the longer you stay because the upfront fees are spread out over many years.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="years"
+                    data-value="9"
+                    data-type="year"
+                    data-restrict="Math.max(1, Math.min(40, d3.round(v)))"
+                    data-scale="d3.scale.linear().domain([1, 40])">
+                  <div class="g-parameter-label"></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">What Are Your Mortgage Details?</span>
+              <div class="g-section-copy">
+                In addition to the interest rate and down payment, the calculator takes into account the mortgage-interest tax deduction.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyInterestRate"
+                    data-value="0.0367"
+                    data-type="preciseRate"
+                    data-restrict="Math.max(0, Math.min(.15, d3.round(v, 4)))"
+                    data-scale="d3.scale.linear().domain([0, .150001])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Mortgage rate
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">For a fixed-rate loan.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(cost.buy.buyLoanPaymentPerMonth)"></span> per month</div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyDownPaymentRate"
+                    data-type="bigRate"
+                    data-restrict="Math.max(0, Math.min(1, d3.round(v, 2)))"
+                    data-scale="d3.scale.linear().domain([0, 1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Down payment
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(cost.buy.buyDownPayment)"></span></div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyLoanYears"
+                    data-type="year"
+                    data-restrict="Math.max(1, Math.min(40, d3.round(v)))"
+                    data-scale="d3.scale.linear().domain([1, 40])">
+                  <div class="g-parameter-label">
+                    Length of mortgage
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">For a fixed-rate loan.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">What Does the Future Hold?</span>
+              <div class="g-section-copy">
+                How much home prices, rents and stock prices change can have a large impact on your outcome. Unfortunately, these are some of the hardest things to predict. If you choose to rent instead of buying, the calculator assumes that you’ll spend your would-be down payment on stocks or another investment.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyGrowthRate"
+                    data-value=".03"
+                    data-type="changeRate"
+                    data-restrict="Math.max(-.05, Math.min(.15, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([-.05, .150001])"
+                    data-scale-format="+%">
+                  <div class="g-parameter-label">
+                    Home price growth rate
+                  </div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="rentIncreasePerYear"
+                    data-value=".025"
+                    data-type="changeRate"
+                    data-restrict="Math.max(-.05, Math.min(.15, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([-.05, .150001])"
+                    data-scale-format="+%">
+                  <div class="g-parameter-label">
+                    Rent growth rate
+                  </div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="investmentReturnRate"
+                    data-value=".04"
+                    data-type="changeRate"
+                    data-restrict="Math.max(-.1, Math.min(.2, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([-.1, .2])"
+                    data-scale-format="+%">
+                  <div class="g-parameter-label">
+                    Investment return rate
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Annual rate of return on money that can be invested or saved.</div>
+                  </div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="inflationRate"
+                    data-value="0.0198"
+                    data-type="changeRate"
+                    data-restrict="Math.max(-.05, Math.min(.1, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([-.05, .1])"
+                    data-scale-format="+%">
+                  <div class="g-parameter-label">
+                    Inflation rate
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Estimate of the future annual inflation rate.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">Taxes</span>
+              <div class="g-section-copy">
+                Property taxes and mortgage-interest costs are significant but also deductible. The higher your marginal tax rate is, the bigger the deduction.
+                <div class="g-question">
+                  <div class="g-question-label">
+                    How do you file your taxes:
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">The first $250,000 of profit from the sale of your home is excluded from taxation. The exclusion is $500,000 if you file jointly with a spouse. See <a href="http://www.irs.gov/taxtopics/tc701.html" target="_blank">IRS Topic 701</a> for more information.</div>
+                  </div>
+                  <div class="g-question-answer"><input type="radio" name="capitalGainsExclusion" id="capitalGainsExclusion_250000" value="250000"><label for="capitalGainsExclusion_250000">Individual Return</label></div>
+                  <div class="g-question-answer"><input type="radio" name="capitalGainsExclusion" id="capitalGainsExclusion_500000" value="500000" checked><label for="capitalGainsExclusion_500000">Joint Return</label></div>
+                </div>
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyPropertyTaxRate"
+                    data-type="preciseRate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 4)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Property tax rate
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Amount you will pay each year, expressed as a percentage of the home value.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.buyPrice * options.buyPropertyTaxRate)"></span> for first year</div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="marginalTaxRate"
+                    data-type="bigRate"
+                    data-restrict="Math.max(0, Math.min(.5, d3.round(v, 2)))"
+                    data-scale="d3.scale.linear().domain([0, .5])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Marginal tax rate
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Effective tax rate, including federal, state and local taxes.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">Closing Costs</span>
+              <div class="g-section-copy">
+                You’ll have to pay various fees when you buy your home, as well as when you sell it.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyPurchaseClosingRate"
+                    data-type="rate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Costs of buying home
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Closing costs when the home is purchased, expressed as a percentage of the home price.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(cost.buy.buyClosingCost)"></span></div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buySellClosingRate"
+                    data-type="rate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 3)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Costs of selling home
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Closing costs when the home is sold, expressed as a percentage of the home price.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(cost.buy.buySellClosingCost)"></span></div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">Maintenance and Fees</span>
+              <div class="g-section-copy">
+                Owning a home comes with a surprising variety of expenses that renters do not directly pay.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="buyMaintenanceCostRate"
+                    data-type="preciseRate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 4)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Maintenance&#x2F;renovation
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">The annual amount you will spend for maintaining or repairing your home, as well as for renovations. Enter as a percentage of your purchase price. The calculator will adjust this amount for subsequent years based on the inflation rate.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.buyPrice * options.buyMaintenanceCostRate)"></span> first year</div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyInsuranceRate"
+                    data-type="preciseRate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 4)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Homeowner’s insurance
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">The amount you will pay each year for homeowner’s insurance. Enter as a percentage of the home’s value.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.buyPrice * options.buyInsuranceRate)"></span> first year</div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyUtilitiesCostPerMonth"
+                    data-type="dollars"
+                    data-restrict="Math.max(0, Math.min(2e3, d3.round(v)))"
+                    data-scale="d3.scale.linear().domain([0, 2e3])"
+                    data-scale-format="$,f">
+                  <div class="g-parameter-label">
+                    Monthly utilities
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Portion of utilities, in dollars per month, that a landlord would cover in the rental of a similar home.</div>
+                  </div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyCommonChargePerMonth"
+                    data-type="dollars"
+                    data-restrict="Math.max(0, Math.min(4e3, d3.round(v)))"
+                    data-scale="d3.scale.linear().domain([0, 4e3])"
+                    data-scale-format="$,f">
+                  <div class="g-parameter-label">
+                    Monthly common fees
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">The monthly condo, association or other community-living fees. In New York, this is often known as maintenance.</div>
+                  </div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="buyCommonChargeDeductionRate"
+                    data-type="bigRate"
+                    data-restrict="Math.max(0, Math.min(1, d3.round(v, 2)))"
+                    data-scale="d3.scale.linear().domain([0, 1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Common fees deduction
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Percentage of the monthly “common fees” that is tax deductible.</div>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="g-section">
+              <span class="g-section-title">Additional Renting Costs</span>
+              <div class="g-section-copy">
+                These are the costs on top of rent, such as the fee you pay to a broker and the opportunity cost on your security deposit. But these expenses typically have a negligible impact.
+              </div>
+              <div class="g-parameters">
+                <div class="g-axis-label">EQUIV.<br>RENT</div>
+                <label class="g-parameter"
+                    data-parameter="rentDepositMonths"
+                    data-type="month"
+                    data-restrict="Math.max(0, Math.min(12, d3.round(v)))"
+                    data-scale="d3.scale.linear().domain([0, 12])"
+                    data-scale-format="d">
+                  <div class="g-parameter-label">
+                    Security deposit
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">The number of months of rent that the landlord will keep as a security deposit. </div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.rentPerMonth * options.rentDepositMonths)"></span></div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="rentBrokerFee"
+                    data-type="bigRate"
+                    data-restrict="Math.max(0, Math.min(.5, d3.round(v, 2)))"
+                    data-scale="d3.scale.linear().domain([0, .5])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Broker’s fee
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">Some rental brokers charge a fee, expressed here as a percentage of the annual rent.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.rentPerMonth * 12 * options.rentBrokerFee)"></span></div>
+                </label>
+                <label class="g-parameter"
+                    data-parameter="rentInsuranceRate"
+                    data-type="preciseRate"
+                    data-restrict="Math.max(0, Math.min(.1, d3.round(v, 4)))"
+                    data-scale="d3.scale.linear().domain([0, .1])"
+                    data-scale-format="%">
+                  <div class="g-parameter-label">
+                    Renter’s insurance
+                    <span class="g-parameter-help">?</span><div class="g-parameter-label-tip">As a percentage of the annual rent.</div>
+                  </div>
+                  <div class="g-parameter-sublabel"><span class="g-value" data-value="formatCurrency(options.rentPerMonth * 12 * options.rentInsuranceRate)"></span> first year</div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div id="g-fixed-container" class="col l4">
+            <div id="g-fixed">
+              <div class="g-mobile-fixed-content">
+                <div class="g-if-positive">If you can rent a similar home for less than <span class="g-value" data-value="formatCurrency(options.rentPerMonth)"></span> per month, then renting is better.</div>
+                <div class="g-if-negative">Buying is better, even if you could rent&nbsp;for&nbsp;free.</div>
+              </div>
+              <div class="g-desktop-fixed-content hide-on-med-and-down">
+                <div class="g-primary-cost-before">
+                  <div class="g-if-positive">If you can rent a similar<br>home for less than ...</div>
+                  <div class="g-if-negative">Buying is better, even if<br>you could rent for free.</div>
+                </div>
+                <div class="g-primary-cost">
+                  <span class="g-primary-cost-value g-value" data-value="formatCurrency(options.rentPerMonth)"></span>
+                  <div class="g-primary-cost-unit">PER<br>MONTH</div>
+                </div>
+                <div class="g-primary-cost-after">
+                  <div class="g-if-positive">... then renting is better.</div>
+                  <div class="g-if-negative">The home pays for itself.</div>
+                </div>
+                <div class="g-secondary-costs-before">
+                  Costs after <span style="color:#000;" class="g-value" data-value="options.years === 1 ? '1 year' : options.years + ' years'"></span>
+                  <div class="g-secondary-cost-value">Buy</div>
+                  <div class="g-secondary-cost-value">Rent</div>
+                </div>
+                <div class="g-secondary-costs">
+                  <div class="g-secondary-cost">
+                    Initial costs
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.buy.buyDownPayment + cost.buy.buyClosingCost)"></div>
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.rent.rentDeposit + cost.rent.rentBrokerFee)"></div>
+                  </div>
+                  <div class="g-secondary-cost">
+                    Recurring costs
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.buy.buyLoanPaymentToPrincipal + cost.buy.buyLoanPaymentToInterest + cost.buy.buyCommonCharges + cost.buy.buyPropertyTaxes + cost.buy.buyUtilitiesCost + cost.buy.buyMaintenanceCost + cost.buy.buyInsuranceCost)"></div>
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.rent.rentCost + cost.rent.rentInsuranceCost)"></div>
+                  </div>
+                  <div class="g-secondary-cost">
+                    Opportunity costs
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.buy.buyPurchaseOpportunityCost + cost.buy.buyYearlyOpportunityCost)"></div>
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.rent.rentInitialOpportunityCost + cost.rent.rentYearlyOpportunityCost)"></div>
+                  </div>
+                  <div class="g-secondary-cost">
+                    Net proceeds
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.buy.buySellClosingCost + cost.buy.buySellTaxes + cost.buy.buyLoanPrincipal + cost.buy.buySellProceeds)"></div>
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.rent.rentDepositReturn)"></div>
+                  </div>
+                </div>
+                <div class="g-secondary-costs">
+                  <div class="g-secondary-cost">
+                    Total
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.buy.buyTotalCost)"></div>
+                    <div class="g-secondary-cost-value g-value" data-value="formatCurrency(cost.rent.rentTotalCost)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>

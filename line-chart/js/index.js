@@ -30,23 +30,11 @@ g.append("g")
 
 
 // Use this function for sqliteDb
-function handleFiles() {
+function handleFiles(value) {
+    console.log(value)
+    d3.csv(value, function(raw_data){
     
-    var dbFile = this.files[0]; /* now you can work with the file list */
-
-    //instantiate a reader for the loaded db
-    var reader = new FileReader();
-    reader.readAsArrayBuffer(dbFile);
-
-    var fileBuffer = [];
-    reader.onload = function(){
-      //need to transform to a typed array to correctly load db from sql js
-      var db = new SQL.Database((reader.result ? new Uint8Array(reader.result) : void 0));
-      var results = db.exec("SELECT * FROM 'zread_report';");
-
-      // get data
-    var  data = getData(results[0]);
-    
+    var data = getData(raw_data);
     var categorizedData = [];
     var keys = [];
 
@@ -82,12 +70,7 @@ function handleFiles() {
                       .ticks(d3.timeDay));
 
   g.select('.axis--y').call(d3.axisLeft(y));
-    // .append("text")
-    // .attr("transform", "rotate(-90)")
-    // .attr("y", 6)
-    // .attr("dy", "0.71em")
-    // .attr("fill", "#000")
-    // .text("Values");
+
 
   var column = g.selectAll("path.line")
     .data(categorizedData, function(d){
@@ -137,117 +120,22 @@ function handleFiles() {
 
   text.exit().remove();
 
-  };
+  });
 };
 
-function handleFilesCsv(fileName){
-  d3.csv(fileName, function(data){
-    var categorizedData = [];
-    var keys = [];
-
-    Object.keys(data[0]).forEach(key => {
-        
-        if (key != 'report_value'){
-          keys.push(key);
-          
-          categorizedData.push(
-            {
-              id: key,
-              values: data.map(d => {
-
-                return { date: d['report_value'],
-                         value: d[key]
-                        };
-              })
-            }
-          );
-        }
-    });
-
-  x.domain(d3.extent(data, function(d) { return d['report_value']; }));
-
-  y.domain([
-    d3.min(categorizedData, function(c) { return d3.min(c.values, function(d) { return d.value; }); }),
-    d3.max(categorizedData, function(c) { return d3.max(c.values, function(d) { return d.value; }); })
-  ]);
-
-  z.domain(keys);
-
-  g.select('.axis--x').call(d3.axisBottom(x)
-                      .ticks(d3.timeDay));
-
-  g.select('.axis--y').call(d3.axisLeft(y));
-    // .append("text")
-    // .attr("transform", "rotate(-90)")
-    // .attr("y", 6)
-    // .attr("dy", "0.71em")
-    // .attr("fill", "#000")
-    // .text("Values");
-
-  var column = g.selectAll("path.line")
-    .data(categorizedData, function(d){
-      return d.id;
-    });
-
-  column
-    .transition().duration(transitionTime)
-    .attr("d", function(d) { return line(d.values); })
-    
-  column.enter()
-    .append("path")
-    .attr("class", "line")
-    .attr("d", function(d) { return line(d.values); })
-    .style("stroke", d => {
-      return z(d.id);
-    });
-
-  column.exit().remove();
-
-  var text = g.selectAll("text.labels")
-    .data(categorizedData, function(d){
-      return d.id;
-  });
-
-  text.datum(function(d) { return { id: d.id, value: d.values[d.values.length - 1]}; })
-      .transition().duration(transitionTime)
-      .attr("x", d => {
-        return x(d.value.date);
-      })
-      .attr("y", d => {
-        return y(d.value.value);
-      });
-
-  text.enter()
-      .append("text")
-      .attr("class", "labels")
-      .datum(function(d) { return { id: d.id, value: d.values[d.values.length - 1]}; })
-      .attr("x", d => {
-        return x(d.value.date);
-      })
-      .attr("y", d => {
-        return y(d.value.value);
-      })
-      .style("font", "10px sans-serif")
-      .text(function(d) { return d.id; });
-
-  text.exit().remove();
-  });
-}
-
-// pass object returned from sql.js and get data as json
-function getData(obj) {
+// preprocess data
+function getData(objs) {
   var data = [];
-  var columnNames = obj.columns;
-  var values = obj.values;
-  for (var i = 0; i < values.length; i++) {
-    var value = values[i];
+
+  for (var i = 0; i < objs.length; i++) {
+    var value = objs[i];
     var thisObj = {};
-    for (var j = 0; j < columnNames.length; j++) {
-      if (columnNames[j] == 'report_value'){
-        thisObj[columnNames[j]] = parseTime(value[j]);
+    for (var key in objs[0]) {
+      if (key == 'report_value'){
+        thisObj[key] = parseTime(value[key]);
       }
       else{
-        thisObj[columnNames[j]] = +value[j];
+        thisObj[key] = +value[key];
       }
     }
     data.push(thisObj);

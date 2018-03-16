@@ -8,8 +8,7 @@ function getChart(params) {
         marginRight: 5,
         marginLeft: 5,
         center: [43.5, 44],
-        scale: 150,
-        dotDeleteTime: 3000,
+        scale: 250,
         container: 'body',
         geojson: null,
         data: null
@@ -49,10 +48,12 @@ function getChart(params) {
                 zoomed: null
             }
 
-            /*##################################   BEHAVIORS ####################################### */
-            // var behaviors = {};
 
-            // behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
+
+            /*##################################   BEHAVIORS ####################################### */
+            var behaviors = {};
+
+            behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
 
             //################################ DRAWING ######################  
             //drawing containers
@@ -62,93 +63,46 @@ function getChart(params) {
             var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
                 .attr('width', attrs.svgWidth)
                 .attr('height', attrs.svgHeight)
-                // .call(behaviors.zoom);
+                .call(behaviors.zoom);
             // .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight)
             // .attr("preserveAspectRatio", "xMidYMid meet")
 
             var chart = svg.patternify({ tag: 'g', selector: 'chart' })
-                // .attr('width', calc.chartWidth)
-                // .attr('height', calc.chartHeight)
+                .attr('width', calc.chartWidth)
+                .attr('height', calc.chartHeight)
                 .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')')
 
             /* ############# PROJECTION ############### */
 
-            var projection = d3.geoEquirectangular()
+            var projection = d3.geoMercator()
                 .scale(attrs.scale)
-                .translate([calc.chartWidth * 0.6, calc.chartHeight * 0.2])
+                .translate([calc.chartWidth * 0.56, calc.chartHeight * 0.33])
                 .center(attrs.center);
 
             var path = d3.geoPath()
-                .projection(projection);
+                //.projection(projection);
 
             /* ##############  DRAWING ################# */
-            chart.patternify({ tag: 'path', selector: 'map-path', data: attrs.geojson.features })
-                .attr('d', path)
-                .attr('fill', "steelblue")
+
+            chart.patternify({ tag: 'path', selector: 'counties', data: topojson.feature(attrs.geojson, attrs.geojson.objects.counties).features })
+                 .attr('d', path)
+                 .attr('fill', d => '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6)) //random color
+
+            chart.append("path")
+                 .datum(topojson.mesh(attrs.geojson, attrs.geojson.objects.states, function(a, b) { return a !== b; }))
+                 .attr("class", "states")
+                 .attr("d", path);
 
             /* #############################   HANDLER FUNCTIONS    ############################## */
-            // handlers.zoomed = function () {
-            //     var transform = d3.event.transform;
-            //     chart.attr('transform', transform);
-            // }
+            handlers.zoomed = function () {
+                var transform = d3.event.transform;
+                chart.attr('transform', transform);
+            }
 
             // smoothly handle data updating
             updateData = function () {
-                
-                var dots = chart.selectAll(".dot").data(attrs.data, d => {
-                    return d.id;
-                });
 
-                var tooltip = chart.selectAll('.tooltip').data(attrs.data, d => {
-                    return d.id;
-                });
 
-                setTimeout(() => {
-                    dots.exit().remove();
-                    tooltip.exit().remove();
-                }, attrs.dotDeleteTime / 2);
-                
-              // <animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="5%" to="25%"/>
-              // <animate attributeType="CSS" attributeName="stroke-width" begin="0s"  dur="1.5s" repeatCount="indefinite" from="3%" to="0%" />
-              // <animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
-                
-                dots.enter()
-                    .append("circle").merge(dots).attr("class", "dot")
-                    .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
-                    .attr("cy", function (d) { return projection([d.Longitude, d.Latitude])[1]; })
-                    .attr("r", "1")
-                    .attr("fill", d => {
-                        return d.Class;
-                    })
-                    .append("animate")
-                    .attr("attributeType", "SVG")
-                    .attr( "attributeName","r")
-                    .attr( "begin","0s")
-                    .attr("dur","1.5s")
-                    .attr("repeatCount", "indefinite")
-                    .attr("from","0%")
-                    .attr("to","1%");
-
-                var groups = tooltip.enter().append("g").merge(tooltip).attr("class", "tooltip")
-                                    .attr("transform", d => {
-                                    var x = projection([d.Longitude, d.Latitude])[0] + 15;
-                                    var y = projection([d.Longitude, d.Latitude])[1] - 15;
-
-                                return "translate("+[x,y]+")"})
-                            
-                groups.append("rect")
-                       .attr("width", 190)
-                       .attr("height", 30)
-                       .attr("rx", 5)
-                       .attr("fill", "#667")
-
-                var texts = groups.append("text")
-                      .attr("dx", 0)
-                      .attr("dy", 20)
-                      .style("fill",d => {
-                                return d.Class;
-                            })
-                      .text(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); });
             }
 
             //#########################################  UTIL FUNCS ##################################
@@ -177,13 +131,15 @@ function getChart(params) {
 
         });
     }
-    
+
+
     //----------- PROTOTYEPE FUNCTIONS  ----------------------
     d3.selection.prototype.patternify = function (params) {
       var container = this;
       var selector = params.selector;
       var elementTag = params.tag;
       var data = params.data || [selector];
+  
       // Pattern in action
       var selection = container.selectAll('.' + selector).data(data, (d, i) => {
               if (typeof d === "object") {
@@ -192,8 +148,7 @@ function getChart(params) {
                   }
               }
               return i;
-          });
-
+          })
       selection.exit().remove();
       selection = selection.enter().append(elementTag).merge(selection)
       selection.attr('class', selector);

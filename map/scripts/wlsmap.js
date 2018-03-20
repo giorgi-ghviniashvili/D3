@@ -1,3 +1,15 @@
+/**
+ * Shuffles array in place. ES6 version
+ * @param {Array} a items An array containing the items.
+ */
+function shuffle(a) {
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
 function getPoints(){
     //Holds all Northern points
     var nPoints = new Array();
@@ -43,7 +55,7 @@ function getPoints(){
         City: "New York"
         });
     }
-        
+
     //Simulate the blue points in the south array
     for (var i = 0; i < 250; i++) {
         a = Math.random() * 90;
@@ -56,5 +68,5 @@ function getPoints(){
         City: "New York"
         });
     }
-    return [nPoints, sPoints];
+    return [shuffle(nPoints), shuffle(sPoints)];
 }

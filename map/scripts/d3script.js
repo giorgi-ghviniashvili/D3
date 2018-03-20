@@ -50,11 +50,11 @@ function getChart(params) {
             }
 
             /*##################################   BEHAVIORS ####################################### */
-            // var behaviors = {};
+            var behaviors = {};
 
-            // behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
+            behaviors.zoom = d3.zoom().on("zoom", d => handlers.zoomed(d));
 
-            //################################ DRAWING ######################  
+            //################################ DRAWING ######################
             //drawing containers
             var container = d3.select(this);
 
@@ -62,9 +62,9 @@ function getChart(params) {
             var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
                 .attr('width', attrs.svgWidth)
                 .attr('height', attrs.svgHeight)
-                // .call(behaviors.zoom);
-            // .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight)
-            // .attr("preserveAspectRatio", "xMidYMid meet")
+                .call(behaviors.zoom)
+            .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight)
+            .attr("preserveAspectRatio", "xMidYMid meet")
 
             var chart = svg.patternify({ tag: 'g', selector: 'chart' })
                 // .attr('width', calc.chartWidth)
@@ -84,17 +84,18 @@ function getChart(params) {
             /* ##############  DRAWING ################# */
             chart.patternify({ tag: 'path', selector: 'map-path', data: attrs.geojson.features })
                 .attr('d', path)
-                .attr('fill', "steelblue")
+                .attr('fill', d => '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6)) //random color
+
 
             /* #############################   HANDLER FUNCTIONS    ############################## */
-            // handlers.zoomed = function () {
-            //     var transform = d3.event.transform;
-            //     chart.attr('transform', transform);
-            // }
+            handlers.zoomed = function () {
+                var transform = d3.event.transform;
+                chart.attr('transform', transform);
+            }
 
             // smoothly handle data updating
             updateData = function () {
-                
+
                 var dots = chart.selectAll(".dot").data(attrs.data, d => {
                     return d.id;
                 });
@@ -107,11 +108,11 @@ function getChart(params) {
                     dots.exit().remove();
                     tooltip.exit().remove();
                 }, attrs.dotDeleteTime / 2);
-                
+
               // <animate attributeType="SVG" attributeName="r" begin="0s" dur="1.5s" repeatCount="indefinite" from="5%" to="25%"/>
               // <animate attributeType="CSS" attributeName="stroke-width" begin="0s"  dur="1.5s" repeatCount="indefinite" from="3%" to="0%" />
               // <animate attributeType="CSS" attributeName="opacity" begin="0s"  dur="1.5s" repeatCount="indefinite" from="1" to="0"/>
-                
+
                 dots.enter()
                     .append("circle").merge(dots).attr("class", "dot")
                     .attr("cx", function (d) { return projection([d.Longitude, d.Latitude])[0]; })
@@ -135,20 +136,20 @@ function getChart(params) {
                                     var y = projection([d.Longitude, d.Latitude])[1] - 15;
 
                                 return "translate("+[x,y]+")"})
-                            
+
                 groups.append("rect")
-                       .attr("width", 190)
+                       .attr("width", 86)
                        .attr("height", 30)
                        .attr("rx", 5)
                        .attr("fill", "#667")
 
                 var texts = groups.append("text")
-                      .attr("dx", 0)
+                      .attr("dx", 4)
                       .attr("dy", 20)
                       .style("fill",d => {
                                 return d.Class;
                             })
-                      .text(d => { return d.Class.toUpperCase() + " event at " + d.City.toUpperCase(); });
+                      .text(d => { return d.Class.toUpperCase() + " event "; });
             }
 
             //#########################################  UTIL FUNCS ##################################
@@ -177,7 +178,7 @@ function getChart(params) {
 
         });
     }
-    
+
     //----------- PROTOTYEPE FUNCTIONS  ----------------------
     d3.selection.prototype.patternify = function (params) {
       var container = this;

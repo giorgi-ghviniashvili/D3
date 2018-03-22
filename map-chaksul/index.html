@@ -71,8 +71,8 @@
         }
 
         d3.queue() 
-          .defer(d3.json, "https:cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-districts-500.geojson")
-          .defer(d3.csv,  "https:cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-funding.csv")
+          .defer(d3.json, "https://cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-districts-500.geojson")
+          .defer(d3.csv,  "https://cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-funding.csv")
           .await(createVis);
         
     </script>

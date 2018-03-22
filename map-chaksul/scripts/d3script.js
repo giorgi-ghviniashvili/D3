@@ -1,4 +1,4 @@
-function getChart(params) {
+function getCloropleth(params) {
     // exposed variables
     var attrs = {
         svgWidth: 700,
@@ -8,10 +8,11 @@ function getChart(params) {
         marginRight: 5,
         marginLeft: 5,
         center: [43.5, 44],
-        scale: 250,
+        scale: 1,
         container: 'body',
         geojson: null,
-        data: null
+        data: null,
+        header: "Header"
     };
 
 
@@ -42,13 +43,17 @@ function getChart(params) {
             calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
             calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
 
+            /* ########### SCALES ###################### */
+
+            var color = d3.scaleSequential(d3.interpolateGreens)
+                          .domain([0, d3.max(attrs.data, function(d){
+                            return +d.TTPP;
+                          })]);
 
             /*##################################   HANDLERS  ####################################### */
             var handlers = {
                 zoomed: null
             }
-
-
 
             /*##################################   BEHAVIORS ####################################### */
             var behaviors = {};
@@ -61,38 +66,75 @@ function getChart(params) {
 
             //drawing
             var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
-                .attr('width', attrs.svgWidth)
-                .attr('height', attrs.svgHeight)
-                .call(behaviors.zoom);
+                                .attr('width', attrs.svgWidth)
+                                .attr('height', attrs.svgHeight)
+                                .call(behaviors.zoom);
             // .attr("viewBox", "0 0 " + attrs.svgWidth + " " + attrs.svgHeight)
             // .attr("preserveAspectRatio", "xMidYMid meet")
+            // Add a legend for the color values.
 
+            
             var chart = svg.patternify({ tag: 'g', selector: 'chart' })
                 .attr('width', calc.chartWidth)
                 .attr('height', calc.chartHeight)
                 .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')')
 
+
             /* ############# PROJECTION ############### */
 
-            var projection = d3.geoMercator()
-                .scale(attrs.scale)
-                .translate([calc.chartWidth * 0.56, calc.chartHeight * 0.33])
-                .center(attrs.center);
+            var projection = d3.geoAlbersUsa()
+                                   //.translate([w/2, h/2])
+                                   .scale(attrs.scale)
+                                   .fitSize([calc.chartWidth,calc.chartHeight], attrs.geojson);
 
             var path = d3.geoPath()
-                //.projection(projection);
+                         .projection(projection);
+
+            
 
             /* ##############  DRAWING ################# */
+            chart.patternify({ tag: 'text', selector: 'header' })
+                 .attr("x", calc.chartWidth / 3)
+                 .attr("y", 30)
+                 .text(attrs.header)
+                 .style("fill", "green")
 
-            chart.patternify({ tag: 'path', selector: 'counties', data: topojson.feature(attrs.geojson, attrs.geojson.objects.counties).features })
+            chart.patternify({ tag: 'path', selector: 'districts', data: attrs.geojson.features })
                  .attr('d', path)
-                 .attr('fill', d => '#' + (0x1000000 + (Math.random()) * 0xffffff).toString(16).substr(1, 6)) //random color
+                 .attr('fill', d => {
 
-            chart.append("path")
-                 .datum(topojson.mesh(attrs.geojson, attrs.geojson.objects.states, function(a, b) { return a !== b; }))
-                 .attr("class", "states")
-                 .attr("d", path);
+                    var spendingDataEnty = attrs.data.filter(function(x){
+                        return x.District.includes(d.properties.DISTRICT);
+                    });
 
+                    if (spendingDataEnty.length > 0){
+                        return color(+spendingDataEnty[0].TTPP);
+                    }
+                    return "rgb(167, 219, 162)";
+                 }) 
+
+            if (attrs.container == "#mapRight"){
+                var legend = svg.selectAll(".legend")
+                      .data(color.ticks(6).slice(1).reverse())
+                      .enter()
+                      .append("g")
+                      .attr("class", "legend")
+                      .attr("transform", function(d, i) { return "translate(" + (calc.chartWidth - 60) + "," + (20 + i * 20) + ")"; });
+
+                legend.append("rect")
+                      .attr("width", 20)
+                      .attr("height", 20)
+                      .style("fill", d => {
+                        return color(d);
+                      });
+
+                legend.append("text")
+                      .attr("x", 26)
+                      .attr("y", 10)
+                      .attr("dy", ".35em")
+                      .text(String);
+
+            }
             /* #############################   HANDLER FUNCTIONS    ############################## */
             handlers.zoomed = function () {
                 var transform = d3.event.transform;
@@ -104,30 +146,6 @@ function getChart(params) {
 
 
             }
-
-            //#########################################  UTIL FUNCS ##################################
-
-            function debug() {
-                if (attrs.isDebug) {
-                    //stringify func
-                    var stringified = scope + "";
-
-                    // parse variable names
-                    var groupVariables = stringified
-                        //match var x-xx= {};
-                        .match(/var\s+([\w])+\s*=\s*{\s*}/gi)
-                        //match xxx
-                        .map(d => d.match(/\s+\w*/gi).filter(s => s.trim()))
-                        //get xxx
-                        .map(v => v[0].trim())
-
-                    //assign local variables to the scope
-                    groupVariables.forEach(v => {
-                        main['P_' + v] = eval(v)
-                    })
-                }
-            }
-            debug();
 
         });
     }
@@ -168,16 +186,6 @@ function getChart(params) {
 
     //set attrs as property
     main.attrs = attrs;
-
-    //debugging visuals
-    main.debug = function (isDebug) {
-        attrs.isDebug = isDebug;
-        if (isDebug) {
-            if (!window.charts) window.charts = [];
-            window.charts.push(main);
-        }
-        return main;
-    }
 
     //exposed update functions
     main.data = function (value) {

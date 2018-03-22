@@ -15,37 +15,66 @@
           stroke: #fff;
           stroke-linejoin: round;
         }
+
+        .container div{
+            width: 50%;
+            float: left;
+        }
+        .header{
+            font-weight: bold;
+        }
     </style>
 </head>
 
 <body translate="no">
     <div class="container centered">
-        <div id="myGraph"></div>
+        <div id="mapLeft"></div>
+        <div id="mapRight"></div>
     </div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="libs/d3-scale-chromatic.v1.min.js"></script>
-    <script src="libs/topojson.v2.min.js"></script>
     <script src="scripts/d3script.js"></script>
 
     <script>
-        d3.queue()
-          .defer(d3.json, "data/us-10m.v1.json")
-          //.defer(d3.tsv, "unemployment.tsv", function(d) { unemployment.set(d.id, +d.rate); })
-          .await(ready);
+        function createVis(errors, mapData, spendingData) { 
+            // error check
+            if (errors) {
+                console.error('Error getting or parsing the data.');
+                throw errors;
+            }
 
-        function ready(err, json) {
-            if (err) throw err;
+            //Width and height
+            var w = document.querySelector('.container div').getBoundingClientRect().width;
+            var h = 600;
 
-            var chart = getChart()
-                .svgHeight(window.innerHeight-30)
-                .svgWidth(window.innerWidth-30)
-                .geojson(json)
-                .data('Pass Something Here and use it as attrs.data')
+            var mapLeft = getCloropleth()
+                          .container("#mapLeft")
+                          .header("Local Public")
+                          .svgWidth(w)
+                          .svgHeight(h)
+                          .geojson(mapData)
+                          .data(spendingData.filter(function(d){
+                            return +d.LEA <= 399;
+                          }))
+                          .run()
 
-            d3.select("#myGraph")
-                .call(chart);
-
+            var mapRight = getCloropleth()
+                          .container("#mapRight")
+                          .header("Regional Academic")
+                          .svgWidth(w)
+                          .svgHeight(h)
+                          .geojson(mapData)
+                          .data(spendingData.filter(function(d){
+                            return +d.LEA >= 600 && +d.LEA <= 799;
+                          }))
+                          .run()
         }
+
+        d3.queue() 
+          .defer(d3.json, "https:cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-districts-500.geojson")
+          .defer(d3.csv,  "https:cdn.rawgit.com/dakoop/e3d0b2100c6b6774554dddb0947f2b67/raw/ea38ad2f7949fb5c2242fa1571c9ea12140f2a76/ma-school-funding.csv")
+          .await(createVis);
+        
     </script>
 
 

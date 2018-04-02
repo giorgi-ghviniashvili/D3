@@ -20,6 +20,7 @@
             width: 50%;
             float: left;
         }
+        
         .header{
             font-weight: bold;
         }
@@ -43,31 +44,55 @@
                 throw errors;
             }
 
+            // local public data
+            var localPublicData = spendingData.filter(function(d){
+                            return +d.LEA <= 399;
+                          });
+
+            // regional academic data
+            var regionalAcademic = spendingData.filter(function(d){
+                            return +d.LEA >= 600 && +d.LEA <= 799;
+                          });
+
+            // create a color scale for local + regional data
+            var color = d3.scaleSequential(d3.interpolateGreens)
+                          .domain(d3.extent(localPublicData.concat(regionalAcademic), function(d){
+                            return +d.TTPP;
+                          }));
+
             //Width and height
             var w = document.querySelector('.container div').getBoundingClientRect().width;
             var h = 600;
 
-            var mapLeft = getCloropleth()
-                          .container("#mapLeft")
-                          .header("Local Public")
-                          .svgWidth(w)
-                          .svgHeight(h)
-                          .geojson(mapData)
-                          .data(spendingData.filter(function(d){
-                            return +d.LEA <= 399;
-                          }))
-                          .run()
+            var mapLeft = getCloropleth({
+                            svgWidth: w,
+                            svgHeight: h,
+                            marginTop: 5,
+                            marginBottom: 5,
+                            marginRight: 5,
+                            marginLeft: 5,
+                            scale: 1,
+                            container: "#mapLeft",
+                            geojson: mapData,
+                            data: localPublicData,
+                            color: color, // color scale
+                            header: "Local Public"
+                          });
 
-            var mapRight = getCloropleth()
-                          .container("#mapRight")
-                          .header("Regional Academic")
-                          .svgWidth(w)
-                          .svgHeight(h)
-                          .geojson(mapData)
-                          .data(spendingData.filter(function(d){
-                            return +d.LEA >= 600 && +d.LEA <= 799;
-                          }))
-                          .run()
+            var mapRight = getCloropleth({
+                            svgWidth: w,
+                            svgHeight: h,
+                            marginTop: 5,
+                            marginBottom: 5,
+                            marginRight: 5,
+                            marginLeft: 5,
+                            scale: 1,
+                            container: "#mapRight",
+                            geojson: mapData,
+                            data: regionalAcademic,
+                            color: color, // color scale
+                            header: "Regional Academic"
+                          });
         }
 
         d3.queue() 

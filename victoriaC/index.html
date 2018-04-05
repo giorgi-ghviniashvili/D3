@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #FAFAFA;
+        }
+
+        svg {
+            background-color: #fff;
+        }
+
+        /*.chart {
+            fill: #fff;
+        }*/
+
+        .centered div {
+            width: 80%;
+            margin: auto;
+        }
+
+        @media(min-width:768px) and (max-width:850px) {
+           .centered div{
+                position: relative;
+                width: 80%;
+                margin: auto;
+                float: none;
+            }
+        }
+        @media(max-width:768px) {
+           .centered div{
+                position: relative;
+                width: 100%;
+                margin: auto;
+            }
+        }
+        
+        .bullet { font: 10px sans-serif; }
+        .bullet .marker { stroke: #000; stroke-width: 2px; }
+        .bullet .tick line { stroke: #666; stroke-width: .5px; }
+        .bullet .range.s0 { fill: #eee; }
+        .bullet .range.s1 { fill: #ddd; }
+        .bullet .range.s2 { fill: #ccc; }
+        .bullet .measure.s0 { fill: lightsteelblue; }
+        .bullet .measure.s1 { fill: steelblue; }
+        .bullet .title { font-size: 14px; font-weight: bold; }
+        .bullet .subtitle { fill: #999; }
+    </style>
+</head>
+
+<body translate="no">
+
+    <div class="container centered">
+        <div id="myGraph"></div>
+    </div>
+    <script src="libs/d3.v3.min.js"></script>
+    <script src="libs/bullets.js"></script>
+    <script src="scripts/d3script.js"></script>
+
+    <script>
+
+        d3.json("data/bullets.json", function(error, data){
+            if (error){
+                console.error("error loading data");
+                throw error;
+            }
+
+            var width = document.getElementById("myGraph").getBoundingClientRect().width;
+            var chart = renderBulletChart()
+                        .svgHeight(300)
+                        .svgWidth(width)
+                        .container('#myGraph')
+                        .data(data)
+                        .debug(true)
+                        .run()
+        })
+    </script>
+
+
+</body>
+
+</html>

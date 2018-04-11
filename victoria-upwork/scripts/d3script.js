@@ -10,7 +10,7 @@ function renderBulletChart(params) {
     marginRight: 0,
     marginLeft: 0,
     marginBulletLeft: 120,
-    marginBulletTop: 5,
+    marginBulletTop: 20,
     marginBulletBottom: 20,
     marginBulletRight: 40,
     container: 'body',
@@ -57,9 +57,16 @@ function renderBulletChart(params) {
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
 
-      var bullet = chart.patternify({ tag: 'g', selector: 'bullet', data: attrs.data })
+      var bullet = chart.patternify({ 
+                                      tag: 'g', 
+                                      selector: 'bullet', 
+                                      data: attrs.data.map(function(d,i){
+                                        d.hasAxis = i ==  attrs.data.length - 1;
+                                        return d;
+                                      }) 
+                                    })
                         .attr('transform', (d,i) => {
-                          return 'translate(' + attrs.marginBulletLeft + ',' + (i * (bulletChartHeight + 25))  + ')'
+                          return 'translate(' + attrs.marginBulletLeft + ',' + (i * (bulletChartHeight + 40))  + ')'
                         })
                         .call(bulletChart);
 
@@ -75,6 +82,12 @@ function renderBulletChart(params) {
           .attr("class", "subtitle")
           .attr("dy", "1em")
           .text(function(d) { return d.subtitle; });
+
+      var zeroBar = chart.patternify({ tag: 'line', selector: 'zeroBar' })
+                         .attr("x1", bulletChartWidth / 2 + attrs.marginBulletLeft)
+                         .attr("x2", bulletChartWidth / 2 + attrs.marginBulletLeft)
+                         .attr("y1", 0)
+                         .attr("y2", 200);
 
       // Smoothly handle data updating
       updateData = function () {

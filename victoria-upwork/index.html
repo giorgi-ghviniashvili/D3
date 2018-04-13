@@ -40,7 +40,7 @@
         .bullet .tick line { stroke: #666; stroke-width: .5px; }
         .bullet .title { font-size: 14px; font-weight: bold; }
         .bullet .subtitle { fill: #999; }
-        .zeroBar { stroke: grey; stroke-width: 2px; }
+        .zeroBar { stroke: grey; stroke-width: 1px; }
     </style>
 </head>
 
@@ -64,7 +64,6 @@
 
             var width = document.getElementById("myGraph").getBoundingClientRect().width;
             var chart = renderBulletChart()
-                        .svgHeight(250)
                         .svgWidth(width)
                         .container('#myGraph')
                         .data(data)

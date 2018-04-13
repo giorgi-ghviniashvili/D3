@@ -30,5 +30,13 @@
     "colorTheme": "#C49F47",
     "confidenceLevels": [17, 77],
     "mean": 47
+  },
+  {
+    "title":"Factor 4",
+    "subtitle":"other name 4",
+    "standardErrors": [-17, -7],
+    "colorTheme": "#D49FA7",
+    "confidenceLevels": [-22,72],
+    "mean": -10
   }
 ]

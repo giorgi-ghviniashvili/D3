@@ -76,7 +76,8 @@ function renderBulletChart(params) {
 
       title.append("text")
           .attr("class", "title")
-          .text(function(d) { return d.title; });
+          .text(function(d) { return d.title; })
+          .style("fill", attrs.defaultTextFill);
 
       title.append("text")
           .attr("class", "subtitle")

@@ -85,11 +85,11 @@ d3.bullet = function() {
 
       if (d.hasAxis) {
         // Compute the tick format.
-        var format = tickFormat || x1.tickFormat(8);
+        var format =  tickFormat;
 
         // Update the tick groups.
         var tick = g.selectAll("g.tick")
-            .data(x.ticks(8), function(d) {
+            .data(x.ticks(5), function(d) {
               return this.textContent || format(d);
             });
 

@@ -15,10 +15,6 @@
             background-color: #fff;
         }
 
-        /*.chart {
-            fill: #fff;
-        }*/
-
         .centered div {
             width: 80%;
             margin: auto;
@@ -39,17 +35,12 @@
                 margin: auto;
             }
         }
-        
         .bullet { font: 10px sans-serif; }
-        .bullet .marker { stroke: #000; stroke-width: 2px; }
+        .bullet .mean { stroke: #000; stroke-width: 2px; }
         .bullet .tick line { stroke: #666; stroke-width: .5px; }
-        .bullet .range.s0 { fill: #eee; }
-        .bullet .range.s1 { fill: #ddd; }
-        .bullet .range.s2 { fill: #ccc; }
-        .bullet .measure.s0 { fill: lightsteelblue; }
-        .bullet .measure.s1 { fill: steelblue; }
         .bullet .title { font-size: 14px; font-weight: bold; }
         .bullet .subtitle { fill: #999; }
+        .zeroBar { stroke: grey; stroke-width: 1px; }
     </style>
 </head>
 
@@ -59,6 +50,7 @@
         <div id="myGraph"></div>
     </div>
     <script src="libs/d3.v3.min.js"></script>
+    <script src="libs/utils.js"></script>
     <script src="libs/bullets.js"></script>
     <script src="scripts/d3script.js"></script>
 
@@ -72,7 +64,6 @@
 
             var width = document.getElementById("myGraph").getBoundingClientRect().width;
             var chart = renderBulletChart()
-                        .svgHeight(300)
                         .svgWidth(width)
                         .container('#myGraph')
                         .data(data)

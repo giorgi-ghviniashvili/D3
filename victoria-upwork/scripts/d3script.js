@@ -6,13 +6,15 @@ function renderBulletChart(params) {
     svgWidth: 400,
     svgHeight: 400,
     marginTop: 10,
-    marginBottom: 0,
+    marginBottom: 40,
     marginRight: 0,
     marginLeft: 0,
-    marginBulletLeft: 120,
-    marginBulletTop: 5,
+    marginBulletLeft: 80,
+    marginBulletTop: 20,
     marginBulletBottom: 20,
-    marginBulletRight: 40,
+    marginBulletRight: 20,
+    bulletHeight: 25,
+    marginBetweenBullets: 40,
     container: 'body',
     defaultTextFill: '#2C3E50',
     defaultFont: 'Helvetica',
@@ -27,6 +29,9 @@ function renderBulletChart(params) {
   var main = function (selection) {
     selection.each(function scope() {
 
+      attrs.svgHeight = attrs.data.length * attrs.bulletHeight + 
+                       (attrs.data.length - 1) * attrs.marginBetweenBullets + attrs.marginBottom;
+
       //Calculated properties
       var calc = {}
       calc.id = "ID" + Math.floor(Math.random() * 1000000);  // id for event handlings
@@ -35,7 +40,7 @@ function renderBulletChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
 
-      var bulletChartHeight = (calc.chartHeight / attrs.data.length) - attrs.marginBulletTop - attrs.marginBulletBottom;
+      var bulletChartHeight = attrs.bulletHeight;
       var bulletChartWidth = calc.chartWidth - attrs.marginBulletLeft - attrs.marginBulletRight;
 
       // ###### layouts ######## //
@@ -57,9 +62,16 @@ function renderBulletChart(params) {
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
 
-      var bullet = chart.patternify({ tag: 'g', selector: 'bullet', data: attrs.data })
+      var bullet = chart.patternify({ 
+                                      tag: 'g', 
+                                      selector: 'bullet', 
+                                      data: attrs.data.map(function(d,i){
+                                        d.hasAxis = i ==  attrs.data.length - 1;
+                                        return d;
+                                      }) 
+                                    })
                         .attr('transform', (d,i) => {
-                          return 'translate(' + attrs.marginBulletLeft + ',' + (i * (bulletChartHeight + 25))  + ')'
+                          return 'translate(' + attrs.marginBulletLeft + ',' + (i * (bulletChartHeight + attrs.marginBetweenBullets))  + ')'
                         })
                         .call(bulletChart);
 
@@ -69,12 +81,19 @@ function renderBulletChart(params) {
 
       title.append("text")
           .attr("class", "title")
-          .text(function(d) { return d.title; });
+          .text(function(d) { return d.title; })
+          .style("fill", attrs.defaultTextFill);
 
       title.append("text")
           .attr("class", "subtitle")
           .attr("dy", "1em")
           .text(function(d) { return d.subtitle; });
+
+      var zeroBar = chart.patternify({ tag: 'line', selector: 'zeroBar' })
+                         .attr("x1", bulletChartWidth / 2 + attrs.marginBulletLeft)
+                         .attr("x2", bulletChartWidth / 2 + attrs.marginBulletLeft)
+                         .attr("y1", 0)
+                         .attr("y2", calc.chartHeight + attrs.marginTop);
 
       // Smoothly handle data updating
       updateData = function () {

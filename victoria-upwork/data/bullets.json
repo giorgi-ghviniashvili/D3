@@ -5,7 +5,7 @@
     "standardErrors": [1, 33],
     "colorTheme": "#67809F",
     "confidenceLevels": [-14, 48],
-    "bulletHeight": 50,
+    "bulletHeight": 30,
     "mean": 17
   },
   {
@@ -32,7 +32,7 @@
     "standardErrors": [22,72],
     "colorTheme": "#C49F47",
     "confidenceLevels": [17, 77],
-    "bulletHeight": 25,
+    "bulletHeight": 35,
     "mean": 47
   },
   {

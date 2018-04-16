@@ -5,6 +5,7 @@
     "standardErrors": [1, 33],
     "colorTheme": "#67809F",
     "confidenceLevels": [-14, 48],
+    "bulletHeight": 50,
     "mean": 17
   },
   {
@@ -13,6 +14,7 @@
     "standardErrors": [-5,-1],
     "colorTheme": "#8775A7",
     "confidenceLevels": [-47, 41],
+    "bulletHeight": 25,
     "mean": -3
   },
   {
@@ -21,6 +23,7 @@
     "standardErrors": [41,47],
     "colorTheme": "#E08283",
     "confidenceLevels": [14, 74],
+    "bulletHeight": 25,
     "mean": 44
   },
   {
@@ -29,6 +32,7 @@
     "standardErrors": [22,72],
     "colorTheme": "#C49F47",
     "confidenceLevels": [17, 77],
+    "bulletHeight": 25,
     "mean": 47
   },
   {
@@ -37,6 +41,7 @@
     "standardErrors": [-17, -7],
     "colorTheme": "#D49FA7",
     "confidenceLevels": [-22,72],
+    "bulletHeight": 25,
     "mean": -10
   }
 ]

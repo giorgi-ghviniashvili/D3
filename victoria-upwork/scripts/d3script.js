@@ -6,7 +6,7 @@ function renderBulletChart(params) {
     svgWidth: 400,
     svgHeight: 400,
     marginTop: 20,
-    marginBottom: 50,
+    marginBottom: 100,
     marginRight: 0,
     marginLeft: 0,
     marginBulletLeft: 80,
@@ -17,6 +17,7 @@ function renderBulletChart(params) {
     marginBetweenBullets: 40,
     container: 'body',
     defaultTextFill: '#2C3E50',
+    xAxisHeader: "",
     defaultFont: 'Helvetica',
     data: null
   };
@@ -139,6 +140,24 @@ function renderBulletChart(params) {
                          .attr("x2", bulletChartWidth / 2 + attrs.marginBulletLeft)
                          .attr("y1", 0)
                          .attr("y2", calc.chartHeight + attrs.marginTop);
+
+      var linearScale = d3.scale.linear().domain([-100, 100])
+                              .range([0, bulletChartWidth]);
+
+      var overallBar = chart.patternify({ tag: 'line', selector: 'overallBar', data: attrs.data.filter(x => x.hasMeanLine) })
+                         .attr("x1", function(d) {
+                            return linearScale(d.mean) + attrs.marginBulletLeft;
+                         })
+                         .attr("x2", function(d) {
+                            return linearScale(d.mean) + attrs.marginBulletLeft;
+                         })
+                         .attr("y1", 4)
+                         .attr("y2", calc.chartHeight + attrs.marginTop);
+
+      var xAxisHeader = chart.patternify({ tag: "text", selector: "xAxisHeader" })
+                             .attr("x", "48%")
+                             .attr("y", calc.chartHeight + 80)
+                             .text(attrs.xAxisHeader);
 
       // Smoothly handle data updating
       updateData = function () {

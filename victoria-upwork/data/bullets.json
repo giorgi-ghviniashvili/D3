@@ -6,6 +6,7 @@
     "colorTheme": "#67809F",
     "confidenceLevels": [-14, 48],
     "bulletHeight": 30,
+    "hasMeanLine": true,
     "mean": 17
   },
   {

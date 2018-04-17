@@ -1,42 +1,53 @@
 [
   {
-    "title":"OVERALL",
-    "subtitle":"other name",
-    "standardErrors": [1, 33],
-    "colorTheme": "#67809F",
-    "confidenceLevels": [-14, 48],
-    "mean": 17
-  },
-  {
+    "Id": "1",
     "title":"Factor 1",
     "subtitle":"other name 1",
     "standardErrors": [-5,-1],
     "colorTheme": "#8775A7",
     "confidenceLevels": [-47, 41],
+    "bulletHeight": 25,
     "mean": -3
   },
   {
+    "Id": "0",
+    "title":"OVERALL",
+    "subtitle":"other name",
+    "standardErrors": [1, 33],
+    "colorTheme": "#67809F",
+    "confidenceLevels": [-14, 48],
+    "bulletHeight": 30,
+    "hasMeanLine": true,
+    "mean": 17
+  },
+  {
+    "Id": "2",
     "title":"Factor 2",
     "subtitle":"other name 2",
     "standardErrors": [41,47],
     "colorTheme": "#E08283",
     "confidenceLevels": [14, 74],
+    "bulletHeight": 25,
     "mean": 44
   },
   {
+    "Id": "3",
     "title":"Factor 3",
     "subtitle":"other name 3",
     "standardErrors": [22,72],
     "colorTheme": "#C49F47",
     "confidenceLevels": [17, 77],
+    "bulletHeight": 35,
     "mean": 47
   },
   {
+    "Id": "4",
     "title":"Factor 4",
     "subtitle":"other name 4",
     "standardErrors": [-17, -7],
     "colorTheme": "#D49FA7",
     "confidenceLevels": [-22,72],
+    "bulletHeight": 25,
     "mean": -10
   }
 ]

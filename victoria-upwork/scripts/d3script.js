@@ -5,8 +5,8 @@ function renderBulletChart(params) {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
     svgWidth: 400,
     svgHeight: 400,
-    marginTop: 10,
-    marginBottom: 40,
+    marginTop: 20,
+    marginBottom: 100,
     marginRight: 0,
     marginLeft: 0,
     marginBulletLeft: 80,
@@ -17,6 +17,7 @@ function renderBulletChart(params) {
     marginBetweenBullets: 40,
     container: 'body',
     defaultTextFill: '#2C3E50',
+    xAxisHeader: "",
     defaultFont: 'Helvetica',
     data: null
   };
@@ -28,8 +29,11 @@ function renderBulletChart(params) {
   //Main chart object
   var main = function (selection) {
     selection.each(function scope() {
-
-      attrs.svgHeight = attrs.data.length * attrs.bulletHeight + 
+      var sumHeight = 0;
+      attrs.data.forEach(d => {
+        sumHeight += d.bulletHeight;
+      })
+      attrs.svgHeight = sumHeight + 
                        (attrs.data.length - 1) * attrs.marginBetweenBullets + attrs.marginBottom;
 
       //Calculated properties
@@ -45,8 +49,7 @@ function renderBulletChart(params) {
 
       // ###### layouts ######## //
       var bulletChart = d3.bullet()
-                          .width(bulletChartWidth)
-                          .height(bulletChartHeight);
+                          .width(bulletChartWidth);
 
       //Drawing containers
       var container = d3.select(this);
@@ -61,6 +64,23 @@ function renderBulletChart(params) {
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
 
+      var tooltip = d3
+                .componentsTooltip()
+                .container(svg)
+                .content([
+                  {
+                    left: "StandardErrors:",
+                    right: "{se}"
+                  },
+                  {
+                    left: "ConfidenceLevels:",
+                    right: "{cl}"
+                  },
+                  {
+                    left: "Mean:",
+                    right: "{m}"
+                  }
+                ]);
 
       var bullet = chart.patternify({ 
                                       tag: 'g', 
@@ -70,14 +90,41 @@ function renderBulletChart(params) {
                                         return d;
                                       }) 
                                     })
+                        .attr("id", d => {return "bullet" + d.Id;})
                         .attr('transform', (d,i) => {
-                          return 'translate(' + attrs.marginBulletLeft + ',' + (i * (bulletChartHeight + attrs.marginBetweenBullets))  + ')'
+                          var sum = 0;
+                          for (var j = 0; j < i; j++) {
+                            sum += attrs.data[j].bulletHeight;
+                          }
+                          var yAxisTransform = i == 0 ? sum : sum + i * attrs.marginBetweenBullets;
+                          return 'translate(' + attrs.marginBulletLeft + ',' + yAxisTransform  + ')'
                         })
+                        .on("mouseover", function(d){
+                          var mouse = d3.mouse(svg.node());
+                          var direction = "bottom";
+                          if (mouse[1] - 80 < 0) {
+                            direction = "top";
+                          }
+                          if (mouse[0] - 100 < 0) {
+                            direction = "left";
+                          }
+                          else if (mouse[0] + 50 > attrs.svgWidth){
+                            direction = "right";
+                          }
+                          tooltip.x(mouse[0])
+                                 .y(mouse[1])
+                                 .direction(direction)
+                                 .show({ se: "[" + d.standardErrors.toString() + "]", cl: "[" + d.confidenceLevels.toString()  + "]", m: d.mean});
+                        })
+                        .on("mouseout", tooltip.hide)
                         .call(bulletChart);
+                        
 
       var title = bullet.append("g")
                     .style("text-anchor", "end")
-                    .attr("transform", "translate(-6," + bulletChartHeight / 2 + ")");
+                    .attr("transform", function(d){
+                      return  "translate(-6," + d.bulletHeight / 2 + ")"
+                    });
 
       title.append("text")
           .attr("class", "title")
@@ -94,6 +141,24 @@ function renderBulletChart(params) {
                          .attr("x2", bulletChartWidth / 2 + attrs.marginBulletLeft)
                          .attr("y1", 0)
                          .attr("y2", calc.chartHeight + attrs.marginTop);
+
+      var linearScale = d3.scale.linear().domain([-100, 100])
+                              .range([0, bulletChartWidth]);
+
+      var overallBar = chart.patternify({ tag: 'line', selector: 'overallBar', data: attrs.data.filter(x => x.hasMeanLine) })
+                         .attr("x1", function(d) {
+                            return linearScale(d.mean) + attrs.marginBulletLeft;
+                         })
+                         .attr("x2", function(d) {
+                            return linearScale(d.mean) + attrs.marginBulletLeft;
+                         })
+                         .attr("y1", 4)
+                         .attr("y2", calc.chartHeight + attrs.marginTop);
+
+      var xAxisHeader = chart.patternify({ tag: "text", selector: "xAxisHeader" })
+                             .attr("x", "48%")
+                             .attr("y", calc.chartHeight + 80)
+                             .text(attrs.xAxisHeader);
 
       // Smoothly handle data updating
       updateData = function () {

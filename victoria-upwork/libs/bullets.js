@@ -20,6 +20,7 @@ d3.bullet = function() {
   // For each small multiple…
   function bullet(g) {
     g.each(function(d, i) {
+      height = d.bulletHeight;
       var clz = confidenceLevels.call(this, d, i).slice().sort(d3.ascending),
           meanz = _mean.call(this, d, i),
           sez = standardErrors.call(this, d, i).slice().sort(d3.ascending),

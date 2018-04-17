@@ -20,6 +20,15 @@
             margin: auto;
         }
 
+        .bullet { font: 10px sans-serif; }
+        .bullet .mean { stroke: #000; stroke-width: 2px; }
+        .bullet .tick line { stroke: #666; stroke-width: .5px; }
+        .bullet .title { font-size: 14px; font-weight: bold; }
+        .bullet .subtitle { fill: #999; }
+        .zeroBar { stroke: grey; stroke-width: 1px; }
+        .overallBar { stroke: red; stroke-width: 2px; stroke-dasharray: 5, 5;}
+        .xAxisHeader { fill: #2C3E50; font-weight: bold; }
+        
         @media(min-width:768px) and (max-width:850px) {
            .centered div{
                 position: relative;
@@ -35,12 +44,7 @@
                 margin: auto;
             }
         }
-        .bullet { font: 10px sans-serif; }
-        .bullet .mean { stroke: #000; stroke-width: 2px; }
-        .bullet .tick line { stroke: #666; stroke-width: .5px; }
-        .bullet .title { font-size: 14px; font-weight: bold; }
-        .bullet .subtitle { fill: #999; }
-        .zeroBar { stroke: grey; stroke-width: 1px; }
+
     </style>
 </head>
 
@@ -52,6 +56,7 @@
     <script src="libs/d3.v3.min.js"></script>
     <script src="libs/utils.js"></script>
     <script src="libs/bullets.js"></script>
+    <script src="libs/tooltip.js"></script>
     <script src="scripts/d3script.js"></script>
 
     <script>
@@ -66,6 +71,7 @@
             var chart = renderBulletChart()
                         .svgWidth(width)
                         .container('#myGraph')
+                        .xAxisHeader("This is the header")
                         .data(data)
                         .debug(true)
                         .run()

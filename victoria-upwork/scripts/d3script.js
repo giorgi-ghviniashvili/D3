@@ -90,6 +90,7 @@ function renderBulletChart(params) {
                                         return d;
                                       }) 
                                     })
+                        .attr("id", d => {return "bullet" + d.Id;})
                         .attr('transform', (d,i) => {
                           var sum = 0;
                           for (var j = 0; j < i; j++) {

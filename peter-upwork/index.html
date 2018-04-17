@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #FAFAFA;
+        }
+
+        svg {
+            background-color: white;
+        }
+
+        #myGraph {
+            min-width: 300px;
+            min-height: 300px;
+            max-height: 1000px;
+            max-width: 1000px;
+            width: 30%;
+        }
+    </style>
+</head>
+
+<body translate="no">
+
+    <div class="container centered">
+        <div id="myGraph"></div>
+    </div>
+    <script src="libs/d3.v4.min.js"></script>
+    <script src="scripts/d3script.js"></script>
+
+    <script>
+
+
+        var chart = renderChart()
+            .svgHeight(window.innerHeight - 30)
+            .svgWidth(window.innerWidth - 30)
+            .container('#myGraph')
+            .data('Pass Something Here and use it as attrs.data')
+            .debug(true)
+            .run()
+
+
+    </script>
+
+
+</body>
+
+</html>

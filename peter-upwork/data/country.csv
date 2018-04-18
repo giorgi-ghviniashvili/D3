@@ -1,0 +1,106 @@
+﻿Country,Secenario Run,Run Date,Assumption,Number Value
+JP,Esketamine,4/9/2018 15:40,Population,1480000
+JP,Esketamine,4/9/2018 15:40,Subpopulation,0.411197356
+JP,Esketamine,4/9/2018 15:40,Therapy Days per Year,230
+JP,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+JP,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+JP,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+JP,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+JP,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+JP,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+JP,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+JP,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+JP,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+JP,Esketamine,4/9/2018 15:40,Num Iterations,1000
+JP,Esketamine,4/9/2018 15:40,Num Workers,3
+JP,Esketamine,4/9/2018 15:40,Execution Time,25.01297807
+IT,Esketamine,4/9/2018 15:40,Population,1200000
+IT,Esketamine,4/9/2018 15:40,Subpopulation,0.306920644
+IT,Esketamine,4/9/2018 15:40,Therapy Days per Year,230
+IT,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+IT,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+IT,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+IT,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+IT,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+IT,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+IT,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+IT,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+IT,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+IT,Esketamine,4/9/2018 15:40,Num Iterations,1000
+IT,Esketamine,4/9/2018 15:40,Num Workers,3
+IT,Esketamine,4/9/2018 15:40,Execution Time,22.7839885
+ES,Esketamine,4/9/2018 15:40,Population,1200000
+ES,Esketamine,4/9/2018 15:40,Subpopulation,0.46
+ES,Esketamine,4/9/2018 15:40,Therapy Days per Year,231
+ES,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+ES,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+ES,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+ES,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+ES,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+ES,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+ES,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+ES,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+ES,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+ES,Esketamine,4/9/2018 15:40,Num Iterations,1000
+ES,Esketamine,4/9/2018 15:40,Num Workers,3
+ES,Esketamine,4/9/2018 15:40,Execution Time,24.32807393
+UK,Esketamine,4/9/2018 15:40,Population,2650000
+UK,Esketamine,4/9/2018 15:40,Subpopulation,0.254283451
+UK,Esketamine,4/9/2018 15:40,Therapy Days per Year,231
+UK,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+UK,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+UK,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+UK,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+UK,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+UK,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+UK,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+UK,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+UK,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+UK,Esketamine,4/9/2018 15:40,Num Iterations,1000
+UK,Esketamine,4/9/2018 15:40,Num Workers,3
+UK,Esketamine,4/9/2018 15:40,Execution Time,26.8854964
+FR,Esketamine,4/9/2018 15:40,Population,5240000
+FR,Esketamine,4/9/2018 15:40,Subpopulation,0.337830121
+FR,Esketamine,4/9/2018 15:40,Therapy Days per Year,201
+FR,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+FR,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+FR,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+FR,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+FR,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+FR,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+FR,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+FR,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+FR,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+FR,Esketamine,4/9/2018 15:40,Num Iterations,1000
+FR,Esketamine,4/9/2018 15:40,Num Workers,3
+FR,Esketamine,4/9/2018 15:40,Execution Time,25.15750244
+DE,Esketamine,4/9/2018 15:40,Population,4570000
+DE,Esketamine,4/9/2018 15:40,Subpopulation,0.406799867
+DE,Esketamine,4/9/2018 15:40,Therapy Days per Year,223
+DE,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+DE,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+DE,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+DE,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+DE,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+DE,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+DE,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+DE,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+DE,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+DE,Esketamine,4/9/2018 15:40,Num Iterations,1000
+DE,Esketamine,4/9/2018 15:40,Num Workers,3
+DE,Esketamine,4/9/2018 15:40,Execution Time,25.21207559
+US,Esketamine,4/9/2018 15:40,Population,15900000
+US,Esketamine,4/9/2018 15:40,Subpopulation,0.338013393
+US,Esketamine,4/9/2018 15:40,Therapy Days per Year,232
+US,Esketamine,4/9/2018 15:40,Profile Elasticity,3
+US,Esketamine,4/9/2018 15:40,Class Order of Entry Elasticity,0.2
+US,Esketamine,4/9/2018 15:40,Product Order of Entry Elasticity,-0.5
+US,Esketamine,4/9/2018 15:40,Barrier Elasticity,1.2
+US,Esketamine,4/9/2018 15:40,PCP Factor,0.81
+US,Esketamine,4/9/2018 15:40,ROEMEA Bump-Up,0.5
+US,Esketamine,4/9/2018 15:40,ROAP Bump-Up,0.3
+US,Esketamine,4/9/2018 15:40,CA Bump-Up,0.15
+US,Esketamine,4/9/2018 15:40,LA Bump-Up,0.15
+US,Esketamine,4/9/2018 15:40,Num Iterations,1000
+US,Esketamine,4/9/2018 15:40,Num Workers,3
+US,Esketamine,4/9/2018 15:40,Execution Time,28.32820475

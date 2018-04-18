@@ -6,6 +6,9 @@
     <meta charset="UTF-8">
     <title>Chart</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower" rel="stylesheet">
     <style>
         body {
             background-color: #FAFAFA;
@@ -14,40 +17,94 @@
         svg {
             background-color: white;
         }
-
-        #myGraph {
-            min-width: 300px;
-            min-height: 300px;
-            max-height: 1000px;
-            max-width: 1000px;
-            width: 30%;
+        .main-container {
+            padding-top: 15px;
+        }
+        .hr-primary{
+            background-image: -webkit-linear-gradient(left, rgba(66,133,244,.8), rgba(66, 133, 244,.6), rgba(0,0,0,0));
+        }
+        hr {
+          height: 4px;
+          margin-left: 15px;
+          margin-bottom:-3px;
         }
     </style>
 </head>
 
 <body translate="no">
 
-    <div class="container centered">
-        <div id="myGraph"></div>
+    <div class="container-fluid main-container">
+        <div class="row">
+            <div class="form-group row col">
+              <label for="countrySel" class="col-3 col-form-label">Country:</label>
+              <div class="col-9">
+                <select class="form-control" id="countrySel"></select>
+              </div>
+            </div>
+            <div class="form-group row col">
+              <label for="assetSel" class="col-2 col-form-label">Asset:</label>
+              <div class="col-10">
+                <select class="form-control" id="assetSel"></select>
+              </div>
+            </div>
+            <div class="form-group row col">
+              <label for="dataSel" class="col-2 col-form-label">Data:</label>
+              <div class="col-10">
+                <select class="form-control" id="dataSel"></select>
+              </div>
+            </div>
+            <div class="form-group row col">
+              <label for="assetSel" class="col-4 col-form-label">Constraints:</label>
+              <div class="col-8">
+                <select class="form-control" id="assetSel"></select>
+              </div>
+            </div>
+        </div>
+        <hr class="hr-primary" />
     </div>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/d3script.js"></script>
-
     <script>
+        d3.queue()
+            .defer(d3.csv, 'data/country.csv')
+            .defer(d3.csv, 'data/asset.csv')
+            .await(fillSelects);
 
+        function fillSelects(err, countries, assets){
+            if (err){
+                throw err;
+            }
 
-        var chart = renderChart()
-            .svgHeight(window.innerHeight - 30)
-            .svgWidth(window.innerWidth - 30)
-            .container('#myGraph')
-            .data('Pass Something Here and use it as attrs.data')
-            .debug(true)
-            .run()
+            var _countries = [...new Set(countries.map(item => item.Country))];
+            _countries.forEach(d => {
+                $('#countrySel').append("<option>" + d + "</option>");
+            });
 
+            var _assets = [...new Set(assets.map(item => item.Asset))];
+            _assets.forEach(d => {
+                $('#assetSel').append("<option>" + d + "</option>");
+            })
+
+        };
+
+        d3.csv("data/output.csv", function(err, outputs){
+            if (err){
+                throw err;
+            }
+        })
+
+        // var chart = renderChart()
+        //     .svgHeight(window.innerHeight - 30)
+        //     .svgWidth(window.innerWidth - 30)
+        //     .container('#myGraph')
+        //     .data('Pass Something Here and use it as attrs.data')
+        //     .debug(true)
+        //     .run()
 
     </script>
-
-
 </body>
 
 </html>

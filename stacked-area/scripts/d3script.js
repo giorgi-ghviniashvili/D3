@@ -8,7 +8,7 @@ function renderChart(params) {
     marginTop: 5,
     marginBottom: 25,
     marginRight: 15,
-    marginLeft: 25,
+    marginLeft: 40,
     container: 'body',
     defaultTextFill: '#2C3E50',
     defaultFont: 'Helvetica',
@@ -35,7 +35,7 @@ function renderChart(params) {
       formats.parseDate = d3.timeParse('%Y');
       formats.formatSi = d3.format(".3s");
       formats.formatNumber = d3.format(".1f");
-      formats.formatBillion = function(x) { return formats.formatNumber(x / 1e9); };
+      formats.formatPercent = d3.format(".0%");
 
       // scales
       var x = d3.scaleTime().range([0, calc.chartWidth]);
@@ -45,7 +45,7 @@ function renderChart(params) {
       var xAxis = d3.axisBottom().scale(x);
       var yAxis = d3.axisLeft()
                     .scale(y)
-                    .tickFormat(formats.formatBillion);
+                    .tickFormat(formats.formatPercent);
       // colors
       var color = d3.scaleOrdinal(d3.schemeCategory20)
                     .domain(d3.keys(attrs.data[0]).filter(function(key) { return key !== 'date'; }));;
@@ -64,14 +64,9 @@ function renderChart(params) {
           });
           tsvData = (function(){ return attrs.data; })();
 
-      var maxDateVal = d3.max(attrs.data, function(d){
-        var vals = d3.keys(d).map(function(key){ return key !== 'date' ? d[key] : 0 });
-        return d3.sum(vals);
-      });
-
       // Set domains for axes
       x.domain(d3.extent(attrs.data, function(d) { return d.date; }));
-      y.domain([0, maxDateVal]);
+      y.domain([0, 1]);
 
       // stack
       var stack = d3.stack();

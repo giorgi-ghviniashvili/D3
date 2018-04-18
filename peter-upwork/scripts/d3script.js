@@ -1,4 +1,3 @@
-
 function renderChart(params) {
 
   // Exposed variables
@@ -7,15 +6,14 @@ function renderChart(params) {
     svgWidth: 400,
     svgHeight: 400,
     marginTop: 5,
-    marginBottom: 5,
-    marginRight: 5,
-    marginLeft: 5,
+    marginBottom: 25,
+    marginRight: 15,
+    marginLeft: 40,
     container: 'body',
     defaultTextFill: '#2C3E50',
     defaultFont: 'Helvetica',
     data: null
   };
-
 
   //InnerFunctions which will update visuals
   var updateData;
@@ -32,6 +30,50 @@ function renderChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
 
+      // formats
+      var formats = {};
+      formats.parseDate = d3.timeParse('%Y');
+      formats.formatSi = d3.format(".3s");
+      formats.formatNumber = d3.format(".1f");
+      formats.formatPercent = d3.format(".0%");
+
+      // scales
+      var x = d3.scaleTime().range([0, calc.chartWidth]);
+      var y = d3.scaleLinear().range([calc.chartHeight, 0]);
+
+      // axis
+      var xAxis = d3.axisBottom().scale(x);
+      var yAxis = d3.axisLeft()
+                    .scale(y)
+                    .tickFormat(formats.formatPercent);
+      // colors
+      var color = d3.scaleOrdinal(d3.schemeCategory20)
+                    .domain(d3.keys(attrs.data[0]).filter(function(key) { return key !== 'date'; }));;
+
+      // layouts
+      var area = d3.area()
+                  .x(function(d) { 
+                    return x(d.data.date); })
+                  .y0(function(d) { return y(d[0]); })
+                  .y1(function(d) { return y(d[1]); }); 
+
+      // data processing
+      var keys = attrs.data.columns.filter(function(key) { return key !== 'date'; })
+          attrs.data.forEach(function(d) {
+            d.date = formats.parseDate(d.date); 
+          });
+          tsvData = (function(){ return attrs.data; })();
+
+      // Set domains for axes
+      x.domain(d3.extent(attrs.data, function(d) { return d.date; }));
+      y.domain([0, 1]);
+
+      // stack
+      var stack = d3.stack();
+      stack.keys(keys);
+      stack.order(d3.stackOrderNone);
+      stack.offset(d3.stackOffsetNone);
+
       //Drawing containers
       var container = d3.select(this);
 
@@ -44,6 +86,24 @@ function renderChart(params) {
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
         .attr('transform', 'translate(' + (calc.chartLeftMargin) + ',' + calc.chartTopMargin + ')');
+
+      var browser = chart.patternify({ tag: 'g', selector: 'browser', data: stack(attrs.data)})
+                        .attr('class', function(d){ return 'browser ' + d.key; })
+                        .attr('fill-opacity', 0.5);
+
+      browser.append('path')
+          .attr('class', 'area')
+          .attr('d', area)
+          .style('fill', function(d) { return color(d.key); });
+
+      chart.append('g')
+          .attr('class', 'x axis')
+          .attr('transform', 'translate(0,' + calc.chartHeight + ')')
+          .call(xAxis);
+
+      chart.append('g')
+          .attr('class', 'y axis')
+          .call(yAxis);
 
       // Smoothly handle data updating
       updateData = function () {

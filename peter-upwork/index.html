@@ -28,6 +28,18 @@
           margin-left: 15px;
           margin-bottom:-3px;
         }
+        .axis path,
+        .axis line {
+          fill: none;
+          stroke: none;
+          shape-rendering: crispEdges;
+        }
+        .browser text {
+          text-anchor: end;
+        }
+        #stacked-chart{
+            padding-top: 15px;
+        }
     </style>
 </head>
 
@@ -61,6 +73,10 @@
             </div>
         </div>
         <hr class="hr-primary" />
+        <div class="row">
+            <div class="col" id="stacked-chart"></div>
+            <div class="col"></div>
+        </div>
     </div>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
@@ -90,19 +106,22 @@
 
         };
 
-        d3.csv("data/output.csv", function(err, outputs){
-            if (err){
-                throw err;
-            }
-        })
+        // d3.csv("data/output.csv", function(err, outputs){
+        //     if (err){
+        //         throw err;
+        //     }
+        // })
 
-        // var chart = renderChart()
-        //     .svgHeight(window.innerHeight - 30)
-        //     .svgWidth(window.innerWidth - 30)
-        //     .container('#myGraph')
-        //     .data('Pass Something Here and use it as attrs.data')
-        //     .debug(true)
-        //     .run()
+        d3.csv("data/data.csv", function(err, data){
+            var width = document.getElementById('stacked-chart').getBoundingClientRect().width;
+            var chart = renderChart()
+                .svgHeight(400)
+                .svgWidth(width)
+                .container('#stacked-chart')
+                .data(data)
+                .debug(true)
+                .run()
+        });
 
     </script>
 </body>

@@ -7,6 +7,9 @@
     "colorTheme": "#8775A7",
     "confidenceLevels": [-47, 41],
     "bulletHeight": 25,
+    "stdErrorRectDistanceFromOuterRect": 8,
+    "confidenceLevelRectDistanceFromOuterRect": 4,
+    "meanDistanceFromOuterRect": 4,
     "mean": -3
   },
   {
@@ -18,6 +21,9 @@
     "confidenceLevels": [-14, 48],
     "bulletHeight": 30,
     "hasMeanLine": true,
+    "stdErrorRectDistanceFromOuterRect": 4,
+    "confidenceLevelRectDistanceFromOuterRect": 8,
+    "meanDistanceFromOuterRect": 4,
     "mean": 17
   },
   {
@@ -28,6 +34,9 @@
     "colorTheme": "#E08283",
     "confidenceLevels": [14, 74],
     "bulletHeight": 25,
+    "stdErrorRectDistanceFromOuterRect": 8,
+    "confidenceLevelRectDistanceFromOuterRect": 4,
+    "meanDistanceFromOuterRect": 4,
     "mean": 44
   },
   {
@@ -38,6 +47,9 @@
     "colorTheme": "#C49F47",
     "confidenceLevels": [17, 77],
     "bulletHeight": 35,
+    "stdErrorRectDistanceFromOuterRect": 8,
+    "confidenceLevelRectDistanceFromOuterRect": 4,
+    "meanDistanceFromOuterRect": 0,
     "mean": 47
   },
   {
@@ -48,6 +60,9 @@
     "colorTheme": "#D49FA7",
     "confidenceLevels": [-22,72],
     "bulletHeight": 25,
+    "stdErrorRectDistanceFromOuterRect": 8,
+    "confidenceLevelRectDistanceFromOuterRect": 4,
+    "meanDistanceFromOuterRect": 4,
     "mean": -10
   }
 ]

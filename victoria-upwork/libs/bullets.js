@@ -21,6 +21,9 @@ d3.bullet = function() {
   function bullet(g) {
     g.each(function(d, i) {
       height = d.bulletHeight;
+      var confidenceLevelDistance = d.confidenceLevelRectDistanceFromOuterRect;
+      var standardErrorDistance = d.stdErrorRectDistanceFromOuterRect;
+      var meanDistance = d.meanDistanceFromOuterRect;
       var clz = confidenceLevels.call(this, d, i).slice().sort(d3.ascending),
           meanz = _mean.call(this, d, i),
           sez = standardErrors.call(this, d, i).slice().sort(d3.ascending),
@@ -51,11 +54,11 @@ d3.bullet = function() {
           .attr("x", d => {
             return x(d[0]);
           })
-          .attr("y", 2)
+          .attr("y", confidenceLevelDistance / 2)
           .attr("width", d => {
             return Math.abs(x(d[1]) - x(d[0]));
           })
-          .attr("height", height - 4)
+          .attr("height", height - confidenceLevelDistance)
           .style("fill", ColorLuminance(color, 0.4));
 
       var stdErrors = g.selectAll("rect.standardError")
@@ -66,11 +69,11 @@ d3.bullet = function() {
           .attr("x", d => {
             return x(d[0]);
           })
-          .attr("y", 4)
+          .attr("y", standardErrorDistance / 2)
           .attr("width", d => {
             return Math.abs(x(d[1]) - x(d[0]));
           })
-          .attr("height", height - 8)
+          .attr("height", height - standardErrorDistance)
           .style("fill", color);
 
       // Update the mean lines.
@@ -81,8 +84,8 @@ d3.bullet = function() {
           .attr("class", "mean")
           .attr("x1", x)
           .attr("x2", x)
-          .attr("y1", 4)
-          .attr("y2", height - 4);
+          .attr("y1", meanDistance)
+          .attr("y2", height - meanDistance);
 
       if (d.hasAxis) {
         // Compute the tick format.

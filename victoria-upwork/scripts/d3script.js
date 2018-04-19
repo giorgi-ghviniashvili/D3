@@ -113,6 +113,7 @@ function renderBulletChart(params) {
                           }
                           tooltip.x(mouse[0])
                                  .y(mouse[1])
+                                 .tooltipFill(ColorLuminance(d.colorTheme, 0.4))
                                  .direction(direction)
                                  .show({ se: "[" + d.standardErrors.toString() + "]", cl: "[" + d.confidenceLevels.toString()  + "]", m: d.mean});
                         })

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<style>
+		path {
+		  stroke: #fff;
+		}
+		body {
+            background-color: #1f2b3d;
+            font-family: Helvetica;
+        }
+
+        .centered div {
+            width: 40%;
+            margin: auto;
+        }
+		@media(min-width:768px) and (max-width:850px) {
+           .centered div{
+                position: relative;
+                width: 50%;
+                margin: auto;
+                float: none;
+            }
+        }
+        @media(max-width:768px) {
+           .centered div{
+                position: relative;
+                width: 100%;
+                margin: auto;
+            }
+        }
+	</style>
+</head>
+<body>
+	<div class="centered">
+		<div id="myChart"></div>
+	</div>
+	<script type="text/javascript" src="./d3.v4.min.js"></script>
+	<script type="text/javascript" src="./tooltip.js"></script>
+	<script type="text/javascript">
+
+		function Chart (params) {
+			function main () {
+				var svg = d3.select('#'+params.container)
+							.append("svg")
+							.attr("class", "svg-container")
+							.attr("width", params.width)
+							.attr("height", params.height)
+							.append("g")
+    						.attr("transform", "translate(" + (params.width / 2) + "," + (params.height / 2) + ")");;
+
+				var scales, 
+					layouts,
+					userControls,
+					formats,
+					radius,
+					tooltip;
+
+				formats = {
+					formatNumber: d3.format(",d")
+				};
+
+				tooltip = d3.componentsTooltip()
+			                .container(svg)
+			                .textColor("#fff")
+			                .content([
+			                  {
+			                    left: "Name:",
+			                    right: "{n}"
+			                  },
+			                  {
+			                    left: "value:",
+			                    right: "{v}"
+			                  }
+			                ]);
+
+				radius = getRadius();
+
+				scales = {
+					x: d3.scaleLinear().range([0, 2 * Math.PI]),
+					y: d3.scaleSqrt().range([0, radius]),
+					color: d3.scaleOrdinal(d3.schemeCategory20b) 
+				}
+
+				layouts = {
+					partition: d3.partition(),
+					arc: d3.arc()
+						    .startAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, scales.x(d.x0))); })
+						    .endAngle(function(d) { return Math.max(0, Math.min(2 * Math.PI, scales.x(d.x1))); })
+						    .innerRadius(function(d) { return Math.max(0, scales.y(d.y0)); })
+						    .outerRadius(function(d) { return Math.max(0, scales.y(d.y1)); })
+				}
+
+				userControls = {
+					click: function(d) {
+						svg.transition()
+					      .duration(750)
+					      .tween("scale", function() {
+					        var xd = d3.interpolate(scales.x.domain(), [d.x0, d.x1]),
+					            yd = d3.interpolate(scales.y.domain(), [d.y0, 1]),
+					            yr = d3.interpolate(scales.y.range(), [d.y0 ? 20 : 0, radius]);
+					        return function(t) { scales.x.domain(xd(t)); scales.y.domain(yd(t)).range(yr(t)); };
+					      })
+					      .selectAll("path")
+					      .attrTween("d", function(d) { return function() { return layouts.arc(d); }; });
+					},
+					mouseover: function(d){
+						var mouse = d3.mouse(d3.select(".svg-container").node());
+						var x = mouse[0];
+						var y = mouse[1];
+						var direction = "bottom";
+						if (y - 50 < 0)
+						{
+							direction = "top";
+						}
+						else if (x > params.width/2){
+							direction = "right";
+						}
+						else if (x < params.width/2){
+							direction = "left";
+						}
+						tooltip.x(x)
+						     .y(y)
+						     .tooltipFill(scales.color(d.data.name))
+						     .direction(direction)
+						     .show({ n: d.data.name, v: formats.formatNumber(d.value) });
+					},
+					mouseout: function(d){
+						tooltip.hide();
+					}
+				}
+
+
+				if (params.data) {
+					drawSunburst(params.data);
+				}
+
+
+				function drawSunburst(data){
+					var root = d3.hierarchy(data).sum(function(d) { return d.size; })
+					svg.selectAll("path")
+				      .data(layouts.partition(root).descendants())
+				      .enter().append("path")
+				      .attr("d", layouts.arc)
+				      .style("fill", function(d) { return scales.color((d.children ? d : d.parent).data.name); })
+				      .style("opacity", 0.8)
+				      .on("click", userControls.click)
+				      .on("mouseover", userControls.mouseover)
+				      .on("mouseout", userControls.mouseout)
+				}
+				
+			}
+
+			// private functions
+			function getRadius(){
+				return (Math.min(params.width, params.height) / 2) - 10;
+			}
+
+			main.draw = function(){
+				main();
+				return main;
+			}
+			return main;
+		}
+
+		d3.json("flare.json", function(err, data){
+			if (err) {
+				return
+			}
+			var width = document.getElementById("myChart")
+							    .getBoundingClientRect().width;
+			var height = width;
+			var c = Chart({
+				width: width,
+				height: height,
+				container: "myChart",
+				data: data
+			}).draw();
+		})
+	</script>
+</body>
+</html>

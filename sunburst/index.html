@@ -12,13 +12,13 @@
         }
 
         .centered div {
-            width: 40%;
+            width: 50%;
             margin: auto;
         }
 		@media(min-width:768px) and (max-width:850px) {
            .centered div{
                 position: relative;
-                width: 50%;
+                width: 80%;
                 margin: auto;
                 float: none;
             }
@@ -42,6 +42,7 @@
 
 		function Chart (params) {
 			function main () {
+				d3.select('#'+params.container).html('');
 				var svg = d3.select('#'+params.container)
 							.append("svg")
 							.attr("class", "svg-container")
@@ -138,11 +139,32 @@
 					}
 				}
 
+				responsiveness = {
+					handleWindowResize: function() {
+						var container = d3.select("#" + params.container);
+				        d3.select(window).on('resize', function () {
+				          setDimensions();
+				        });
+
+				        function setDimensions() {
+					        setSvgWidthAndHeight();
+					        main();
+					      }
+
+						function setSvgWidthAndHeight() {
+						var containerRect = container.node().getBoundingClientRect();
+						if (containerRect.width > 0)
+						  params.width = containerRect.width;
+						  params.height = containerRect.width;
+						}
+				    }
+				}
 
 				if (params.data) {
 					drawSunburst(params.data);
 				}
 
+				responsiveness.handleWindowResize();
 				
 				function drawSunburst(data){
 					var root = d3.hierarchy(data).sum(function(d) { return d.size; })

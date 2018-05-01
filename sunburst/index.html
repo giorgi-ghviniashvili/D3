@@ -62,7 +62,7 @@
 				};
 
 				tooltip = d3.componentsTooltip()
-			                .container(svg)
+			                .container(d3.select(".svg-container"))
 			                .textColor("#fff")
 			                .content([
 			                  {
@@ -103,12 +103,18 @@
 					        return function(t) { scales.x.domain(xd(t)); scales.y.domain(yd(t)).range(yr(t)); };
 					      })
 					      .selectAll("path")
-					      .attrTween("d", function(d) { return function() { return layouts.arc(d); }; });
+					      .attrTween("d", function(d) { 
+					      	if(!d) {
+					      		return;
+					      	}
+					      	return function() 
+					      		{ return layouts.arc(d); }; 
+					      	});
 					},
 					mouseover: function(d){
-						var mouse = d3.mouse(d3.select(".svg-container").node());
-						var x = mouse[0];
-						var y = mouse[1];
+						var arcCenter = layouts.arc.centroid(d);
+						var x = params.width / 2 + arcCenter[0];
+						var y = params.height / 2 + arcCenter[1];
 						var direction = "bottom";
 						if (y - 50 < 0)
 						{
@@ -120,9 +126,10 @@
 						else if (x < params.width/2){
 							direction = "left";
 						}
-						tooltip.x(x)
+						tooltip
+						     .x(x)
 						     .y(y)
-						     .tooltipFill(scales.color(d.data.name))
+						     .tooltipFill(scales.color((d.children ? d : d.parent).data.name))
 						     .direction(direction)
 						     .show({ n: d.data.name, v: formats.formatNumber(d.value) });
 					},
@@ -136,7 +143,7 @@
 					drawSunburst(params.data);
 				}
 
-
+				
 				function drawSunburst(data){
 					var root = d3.hierarchy(data).sum(function(d) { return d.size; })
 					svg.selectAll("path")
@@ -144,7 +151,6 @@
 				      .enter().append("path")
 				      .attr("d", layouts.arc)
 				      .style("fill", function(d) { return scales.color((d.children ? d : d.parent).data.name); })
-				      .style("opacity", 0.8)
 				      .on("click", userControls.click)
 				      .on("mouseover", userControls.mouseover)
 				      .on("mouseout", userControls.mouseout)
@@ -154,7 +160,7 @@
 
 			// private functions
 			function getRadius(){
-				return (Math.min(params.width, params.height) / 2) - 10;
+				return (Math.min(params.width, params.height) / 2);
 			}
 
 			main.draw = function(){

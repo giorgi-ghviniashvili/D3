@@ -43,7 +43,8 @@ function renderPieChart(params) {
             lightblue: "#32C5D2",
             lightgrey: "#E1E5EC",
             white: "#fff",
-            grey: "#ccc"
+            grey: "#ccc",
+	    lightgreen: "#36D7B7"
         }
 
         layouts = { 
@@ -72,11 +73,11 @@ function renderPieChart(params) {
           pathClick: function(d) {
             var thisPath = d3.select(this);
           },
-          innerArcMouseOver: function(d){
+          innerArcMouseOver: function(d,i){
             var thisElement = d3.select(this);
             var path = thisElement.select("path");
             var text = thisElement.select("text");
-            path.style("fill", colors.lightblue);
+            path.style("fill", i % 2 == 0 ? colors.lightgreen : colors.lightblue);
             text.style("fill", colors.white);
           },
           innerArcMouseOut: function(d,i){

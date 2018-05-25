@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chart</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #FAFAFA;
+        }
+
+        svg {
+            background-color: white;
+        }
+
+        .centered div {
+            width: 50%;
+            margin: auto;
+            border-bottom: #13a2d7 1px solid;
+        }
+
+        .arc {
+          stroke-width: 8px;
+		  stroke: #fff;
+          cursor: pointer;
+		}
+
+        .arcText {
+            pointer-events: none;
+        }
+
+		@media(min-width:768px) and (max-width:850px) {
+           .centered div{
+                position: relative;
+                width: 80%;
+                margin: auto;
+                float: none;
+            }
+        }
+        @media(max-width:768px) {
+           .centered div{
+                position: relative;
+                width: 100%;
+                margin: auto;
+            }
+        }
+    </style>
+</head>
+
+<body translate="no">
+
+    <div class="container centered">
+        <div id="myGraph"></div>
+    </div>
+    <script src="libs/d3.v4.min.js"></script>
+    <script src="scripts/d3script.js"></script>
+
+    <script>
+
+        var width = document.getElementById("myGraph")
+                                .getBoundingClientRect().width;
+        
+        d3.json('data/data.json', function(err,data){
+            var chart = renderPieChart()
+            .svgHeight(400)
+            .svgWidth(width)
+            .container('#myGraph')
+            .data(data)
+            .debug(true)
+            .run()
+        });
+    </script>
+
+
+</body>
+
+</html>

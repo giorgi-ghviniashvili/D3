@@ -1,0 +1,22 @@
+{
+    "name": "",
+    "children": [
+        {
+            "name": "Strategy & Innovation",
+            "children": [
+                {
+                    "name": "Regulation Scientific Affairs",
+                    "size": 2
+                },
+                {
+                    "name": "Health marketing & communication",
+                    "size": 2
+                },
+                {
+                    "name": "Research & clinical Services",
+                    "size": 2
+                }
+            ]
+        }
+    ]
+}

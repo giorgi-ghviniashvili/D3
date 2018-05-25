@@ -1,0 +1,42 @@
+[   
+    {
+        "text": "Study Design",
+        "value": 1
+    },
+    {
+        "text": "IRB Approval",
+        "value": 1
+    },
+    {
+        "text": "Digital Recruitment",
+        "value": 1
+    },
+    {
+        "text": "Study Initiation",
+        "value": 1
+    },
+    {
+        "text": "Execute Protocol",
+        "value": 1
+    },
+    {
+        "text": "Bio Stats & Monitoring",
+        "value": 1
+    },
+    {
+        "text": "Study Completion",
+        "value": 1
+    },
+    {
+        "text": "Data Managment & Metrics",
+        "value": 1
+    },
+    {
+        "text": "Medical Writing & Publish",
+        "value": 1
+    },
+    {
+        "text": "Post Marketing",
+        "value": 1
+    }
+]

@@ -34,7 +34,7 @@
 		@media(min-width:768px) and (max-width:850px) {
            .centered div{
                 position: relative;
-                width: 80%;
+                width: 100%;
                 margin: auto;
                 float: none;
             }
@@ -54,19 +54,35 @@
     <div class="container centered">
         <div id="myGraph"></div>
     </div>
+    <div class="container centered">
+        <div id="myGraph2"></div>
+    </div>
     <script src="libs/d3.v4.min.js"></script>
     <script src="scripts/d3script.js"></script>
-
+    <script src="scripts/pieChart.js"></script>
     <script>
 
         var width = document.getElementById("myGraph")
                                 .getBoundingClientRect().width;
         
         d3.json('data/data.json', function(err,data){
-            var chart = renderPieChart()
+            var chart = renderHalfPieChart()
             .svgHeight(400)
             .svgWidth(width)
             .container('#myGraph')
+            .data(data)
+            .debug(true)
+            .run()
+        });
+
+        var width = document.getElementById("myGraph2")
+                                .getBoundingClientRect().width;
+        
+        d3.json('data/digital-real.json', function(err,data){
+            var chart = renderPieChart()
+            .svgHeight(width)
+            .svgWidth(width)
+            .container('#myGraph2')
             .data(data)
             .debug(true)
             .run()

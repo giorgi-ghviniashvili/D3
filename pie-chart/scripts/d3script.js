@@ -1,4 +1,4 @@
-function renderPieChart(params) {
+function renderHalfPieChart(params) {
 
   // Exposed variables
   var attrs = {
@@ -55,7 +55,7 @@ function renderPieChart(params) {
       userControls = {
         pathClick: function(d) {
           var thisPath = d3.select(this);
-          
+
         }
       };
 

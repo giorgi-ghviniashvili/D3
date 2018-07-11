@@ -55,7 +55,9 @@ d3.componentsTooltip = function d3ComponentsTooltip(params) {
       var svg = d3
         .select("body")
         .patternify({ tag: "svg", selector: "tooltip-shadow-wrapper-svg" })
-        .attr("visibility", "hidden");
+        .attr("visibility", "hidden")
+        .style("position", "absolute")
+        .style("left", "-700px");
 
       //add container g element
       var chart = svg.patternify({ tag: "g", selector: "chart" });

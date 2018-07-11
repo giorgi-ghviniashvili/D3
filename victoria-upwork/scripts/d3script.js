@@ -44,21 +44,44 @@ function renderBulletChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
 
+      //Drawing containers
+      var container = d3.select(this);
+      container.html("")
+      //Add svg
+      var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
+        .attr('width', attrs.svgWidth)
+        .attr('height', attrs.svgHeight)
+        .attr('font-family', attrs.defaultFont);
+      
+      var hiddenTexts = svg.selectAll("text.title-hidden")
+                          .data(attrs.data)
+                          .enter()
+                          .append("text")
+                          .text(d => d.title)
+                          .style("visibility", "hidden")
+
+      var hiddenTexts2 = svg.selectAll("text.subtitle-hidden")
+          .data(attrs.data)
+          .enter()
+          .append("text")
+          .text(d => d.subtitle)
+          .style("visibility", "hidden")
+
+      hiddenTexts.each(function () {
+        var textWidth = d3.select(this).node().getBBox().width;
+        if (textWidth > attrs.marginBulletLeft) attrs.marginBulletLeft = textWidth;
+      })
+      hiddenTexts2.each(function () {
+        var textWidth = d3.select(this).node().getBBox().width;
+        if (textWidth > attrs.marginBulletLeft) attrs.marginBulletLeft = textWidth;
+      })
+      
       var bulletChartHeight = attrs.bulletHeight;
       var bulletChartWidth = calc.chartWidth - attrs.marginBulletLeft - attrs.marginBulletRight;
 
       // ###### layouts ######## //
       var bulletChart = d3.bullet()
                           .width(bulletChartWidth);
-
-      //Drawing containers
-      var container = d3.select(this);
-      container.html("");
-      //Add svg
-      var svg = container.patternify({ tag: 'svg', selector: 'svg-chart-container' })
-        .attr('width', attrs.svgWidth)
-        .attr('height', attrs.svgHeight)
-        .attr('font-family', attrs.defaultFont);
 
       //Add container g element
       var chart = svg.patternify({ tag: 'g', selector: 'chart' })
@@ -119,9 +142,9 @@ function renderBulletChart(params) {
                         })
                         .on("mouseout", tooltip.hide)
                         .call(bulletChart);
-                        
 
       var title = bullet.append("g")
+                    .attr("class", "title-group")
                     .style("text-anchor", "end")
                     .attr("transform", function(d){
                       return  "translate(-6," + d.bulletHeight / 2 + ")"
@@ -134,7 +157,7 @@ function renderBulletChart(params) {
 
       title.append("text")
           .attr("class", "subtitle")
-          .attr("dy", "1em")
+          .attr("dy", "1.4em")
           .text(function(d) { return d.subtitle; });
 
       var zeroBar = chart.patternify({ tag: 'line', selector: 'zeroBar' })
@@ -146,7 +169,7 @@ function renderBulletChart(params) {
       var linearScale = d3.scale.linear().domain([-100, 100])
                               .range([0, bulletChartWidth]);
 
-      var overallBar = chart.patternify({ tag: 'line', selector: 'overallBar', data: attrs.data.filter(x => x.hasMeanLine) })
+      chart.patternify({ tag: 'line', selector: 'overallBar', data: attrs.data.filter(x => x.hasMeanLine) })
                          .attr("x1", function(d) {
                             return linearScale(d.mean) + attrs.marginBulletLeft;
                          })
@@ -156,11 +179,11 @@ function renderBulletChart(params) {
                          .attr("y1", 4)
                          .attr("y2", calc.chartHeight + attrs.marginTop);
 
-      var xAxisHeader = chart.patternify({ tag: "text", selector: "xAxisHeader" })
+      chart.patternify({ tag: "text", selector: "xAxisHeader" })
                              .attr("x", "48%")
                              .attr("y", calc.chartHeight + 80)
                              .text(attrs.xAxisHeader);
-
+      
       // Smoothly handle data updating
       updateData = function () {
 

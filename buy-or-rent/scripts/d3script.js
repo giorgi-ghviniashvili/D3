@@ -2,7 +2,32 @@ setTimeout(function() {
             var t = d3;
             function e(t) {
                 for (var a in e.defaults) a in t || (t[a] = e.defaults[a]);
-                for (var r = t.investmentReturnRate * (1 - t.capitalGainsRate), n = 1 - t.marginalTaxRate, i = 1 + t.inflationRate, o = Math.pow(1 + r, t.years) - 1, s = 1 + t.buyGrowthRate, u = t.buyPrice * t.buyDownPaymentRate, l = t.buyPrice * t.buyPurchaseClosingRate, c = u + l, p = t.buyInterestRate / 12, d = t.buyPrice * (1 - t.buyDownPaymentRate), h = Math.round(12 * t.buyLoanYears), g = d * (p ? p / (1 - Math.pow(1 + p, -h)) : 1 / h), m = 0, f = 0, y = 0, b = 12 * t.buyCommonChargePerMonth * (1 - t.marginalTaxRate * t.buyCommonChargeDeductionRate), v = 0, x = t.buyPropertyTaxRate * n, M = 0, R = 12 * t.buyUtilitiesCostPerMonth, P = 0, C = t.buyPrice * t.buyMaintenanceCostRate, k = 0, w = 0, F = c * o, T = 0, S = 1; S <= t.years; ++S) {
+                for (var r = t.investmentReturnRate * (1 - t.capitalGainsRate), 
+                         n = 1 - t.marginalTaxRate, 
+                         i = 1 + t.inflationRate, 
+                         o = Math.pow(1 + r, t.years) - 1, 
+                         s = 1 + t.buyGrowthRate, 
+                         u = t.buyPrice * t.buyDownPaymentRate, 
+                         l = t.buyPrice * t.buyPurchaseClosingRate, 
+                         c = u + l, p = t.buyInterestRate / 12, 
+                         d = t.buyPrice * (1 - t.buyDownPaymentRate), 
+                         h = Math.round(12 * t.buyLoanYears), 
+                         g = d * (p ? p / (1 - Math.pow(1 + p, -h)) : 1 / h), 
+                         m = 0, 
+                         f = 0, 
+                         y = 0, 
+                         b = 12 * t.buyCommonChargePerMonth * (1 - t.marginalTaxRate * t.buyCommonChargeDeductionRate), 
+                         v = 0, 
+                         x = t.buyPropertyTaxRate * n, 
+                         M = 0, 
+                         R = 12 * t.buyUtilitiesCostPerMonth, 
+                         P = 0, 
+                         C = t.buyPrice * t.buyMaintenanceCostRate, 
+                         k = 0, 
+                         w = 0, 
+                         F = c * o, 
+                         T = 0, 
+                         S = 1; S <= t.years; ++S) {
                     var A = Math.pow(i, S - 1),
                         N = t.buyPrice * Math.pow(s, S);
                     if (T += (T + w) * r, h > 0) {

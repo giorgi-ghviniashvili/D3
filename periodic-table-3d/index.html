@@ -113,7 +113,7 @@
                 background: #000000;
                 outline: 1px solid rgba(127,255,255,0.75);
                 border: 0px;
-                overflow-x: hidden;
+                overflow: hidden;
                 transition: 0.5s;
                 padding-top: 60px;
             }
@@ -147,11 +147,13 @@
             
             .sidenav .summary-body {
                 text-align: justify;
+                transition: 0.3s;
                 color: rgba(127,255,255,0.75);
             }
             
             .sidenav .sidenav-item {
                 padding-top: 10px;
+                transition: 0.3s;
                 padding-bottom: 10px;
             }
 
@@ -223,7 +225,8 @@
                     .style("font-weight", "bold")
                     .text(firstWordOfSummary);
 
-                summary.select("span.summary-body").text(d.summary.substr(indexOfHari + 1, d.summary.length));
+                summary.select("span.summary-body")
+                    .text(d.summary.substr(indexOfHari + 1, d.summary.length));
 
                 body.select("span.mass").text(d.atomic_mass);
 
@@ -237,8 +240,6 @@
 
             function closeNav() {
                 let body = d3.select('.sidenav-body')
-                var summary = body.select("div.summary")
-                summary.text("")
                 document.getElementById("leftSidenav").style.width = "0";
             }
 
@@ -260,9 +261,11 @@
                         let index = e.target.getAttribute('data-index')
                         let dataItem = table[index]
                         if (dataItem.clicked) {
-
+                            closeNav();
+                            dataItem.clicked = false;
                         } else {
                             openNav(dataItem)
+                            dataItem.clicked = true;
                         }
                     }
                 })

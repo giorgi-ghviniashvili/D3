@@ -11,7 +11,7 @@ function renderChart(params) {
     marginLeft: 25,
     itemsInARow: 10,
     rowHeight: 120,
-    nodeCircleRadius: 25,
+    nodeCircleRadius: 28,
     container: 'body',
     defaultTextFill: '#2C3E50',
     defaultFont: 'Helvetica',
@@ -38,14 +38,10 @@ function renderChart(params) {
       .key(d => d.group)
       .entries(attrs.data.nodes)
 
-      let nestedLinks = d3.nest()
-      .key(d => d.source)
-      .entries(attrs.data.links)
-
       // scales
       let x = d3.scaleBand().range([0, calc.chartWidth]).domain(d3.range(attrs.itemsInARow))
       let yGroupA = (i) => Math.floor(i / attrs.itemsInARow) * attrs.rowHeight
-      let yGroupB = (i) => Math.floor(i / attrs.itemsInARow) * attrs.rowHeight + calc.chartHeight / 2
+      let yGroupB = (i) => Math.floor(i / attrs.itemsInARow) * attrs.rowHeight + calc.chartHeight / 2 - 50
 
       //Drawing containers
       var container = d3.select(this);
@@ -63,8 +59,8 @@ function renderChart(params) {
       svg.patternify({ tag: 'line', selector: 'division-line' })
         .attr('x1', 0)
         .attr('x2', attrs.svgWidth)
-        .attr('y1', attrs.svgHeight / 2)
-        .attr('y2', attrs.svgHeight / 2)
+        .attr('y1', attrs.svgHeight / 2 - 50)
+        .attr('y2', attrs.svgHeight / 2 - 50)
         .attr('stroke-width', 2)
         .attr('stroke', '#999')
         .attr('stroke-dasharray', '2,2')
@@ -77,7 +73,7 @@ function renderChart(params) {
         .attr('stroke-width', 2)
         .attr('stroke', '#e9c5c5')
         .attr('opacity', '0.3')
-        .attr('class', d => `link link-${d.source}`)
+        .attr('class', d => `link link-source-${d.source} link-target-${d.target}`)
 
       var nodes = chart.patternify({ tag: 'g', selector: 'node', data: attrs.data.nodes })
         .attr('class', (d, i) => `node node-${i}`)
@@ -95,6 +91,33 @@ function renderChart(params) {
           return `translate(${translateX},${translateY})`
         });
       
+      //<clipPath id="clipPath-manafort"><circle class="clipPath manafort" r="37.55555555555556"></circle></clipPath>
+      let clipPath = nodes.patternify({ tag: 'clipPath', selector: 'clip-path', data: d => [d] })
+        .attr('id', d => `clipPath-${attrs.data.nodes.indexOf(d)}`)
+      
+      clipPath.patternify({ tag: 'circle', selector: 'clipPath' })
+        .attr('r', attrs.nodeCircleRadius)
+        .attr('cx', x.bandwidth() / 2)
+        .attr('cy', 60)
+
+      // <image class="nodeimg manafort" xlink:href="img/people/manafort.jpg" clip-path="url(#clipPath-manafort)" x="-37.55555555555556px" y="-37.55555555555556px" height="75.11111111111111" width="75.11111111111111"></image>
+      nodes.patternify({ tag: 'image', selector: 'nodeimg', data: d => [d] })
+        .attr('clip-path', d => `url(#clipPath-${attrs.data.nodes.indexOf(d)})`)
+        .attr('x', `${x.bandwidth() / 4}`)
+        .attr('y', `${30}`)
+        .attr('width', attrs.nodeCircleRadius * 2)
+        .attr('height', attrs.nodeCircleRadius * 2)
+        .attr('href', d => `img/${d.href}`)
+        .on('mouseover', mouseover)
+        .on('mouseout', mouseout)
+
+      var circles = nodes.patternify({ tag: 'circle', selector: 'stroke', data: d => [d] })
+        .attr('r', attrs.nodeCircleRadius)
+        .attr('cx', x.bandwidth() / 2)
+        .attr('cy', 60)
+        .attr('fill', 'none')
+        .attr('cursor', 'pointer')
+      
       nodes.patternify({ tag: 'text', selector: 'title', data: d => [d] })
         .attr('text-anchor', 'middle')
         .attr('dy', 0)
@@ -103,64 +126,69 @@ function renderChart(params) {
         .text(d => d.name)
         .call(wrap, x.bandwidth() / 2)
 
-      nodes.patternify({ tag: 'circle', selector: 'avatar', data: d => [d] })
-        .attr('r', attrs.nodeCircleRadius)
-        .attr('cx', x.bandwidth() / 2)
-        .attr('cy', 60)
-        .attr('fill', '#ccc')
-        .attr('cursor', 'pointer')
-        .on('mouseover', function (d) {
-          let parent = d3.select(d3.select(this).node().parentElement)
-          let i = parent.attr('data-index')
+      function mouseover (d) {
+        let parent = d3.select(d3.select(this).node().parentElement)
+        let i = parent.attr('data-index')
 
-          let ls = d3.selectAll(`line.link-${i}`)
-            .attr('stroke-width', 3)
-            .attr('stroke', '#de7c7d')
-            .attr('opacity', 1)
-            .raise()
+        let ls = d3.selectAll(d.group == 'A' ? `line.link-source-${i}` : `line.link-target-${i}`)
+          .attr('stroke-width', 3)
+          .attr('stroke', '#de7c7d')
+          .attr('opacity', 1)
+          .raise()
+        
+        nodes.attr('opacity', 0.4)
 
-          d3.select(this)
+        parent.attr('opacity', 1)
+
+        parent.select('.stroke')
+          .attr('stroke-width', 3)
+          .attr('stroke', '#de7c7d')
+          .attr('r', attrs.nodeCircleRadius + 4)
+
+        let group = d.group;
+        ls.each(d => {
+          let groups = d3.selectAll(group == 'A' ? `g.node-${d.target}` : `g.node-${d.source}`).raise()
+
+          groups.selectAll('circle')
             .attr('stroke-width', 3)
             .attr('stroke', '#de7c7d')
             .attr('r', attrs.nodeCircleRadius + 4)
           
-          ls.each(d => {
-            let groups = d3.selectAll(`g.node-${d.target}`).raise()
+          groups.attr('opacity', 1)
+        })
+
+        parent.raise();
+      }
+
+      function mouseout (d) {
+        let parent = d3.select(d3.select(this).node().parentElement)
+        let i = parent.attr('data-index')
+
+        nodes.attr('opacity', 1)
+
+        parent.select('.stroke')
+          .attr('stroke-width', null)
+          .attr('stroke', null)
+          .attr('r', attrs.nodeCircleRadius)
+
+        let ls = d3.selectAll(d.group == 'A' ? `line.link-source-${i}` : `line.link-target-${i}`)
+          .attr('stroke-width', 2)
+          .attr('stroke', '#e9c5c5')
+          .attr('opacity', '0.3')
+          .lower()
+
+        let group = d.group;
+        ls.each(d => {
+            let groups = d3.selectAll(group == 'A' ? `g.node-${d.target}` : `g.node-${d.source}`)
 
             groups.selectAll('circle')
-              .attr('stroke-width', 3)
-              .attr('stroke', '#de7c7d')
-              .attr('r', attrs.nodeCircleRadius + 4)
+              .attr('stroke-width', null)
+              .attr('stroke', null)
+              .attr('r', attrs.nodeCircleRadius)
           })
 
-          parent.raise();
-        })
-        .on('mouseout', function (d) {
-          let parent = d3.select(d3.select(this).node().parentElement)
-          let i = parent.attr('data-index')
-
-          d3.select(this)
-            .attr('stroke-width', null)
-            .attr('stroke', null)
-            .attr('r', attrs.nodeCircleRadius)
-
-          let ls = d3.selectAll(`line.link-${i}`)
-            .attr('stroke-width', 2)
-            .attr('stroke', '#e9c5c5')
-            .attr('opacity', '0.3')
-            .lower()
-
-          ls.each(d => {
-              let groups = d3.selectAll(`g.node-${d.target}`).lower()
-  
-              groups.selectAll('circle')
-                .attr('stroke-width', null)
-                .attr('stroke', null)
-                .attr('r', attrs.nodeCircleRadius)
-            })
-          parent.lower();
-        })
-      
+          nodes.raise();
+      }
 
       function wrap(text, width) {
           text.each(function() {

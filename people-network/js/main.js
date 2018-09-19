@@ -123,7 +123,13 @@
         source: 19, target: 31, group: 'A',
       }
     ]
-
+    let nodes = [
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      }
+    ]
     let data = {
       nodes: getRandomNodes(),
       links: links
@@ -140,7 +146,8 @@
       return d3.range(44).map((d, i) => {
         return {
           group: i < 20 ? 'A' : 'B',
-          name: 'wubba dubba'
+          name: 'wubba dubba',
+          href: 'generic-male.jpg'
         }
       })
     }

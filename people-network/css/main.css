@@ -1,5 +1,6 @@
 html, body {
   margin: 0;
+  -webkit-font-smoothing: antialiased;
 }
 
 .node text {
@@ -15,9 +16,10 @@ html, body {
   -1px -1px 5px #fff, 
   1px -1px 5px #fff, 
   -1px 1px 5px #fff;
+  fill: #666666;
 }
 
-#chart {
+#chart svg {
   border: 2px solid #e9c5c5;
   border-radius: 4px;
 }

@@ -1,3 +1,23 @@
 html, body {
   margin: 0;
 }
+
+.node text {
+  text-shadow: 1px 1px 5px #fff, 
+  -1px -1px 5px #fff, 
+  1px -1px 5px #fff, 
+  -1px 1px 5px #fff, 
+  1px 1px 5px #fff, 
+  -1px -1px 5px #fff, 
+  1px -1px 5px #fff, 
+  -1px 1px 5px #fff, 
+  1px 1px 5px #fff, 
+  -1px -1px 5px #fff, 
+  1px -1px 5px #fff, 
+  -1px 1px 5px #fff;
+}
+
+#chart {
+  border: 2px solid #e9c5c5;
+  border-radius: 4px;
+}

@@ -5,8 +5,8 @@ function renderChart(params) {
     id: "ID" + Math.floor(Math.random() * 1000000),  // Id for event handlings
     svgWidth: 400,
     svgHeight: 400,
-    marginTop: 100,
-    marginBottom: 25,
+    marginTop: 80,
+    marginBottom: 45,
     marginRight: 25,
     marginLeft: 25,
     itemsInARow: 10,
@@ -34,7 +34,13 @@ function renderChart(params) {
       calc.chartWidth = attrs.svgWidth - attrs.marginRight - calc.chartLeftMargin;
       calc.chartHeight = attrs.svgHeight - attrs.marginBottom - calc.chartTopMargin;
 
-      let nested = d3.nest().key(d => d.group).entries(attrs.data.nodes)
+      let nested = d3.nest()
+      .key(d => d.group)
+      .entries(attrs.data.nodes)
+
+      let nestedLinks = d3.nest()
+      .key(d => d.source)
+      .entries(attrs.data.links)
 
       // scales
       let x = d3.scaleBand().range([0, calc.chartWidth]).domain(d3.range(attrs.itemsInARow))
@@ -66,13 +72,16 @@ function renderChart(params) {
       var links = chart.patternify({ tag: 'line', selector: 'link', data: attrs.data.links })
         .attr('x1', d => x(d.source % attrs.itemsInARow) + x.bandwidth() / 2)
         .attr('x2', d => x(d.target % attrs.itemsInARow) + x.bandwidth() / 2)
-        .attr('y1', d => d.group == 'A' ? yGroupA(d.source) + 30 : yGroupB(d.source  - nested[0].values.length) + 30)
-        .attr('y2', d => d.group == 'A' ? yGroupB(d.target - nested[0].values.length) + 30 : yGroupA(d.target) + 30)
+        .attr('y1', d => yGroupA(d.source) + attrs.nodeCircleRadius + 32)
+        .attr('y2', d => yGroupB(d.target - nested[0].values.length) + 32 + attrs.nodeCircleRadius)
         .attr('stroke-width', 2)
         .attr('stroke', '#e9c5c5')
-        .attr('opacity', '0.1')
+        .attr('opacity', '0.3')
+        .attr('class', d => `link link-${d.source}`)
 
       var nodes = chart.patternify({ tag: 'g', selector: 'node', data: attrs.data.nodes })
+        .attr('class', d => `node node-${d.source}`)
+        .attr('data-index', (d, i) => i)
         .attr('transform', (d, i) => {
           let translateX, translateY;
 
@@ -98,7 +107,36 @@ function renderChart(params) {
         .attr('r', attrs.nodeCircleRadius)
         .attr('cx', x.bandwidth() / 2)
         .attr('cy', 60)
-        .attr('fill-opacity', '0.2')
+        .attr('fill', '#ccc')
+        .attr('cursor', 'pointer')
+        .on('mouseover', function (d) {
+          d3.select(this)
+            .attr('stroke-width', 3)
+            .attr('stroke', '#de7c7d')
+            .attr('r', attrs.nodeCircleRadius + 4)
+          
+          let i = d3.select(this).node().parentElement.getAttribute('data-index')
+
+          d3.selectAll(`line.link-${i}`)
+            .attr('stroke-width', 3)
+            .attr('stroke', '#de7c7d')
+            .attr('opacity', 1)
+            .raise()
+        })
+        .on('mouseout', function (d) {
+          d3.select(this)
+            .attr('stroke-width', null)
+            .attr('stroke', null)
+            .attr('r', attrs.nodeCircleRadius)
+
+          let i = d3.select(this).node().parentElement.getAttribute('data-index')
+
+          d3.selectAll(`line.link-${i}`)
+            .attr('stroke-width', 2)
+            .attr('stroke', '#e9c5c5')
+            .attr('opacity', '0.3')
+            .lower()
+        })
       
 
       function wrap(text, width) {
@@ -151,8 +189,6 @@ function renderChart(params) {
         var containerRect = container.node().getBoundingClientRect();
         if (containerRect.width > 0)
           attrs.svgWidth = containerRect.width;
-        if (containerRect.height > 0)
-          attrs.svgHeight = containerRect.height;
       }
 
 

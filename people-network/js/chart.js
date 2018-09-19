@@ -64,6 +64,17 @@ function renderChart(params) {
         .attr('stroke-width', 2)
         .attr('stroke', '#999')
         .attr('stroke-dasharray', '2,2')
+        
+      //<defs><filter id="default-filter"><feColorMatrix type="saturate" values=".15"></feColorMatrix></filter></defs>
+      let filterDefs = svg.patternify({ tag: 'defs', selector: 'defs' })
+
+      let filter =filterDefs.patternify({ tag: 'filter', selector: 'filter' })
+        .attr('id', 'default-filter')
+
+      filter.patternify({ tag: 'feColorMatrix', selector: 'feColorMatrix' })
+        .attr('type', 'saturate')
+        .attr('values', '.15')
+
 
       var links = chart.patternify({ tag: 'line', selector: 'link', data: attrs.data.links })
         .attr('x1', d => x(d.source % attrs.itemsInARow) + x.bandwidth() / 2)
@@ -72,7 +83,7 @@ function renderChart(params) {
         .attr('y2', d => yGroupB(d.target - nested[0].values.length) + 32 + attrs.nodeCircleRadius)
         .attr('stroke-width', 2)
         .attr('stroke', '#e9c5c5')
-        .attr('opacity', '0.3')
+        .attr('opacity', '0.1')
         .attr('class', d => `link link-source-${d.source} link-target-${d.target}`)
 
       var nodes = chart.patternify({ tag: 'g', selector: 'node', data: attrs.data.nodes })
@@ -103,8 +114,8 @@ function renderChart(params) {
       // <image class="nodeimg manafort" xlink:href="img/people/manafort.jpg" clip-path="url(#clipPath-manafort)" x="-37.55555555555556px" y="-37.55555555555556px" height="75.11111111111111" width="75.11111111111111"></image>
       nodes.patternify({ tag: 'image', selector: 'nodeimg', data: d => [d] })
         .attr('clip-path', d => `url(#clipPath-${attrs.data.nodes.indexOf(d)})`)
-        .attr('x', `${x.bandwidth() / 4}`)
-        .attr('y', `${30}`)
+        .attr('x', `25.5`)
+        .attr('y', `32`)
         .attr('width', attrs.nodeCircleRadius * 2)
         .attr('height', attrs.nodeCircleRadius * 2)
         .attr('href', d => `img/${d.href}`)
@@ -139,11 +150,14 @@ function renderChart(params) {
         nodes.attr('opacity', 0.4)
 
         parent.attr('opacity', 1)
-
-        parent.select('.stroke')
+        
+        parent.selectAll('circle')
           .attr('stroke-width', 3)
           .attr('stroke', '#de7c7d')
-          .attr('r', attrs.nodeCircleRadius + 4)
+          .attr('r', attrs.nodeCircleRadius)
+
+        parent.select('image')
+          .style('filter', 'none')
 
         let group = d.group;
         ls.each(d => {
@@ -152,9 +166,12 @@ function renderChart(params) {
           groups.selectAll('circle')
             .attr('stroke-width', 3)
             .attr('stroke', '#de7c7d')
-            .attr('r', attrs.nodeCircleRadius + 4)
+            .attr('r', attrs.nodeCircleRadius)
           
           groups.attr('opacity', 1)
+
+          groups.select('image')
+              .style('filter', 'none')
         })
 
         parent.raise();
@@ -166,10 +183,14 @@ function renderChart(params) {
 
         nodes.attr('opacity', 1)
 
-        parent.select('.stroke')
+        parent.selectAll('circle')
           .attr('stroke-width', null)
           .attr('stroke', null)
           .attr('r', attrs.nodeCircleRadius)
+        
+        parent.select('image')
+          .style('filter', 'url(#default-filter)')
+
 
         let ls = d3.selectAll(d.group == 'A' ? `line.link-source-${i}` : `line.link-target-${i}`)
           .attr('stroke-width', 2)
@@ -185,6 +206,9 @@ function renderChart(params) {
               .attr('stroke-width', null)
               .attr('stroke', null)
               .attr('r', attrs.nodeCircleRadius)
+
+            groups.select('image')
+              .style('filter', 'url(#default-filter)')
           })
 
           nodes.raise();
@@ -205,7 +229,7 @@ function renderChart(params) {
             while (word = words.pop()) {
               line.push(word);
               tspan.text(line.join(" "));
-              if (tspan.node().getComputedTextLength() > width) {
+              if (tspan.node().getComputedTextLength() > width && line.length > 1) {
                 line.pop();
                 tspan.text(line.join(" "));
                 line = [word];

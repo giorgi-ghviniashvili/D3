@@ -23,6 +23,8 @@ function initTiles (n) {
         element.className = 'element';
         element.style.backgroundColor = 'rgba(233, 237, 239)';
 
+        
+
         var icon = document.createElement('i')
         icon.classList.add('fa')
         icon.classList.add(`fa-${Math.random() > 0.5 ? '' : 'fe'}male`)
@@ -41,6 +43,8 @@ function initTiles (n) {
         object.position.y = - ( Math.floor( i / 15 ) * 180 ) + 990;
 
         targets.push( object );
+
+        element.addEventListener('click', () => transitionToRight(object, 2000));
     }
 
     transform( 2000 );
@@ -56,16 +60,7 @@ function transform( duration ) {
         var object = objects[ i ];
         var target = targets[ i ];
 
-        new TWEEN.Tween( object.position )
-            .to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
-            .easing( TWEEN.Easing.Exponential.InOut )
-            .start();
-
-        new TWEEN.Tween( object.rotation )
-            .to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
-            .easing( TWEEN.Easing.Exponential.InOut )
-            .start();
-
+        transformSingle( object, target, duration );
     }
 
     new TWEEN.Tween( this )
@@ -73,6 +68,31 @@ function transform( duration ) {
         .onUpdate( render )
         .start();
 
+}
+
+function transformSingle ( object, target, duration ) {
+    new TWEEN.Tween( object.position )
+            .to( { x: target.position.x, y: target.position.y, z: target.position.z }, Math.random() * duration + duration )
+            .easing( TWEEN.Easing.Exponential.InOut )
+            .start();
+
+    new TWEEN.Tween( object.rotation )
+        .to( { x: target.rotation.x, y: target.rotation.y, z: target.rotation.z }, Math.random() * duration + duration )
+        .easing( TWEEN.Easing.Exponential.InOut )
+        .start();
+}
+
+function transitionToRight (object, duration) {
+    console.log(object.position)
+    var target = new THREE.Object3D();
+
+    target.position.x = 1000;
+    target.position.y = 0;
+    target.position.z = 0;
+
+    TWEEN.update();
+
+    transformSingle( object, target, duration );
 }
 
 function animate () {

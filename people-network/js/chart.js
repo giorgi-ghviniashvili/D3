@@ -80,7 +80,7 @@ function renderChart(params) {
         .attr('class', d => `link link-${d.source}`)
 
       var nodes = chart.patternify({ tag: 'g', selector: 'node', data: attrs.data.nodes })
-        .attr('class', d => `node node-${d.source}`)
+        .attr('class', (d, i) => `node node-${i}`)
         .attr('data-index', (d, i) => i)
         .attr('transform', (d, i) => {
           let translateX, translateY;
@@ -110,32 +110,55 @@ function renderChart(params) {
         .attr('fill', '#ccc')
         .attr('cursor', 'pointer')
         .on('mouseover', function (d) {
+          let parent = d3.select(d3.select(this).node().parentElement)
+          let i = parent.attr('data-index')
+
+          let ls = d3.selectAll(`line.link-${i}`)
+            .attr('stroke-width', 3)
+            .attr('stroke', '#de7c7d')
+            .attr('opacity', 1)
+            .raise()
+
           d3.select(this)
             .attr('stroke-width', 3)
             .attr('stroke', '#de7c7d')
             .attr('r', attrs.nodeCircleRadius + 4)
           
-          let i = d3.select(this).node().parentElement.getAttribute('data-index')
+          ls.each(d => {
+            let groups = d3.selectAll(`g.node-${d.target}`).raise()
 
-          d3.selectAll(`line.link-${i}`)
-            .attr('stroke-width', 3)
-            .attr('stroke', '#de7c7d')
-            .attr('opacity', 1)
-            .raise()
+            groups.selectAll('circle')
+              .attr('stroke-width', 3)
+              .attr('stroke', '#de7c7d')
+              .attr('r', attrs.nodeCircleRadius + 4)
+          })
+
+          parent.raise();
         })
         .on('mouseout', function (d) {
+          let parent = d3.select(d3.select(this).node().parentElement)
+          let i = parent.attr('data-index')
+
           d3.select(this)
             .attr('stroke-width', null)
             .attr('stroke', null)
             .attr('r', attrs.nodeCircleRadius)
 
-          let i = d3.select(this).node().parentElement.getAttribute('data-index')
-
-          d3.selectAll(`line.link-${i}`)
+          let ls = d3.selectAll(`line.link-${i}`)
             .attr('stroke-width', 2)
             .attr('stroke', '#e9c5c5')
             .attr('opacity', '0.3')
             .lower()
+
+          ls.each(d => {
+              let groups = d3.selectAll(`g.node-${d.target}`).lower()
+  
+              groups.selectAll('circle')
+                .attr('stroke-width', null)
+                .attr('stroke', null)
+                .attr('r', attrs.nodeCircleRadius)
+            })
+          parent.lower();
         })
       
 

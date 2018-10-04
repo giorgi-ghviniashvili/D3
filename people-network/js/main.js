@@ -123,9 +123,235 @@
         source: 19, target: 31, group: 'A',
       }
     ]
-
+    let nodes = [
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Paul Manafort',
+        href: 'manafort.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Michael Flynn',
+        href: 'flynn.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Carter Page',
+        href: 'page.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Jeff Sessions',
+        href: 'sessions.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Jared Kushner',
+        href: 'kushner.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump-Jr.',
+        href: 'trump-jr.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Rex Tillerson',
+        href: 'tillerson.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Willbur Ross',
+        href: 'ross.jpg'
+      },{
+        group: 'A',
+        name: 'Roger Stone',
+        href: 'stone.jpg'
+      },
+      {
+        group: 'A',
+        name: 'J.D. Gordon',
+        href: 'gordon.jpg'
+      },
+      
+      {
+        group: 'A',
+        name: 'Michael Caputo',
+        href: 'generic-male.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Rick Gates',
+        href: 'gates.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Mark Kasowitz',
+        href: 'kasowitz.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'A',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Vladimir Putin',
+        href: 'putin.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Russian Business',
+        href: 'russian-business.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      },
+      {
+        group: 'B',
+        name: 'Donald Trump',
+        href: 'trump.jpg'
+      }
+    ]
     let data = {
-      nodes: getRandomNodes(),
+      nodes: nodes,
       links: links
     }
 
@@ -135,42 +361,5 @@
       .svgHeight(height)
       .data(data)
       .run()
-
-    function getRandomNodes () {
-      return d3.range(44).map((d, i) => {
-        return {
-          group: i < 20 ? 'A' : 'B',
-          name: 'wubba dubba'
-        }
-      })
-    }
-
-    function getRandomLinks () {
-      let links = []
-
-      d3.range(44).forEach((d, i) => {
-        let targets;
-
-        if (i < 20) {
-          targets = d3.range(20, Math.floor(Math.random() * 24 + 20)).map((d, l) => {
-            return l * Math.floor(Math.random() * 10)
-          })
-        } else {
-          targets = d3.range(0, Math.floor(Math.random() * 20)).map((d, l) => {
-            return l * Math.floor(Math.random() * 10)
-          })
-        }
-
-        targets.forEach(m => {
-          links.push({
-            source: i,
-            group: i < 20 ? 'A' : 'B',
-            target: m
-          })
-        })
-      })
-
-      return links
-    }
   }
 )()
